@@ -203,21 +203,11 @@ BOOL CxNetLayers::setNumLayers( int _numLayers )
 
 CxNetLayer & CxNetLayers::operator [] ( int _index ) const
 {
-	CxNetLayer &layer = (CxNetLayer &)layers(_index);
-
-	/*
-	int indLayer = -1;
-	__try {
-		indLayer = layer.index;
-	}
-	__except (filter(GetExceptionCode(), GetExceptionInformation())) {
-		indLayer = 100;
-	}
-	//*/
-	return layer;
+	CxNetLayer &_layer = (CxNetLayer &)layer(_index);
+	return _layer;
 };
 
-CxNetLayer & CxNetLayers::layers( int _index ) const
+CxNetLayer & CxNetLayers::layer( int _index ) const
 {
 	ASSERT(_index >= 0 && _index < numLayers);
 	if (_index >= 0 && _index < numLayers) {
@@ -237,7 +227,7 @@ CxNetLayer & CxNetLayers::layers( int _index ) const
 				break;
 		}
 	}
-	//throw "layers[index] failure!";
+	throw _T("CxNetLayers::layer(index): index overflow!");
 	//RaiseException( EXCEPTION_ACCESS_VIOLATION, 0, 0, 0 );
 	// Create temp 1 layer
 	CxNetLayer *pNetLayers = new CxNetLayer();
@@ -245,8 +235,8 @@ CxNetLayer & CxNetLayers::layers( int _index ) const
 		pNetLayers->index = -1;
 		return (CxNetLayer &)(*pNetLayers);
 	}
-	//throw "layers temp create failure!";
-	RaiseException( EXCEPTION_INVALID_HANDLE, 0, 0, 0 );
+	throw _T("CxNetLayers::layer(index): temp layer create failure!");
+	//RaiseException( EXCEPTION_INVALID_HANDLE, 0, 0, 0 );
 	return *(new CxNetLayer());
 }
 
@@ -589,12 +579,15 @@ int CAnnNetwork::parseNetLayers( const TCHAR *szSizesOfLayers,
 						clearNetLayers();
 					int _index = appendNetLayer(prevNeuron, _numNeuron);
 					if (_index >= 0) {
-						if (_indexLayer == 0)
+						if (_indexLayer == 0) {
 							layers[_index].type = LAYER_TYPE_INPUT;
-						else if (_indexLayer == _inNumLayers - 1)
+						}
+						else if (_indexLayer == _inNumLayers - 1) {
 							layers[_index].type = LAYER_TYPE_OUTPUT;
-						else
+						}
+						else {
 							layers[_index].type = LAYER_TYPE_HIDDEN;
+						}
 					}
 				}
 				TRACE(_T("numNeuron[%d] = %d.\n"), _indexLayer, _numNeuron);
