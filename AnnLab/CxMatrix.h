@@ -27,8 +27,8 @@ enum enumMatInitMode {
 
 #define MAT_INIT_DEFAULT    MAT_INIT_NONE
 
-class CxVector {};
-class CxVectors {};
+class CxVector { };
+class CxVectors { };
 
 class CxMatrix : public CxBaseObject
 {
