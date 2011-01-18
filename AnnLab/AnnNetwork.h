@@ -98,7 +98,8 @@ public:
 
 	// gets
 	CxNetLayer & operator [] ( int _index ) const;
-	CxNetLayer & layers( int _index ) const;
+	CxNetLayer & layer( int _index ) const;
+	CxNetLayer * getLayer( int _index ) const;
 
 	// sets
 	BOOL setNumLayers( int _numLayers );
@@ -114,8 +115,6 @@ public:
 protected:
 	BOOL initLayers( int _numLayers );
 	void freeLayers( void );
-
-	CxNetLayer *getLayer( int _index ) const;
 
 private:
 	CxNetLayer* m_firstLayer;
@@ -158,8 +157,11 @@ public:
 	CxMatrixs LW;
 	CxVectors b;
 
-	CxCells inputs;
-	CxCells outputs;
+	CxMatrix input;
+	CxMatrix output;
+
+	CxMatrixs inputs;
+	CxMatrixs outputs;
 
 	CxCells biases;
 	CxCells inputWeights;

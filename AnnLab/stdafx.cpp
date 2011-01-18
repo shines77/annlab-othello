@@ -17,6 +17,17 @@ void ShowMessage( HWND hWnd, const TCHAR *szValName, int nValue, UINT nType )
 
 }
 
+void ShowMessage( HWND hWnd, const TCHAR *szValName, UINT nType )
+{
+	TCHAR szText[512];
+	if (szValName != NULL)
+		_stprintf_s(szText, _countof(szText), _T("%s"), szValName);
+	else
+		_stprintf_s(szText, _countof(szText), _T("%s"), szValName);
+	::MessageBox(hWnd, szText, _T("Information"), nType);
+
+}
+
 int filter(unsigned int code, struct _EXCEPTION_POINTERS *ep) {
 	TRACE("in filter.\n");
 	if (code == EXCEPTION_ACCESS_VIOLATION) {

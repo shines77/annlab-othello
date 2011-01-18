@@ -73,7 +73,15 @@ int CAnnLabDlg::BpNetwork_Test()
 	int numLayers = net.numLayers;
 	int indexLayer = 0;
 	net.layers.append( 2 );
-	indexLayer = net.layers[0].index;
+	try {
+		indexLayer = net.layers[5].index;
+	}
+	catch( TCHAR *errStr ) {
+		::ShowMessage( GetSafeHwnd(), errStr );
+	}
+	catch (...) {
+		::ShowMessage( GetSafeHwnd(), _T("Error: indexLayer"), indexLayer );
+	}
 	net.setName( _T("BP Network") );
 
 	CxMatrix trainP, trainT;

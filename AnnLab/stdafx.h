@@ -33,6 +33,8 @@
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
 void ShowMessage( HWND hWnd, const TCHAR *szValName, int nValue, UINT nType = MB_OK );
+void ShowMessage( HWND hWnd, const TCHAR *szValName, UINT nType = MB_OK );
+
 int filter(unsigned int code, struct _EXCEPTION_POINTERS *ep);
 
 DWORD GetSysPageSize(void);
