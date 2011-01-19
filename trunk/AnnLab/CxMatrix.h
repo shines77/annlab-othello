@@ -70,6 +70,7 @@ public:
 	virtual ~CxVectors( void );
 
 public:
+	// property
 	int length;
 
 	// gets
@@ -114,23 +115,24 @@ public:
 	int length;
 	int mem_alloc;
 
-	// 重载运算符
+	// operator(重载运算符)
 	CxMatrix &  operator =  ( CxMatrix & _Right );
 	BOOL        operator == ( CxMatrix & _Right );
 	BOOL        operator != ( CxMatrix & _Right );
-	CxMatrix 	operator +  ( double _value     );
-	CxMatrix 	operator +  ( CxMatrix & _Right );
-	CxMatrix 	operator -  ( double _value     );
-	CxMatrix 	operator -  ( CxMatrix & _Right );
-	CxMatrix &	operator += ( CxMatrix & _Right );
-	CxMatrix &	operator -= ( CxMatrix & _Right );
-	CxMatrix 	operator *  ( double _value     );
-	CxMatrix 	operator *  ( CxMatrix & _Right );
-	CxMatrix &	operator *= ( double _value     );
-	CxMatrix &	operator *= ( CxMatrix & _Right );
-	CxMatrix 	operator /  ( double _value     );
-	CxMatrix &	operator /= ( double _value     );
-	CxMatrix 	operator ^  ( double _value     );
+	CxMatrix    operator +  ( double _value     );
+	CxMatrix    operator +  ( CxMatrix & _Right );
+	CxMatrix &  operator += ( CxMatrix & _Right );
+	CxMatrix    operator -  ( double _value     );
+	CxMatrix    operator -  ( CxMatrix & _Right );
+	CxMatrix &  operator -= ( CxMatrix & _Right );
+	CxMatrix    operator *  ( double _value     );
+	CxMatrix    operator *  ( CxMatrix & _Right );
+	CxMatrix &  operator *= ( double _value     );
+	CxMatrix &  operator *= ( CxMatrix & _Right );
+	CxMatrix    operator /  ( double _value     );
+	CxMatrix &  operator /= ( double _value     );
+	CxMatrix    operator ^  ( double _value     );
+	CxMatrix &  operator ^= ( double _value     );
 
 	friend CxMatrix operator + ( double _value, CxMatrix & _Right );
 	friend CxMatrix operator - ( double _value, CxMatrix & _Right );

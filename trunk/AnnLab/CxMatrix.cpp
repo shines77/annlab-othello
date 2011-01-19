@@ -165,7 +165,6 @@ void CxVectors::freeVector( void )
 	length = 0;
 }
 
-
 //////////////////////////////////////////////////////////////////
 // CxMatrix
 //////////////////////////////////////////////////////////////////
@@ -769,6 +768,21 @@ CxMatrix CxMatrix::operator ^ ( double _value )
 	}
 
 	return _Result;
+}
+
+CxMatrix & CxMatrix::operator ^= ( double _value )
+{
+	double _base, _power;
+	// ½øÐÐ³Ë·½
+	for (int i=0; i<rows; ++i) {
+		for (int j=0; j<cols; ++j) {
+			_base  = getElement(i, j);
+			_power = pow(_base, _value);
+			setElement(i, j, _power);
+		}
+	}
+
+	return *this;
 }
 
 CxMatrix CxMatrix::operator / ( double _value )
