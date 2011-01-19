@@ -28,18 +28,15 @@ CxMatrix::CxMatrix( const TCHAR *szName, int _rows, int _cols,
 	initMatrix(szName, _rows, _cols, TRUE, _initFcn);
 }
 
-CxMatrix::CxMatrix( const CxMatrix& other )
+CxMatrix::CxMatrix( CxMatrix& scrMatrix )
 {
-	freeMatrix();
+	int _rows, _cols;
+	_rows = scrMatrix.rows;
+	_cols = scrMatrix.cols;
 
-	cols = other.cols;
-	rows = other.rows;
-	length = cols * rows;
+	initMatrix(NULL, _rows, _cols, TRUE);
 
-	m_pOrigData = NULL;
-	m_pData = NULL;
-
-	CxMatrix *pMatrix = this->copy( &other );
+	CxMatrix *pMatrix = copy( &scrMatrix );
 	ASSERT(pMatrix != NULL);
 }
 
@@ -109,7 +106,7 @@ BOOL CxMatrix::Create( int _rows, int _cols, int _initFcn /*= MAT_INIT_NONE */ )
 	return initMatrix(_T(""), _rows, _cols, FALSE, _initFcn);
 }
 
-BOOL CxMatrix::CreateEx( const TCHAR *szName, int _rows, int _cols,
+BOOL CxMatrix::createEx( const TCHAR *szName, int _rows, int _cols,
 						int _initFcn /*= MAT_INIT_NONE */ )
 {
 	return initMatrix(szName, _rows, _cols, FALSE, _initFcn);
@@ -343,29 +340,29 @@ double * CxMatrix::setDataBuf( double *pBuffer, int _rows, int _cols )
 	return NULL;
 }
 
-CxMatrix & CxMatrix::operator = ( const CxMatrix & other )
+CxMatrix & CxMatrix::operator = ( CxMatrix & _Right )
 {
-	if (&other != this) {
-		CxMatrix *dstMatrix = copy(&other);
+	if (&_Right != this) {
+		CxMatrix *dstMatrix = copy(&_Right);
 		ASSERT(dstMatrix != NULL);
 	}
 
 	// finally return a reference to ourselves
-	return *this ;
+	return *this;
 }
 
-BOOL CxMatrix::operator == ( const CxMatrix & other ) const
+BOOL CxMatrix::operator == ( CxMatrix & _Right )
 {
 	// 首先检查行列数是否相等
-	if (this == &other)
+	if (this == &_Right)
 		return TRUE;
 
-	if (rows != other.rows || cols != other.cols)
+	if (rows != _Right.rows || cols != _Right.cols)
 		return FALSE;
 
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j) {
-			if (getElement(i, j) != other.getElement(i, j))
+			if (getElement(i, j) != _Right.getElement(i, j))
 				return FALSE;
 		}
 	}
@@ -373,66 +370,83 @@ BOOL CxMatrix::operator == ( const CxMatrix & other ) const
 	return TRUE;
 }
 
-BOOL CxMatrix::operator != ( const CxMatrix & other ) const
+BOOL CxMatrix::operator != ( CxMatrix & _Right )
 {
-	return !(*this == other);
+	return !(*this == _Right);
 }
 
-CxMatrix CxMatrix::operator + ( const CxMatrix & other ) const
+CxMatrix & CxMatrix::operator + ( CxMatrix & _Right )
 {
 	// 首先检查行列数是否相等
-	ASSERT(rows == other.rows && cols == other.cols);
+	ASSERT(rows == _Right.rows && cols == _Right.cols);
 
-	// 构造结果矩阵
-	CxMatrix result(*this);		// 拷贝构造
+	// 复制目标矩阵
+	//CxMatrix _Left((CxMatrix &)*this);		// 拷贝构造
 
 	// 矩阵加法
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			result.setElement(i, j, result.getElement(i, j) + other.getElement(i, j));
+			setElement(i, j, getElement(i, j) + _Right.getElement(i, j));
 	}
 
-	return result;
+	return *this;
 }
 
-CxMatrix CxMatrix::operator - ( const CxMatrix & other ) const
+CxMatrix & CxMatrix::operator += ( CxMatrix & _Right )
 {
 	// 首先检查行列数是否相等
-	ASSERT(rows == other.rows && cols == other.cols);
+	ASSERT(rows == _Right.rows && cols == _Right.cols);
 
-	// 构造目标矩阵
-	CxMatrix result(*this);		// 拷贝构造
+	// 复制目标矩阵
+	//CxMatrix _Left((CxMatrix &)*this);		// 拷贝构造
+
+	// 矩阵加法
+	for (int i=0; i<rows; ++i) {
+		for (int j=0; j<cols; ++j)
+			setElement(i, j, getElement(i, j) + _Right.getElement(i, j));
+	}
+
+	return *this;
+}
+
+CxMatrix & CxMatrix::operator - ( CxMatrix & _Right )
+{
+	// 首先检查行列数是否相等
+	ASSERT(rows == _Right.rows && cols == _Right.cols);
+
+	// 复制目标矩阵
+	//CxMatrix _Left((CxMatrix &)*this);		// 拷贝构造
 
 	// 进行减法操作
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			result.setElement(i, j, result.getElement(i, j) - other.getElement(i, j));
+			setElement(i, j, getElement(i, j) - _Right.getElement(i, j));
 	}
 
-	return result;
+	return *this;
 }
 
-CxMatrix CxMatrix::operator * ( double _value ) const
+CxMatrix & CxMatrix::operator * ( double _value )
 {
-	// 构造目标矩阵
-	CxMatrix result(*this);		// copy ourselves
+	// 复制目标矩阵
+	//CxMatrix _Left((CxMatrix &)*this);		// copy ourselves
 
 	// 进行数乘
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			result.setElement(i, j, result.getElement(i, j) * _value) ;
+			setElement(i, j, getElement(i, j) * _value) ;
 	}
 
-	return result;
+	return *this;
 }
 
-CxMatrix CxMatrix::operator * ( const CxMatrix & other ) const
+CxMatrix & CxMatrix::operator * ( CxMatrix & _Right )
 {
 	// 首先检查行列数是否符合要求
-	ASSERT(cols == other.rows);
+	ASSERT(cols == _Right.rows);
 
-	// construct the object we are going to return
-	CxMatrix result(rows, other.cols);
+	// 复制目标矩阵
+	CxMatrix _Left((CxMatrix &)*this);		// 拷贝构造
 
 	// 矩阵乘法，即
 	//
@@ -445,45 +459,45 @@ CxMatrix CxMatrix::operator * ( const CxMatrix & other ) const
 		for (int j=0; j<cols; ++j) {
 			_value = 0.0;
 			for (int k=0; k<cols; ++k) {
-				_value += getElement(i, k) * other.getElement(k, j);
+				_value += _Left.getElement(i, k) * _Right.getElement(k, j);
 			}
-			result.setElement(i, j, _value);
+			setElement(i, j, _value);
 		}
 	}
 
-	return result;
+	return *this;
 }
 
-CxMatrix CxMatrix::operator ^ ( double _value ) const
+CxMatrix & CxMatrix::operator ^ ( double _value )
 {
-	// 构造目标矩阵
-	CxMatrix result(*this);		// copy ourselves
+	// 复制目标矩阵
+	//CxMatrix _Left((CxMatrix &)*this);		// copy ourselves
 
 	double _base, _power;
 	// 进行乘方
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j) {
-			_base  = result.getElement(i, j);
+			_base  = getElement(i, j);
 			_power = pow(_base, _value);
-			result.setElement(i, j, _power);
+			setElement(i, j, _power);
 		}
 	}
 
-	return result;
+	return *this;
 }
 
-CxMatrix CxMatrix::operator / ( double _value ) const
+CxMatrix & CxMatrix::operator / ( double _value )
 {
-	// 构造目标矩阵
-	CxMatrix result(*this);		// copy ourselves
+	// 复制目标矩阵
+	//CxMatrix result((CxMatrix &)*this);		// copy ourselves
 
 	// 进行点除
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			result.setElement(i, j, result.getElement(i, j) / _value) ;
+			setElement(i, j, getElement(i, j) / _value) ;
 	}
 
-	return result;
+	return *this;
 }
 
 BOOL CxMatrix::makeUnitMatrix( int _size )
@@ -501,18 +515,18 @@ BOOL CxMatrix::makeUnitMatrix( int _size )
 	return FALSE;
 }
 
-CxMatrix CxMatrix::transpose( void ) const
+CxMatrix & CxMatrix::transpose( void )
 {
-	// 构造目标矩阵
-	CxMatrix trans(rows, cols);
+	// 复制目标矩阵
+	CxMatrix _Trans((CxMatrix &)*this);		// copy ourselves
 
 	// 转置各元素
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			trans.setElement(j, i, getElement(i, j));
+			setElement(j, i, _Trans.getElement(i, j));
 	}
 
-	return trans;
+	return *this;
 }
 
 int CxMatrix::ones( int _rows, int _cols )
@@ -541,7 +555,7 @@ int CxMatrix::rands2( int _rows, int _cols )
 
 CxMatrix CxMatrix::_rands( int _rows, int _cols ) const
 {
-	// 构造目标矩阵
+	// 复制目标矩阵
 	CxMatrix _rands(_rows, _cols);
 
 	///*
@@ -560,7 +574,7 @@ CxMatrix CxMatrix::_rands( int _rows, int _cols ) const
 
 CxMatrix CxMatrix::_rands2( int _rows, int _cols ) const
 {
-	// 构造目标矩阵
+	// 复制目标矩阵
 	CxMatrix _rands(_rows, _cols);
 
 	///*
@@ -621,7 +635,7 @@ void CxMatrixs::freeMatrixs( void )
 	}
 }
 
-BOOL CxMatrixs::Create( const TCHAR *szName, int _numMatrixs )
+BOOL CxMatrixs::create( const TCHAR *szName, int _numMatrixs )
 {
 	return TRUE;
 }

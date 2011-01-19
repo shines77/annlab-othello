@@ -29,8 +29,8 @@ INLINE void setFcnName( TCHAR *szDstFuncName, int nNameSize, const TCHAR *szFcnN
 
 CxTrainParam::CxTrainParam( void )
 {
-	show       = TRUE;			// 显示训练过程
-	showWindow = TRUE;			// 显示训练窗口
+	show            = TRUE;		// 显示训练过程
+	showWindow      = TRUE;		// 显示训练窗口
 	showCommandLine = TRUE;		// 显示命令行窗口
 
 	epochs   = 0;				// 最大迭代次数 1-∞
@@ -47,7 +47,8 @@ CxTrainParam::CxTrainParam( void )
 	alpha    = 0.001;			// Scale factor which determines sufficient reduction in perf.
 	beta     = 0.1;				// Scale factor which determines sufficiently large step size.
 	delta    = 0.01;			// Initial step size in interval location step.
-	gama     = 0.1;				// Parameter to avoid small reductions in performance. Usually set to 0.1. (See use in srch_cha.)
+	gama     = 0.1;				/* Parameter to avoid small reductions in performance.
+								   Usually set to 0.1. (See use in srch_cha.) */
 	minstep  = 1E-6;			// Minimum step length.
 	maxstep  = 100;				// Maximum step length.
 	low_lim  = 0.1;				// Lower limit on change in step size.
@@ -406,9 +407,14 @@ int CxNetLayers::append( int _numNeurons )
 	return append(_prevNeurons, _numNeurons);
 }
 
-BOOL CxNetLayers::remove( int _index )
+int CxNetLayers::insert( int _index, CxNetLayer *pNetLayer )
 {
-	return FALSE;
+	return 0;
+}
+
+int CxNetLayers::remove( int _index )
+{
+	return 0;
 }
 
 BOOL CxNetLayers::modify( int _index, int _numNeuron )
@@ -501,7 +507,7 @@ BOOL CAnnNetwork::CommonConstructor( const TCHAR *szSizesOfLayers,
 	return CommonConstructor(_T(""), szSizesOfLayers, szTransFcnOfLayers, inputMinMax, szTrainFcn);
 }
 
-BOOL CAnnNetwork::CreateEx( const TCHAR *szName,
+BOOL CAnnNetwork::createEx( const TCHAR *szName,
 						   const TCHAR *szSizesOfLayers,
 						   const TCHAR *szTransFcnOfLayers,
 						   const CxMatrix *inputMinMax,
@@ -512,13 +518,13 @@ BOOL CAnnNetwork::CreateEx( const TCHAR *szName,
 	return bResult;
 }
 
-BOOL CAnnNetwork::Create( const TCHAR *szSizesOfLayers,
+BOOL CAnnNetwork::create( const TCHAR *szSizesOfLayers,
 						 const TCHAR *szTransFcnOfLayers,
 						 const CxMatrix *inputMinMax, /*= NULL */
 						 const TCHAR *szTrainFcn /*= NULL */ )
 {
 	BOOL bResult;
-	bResult = CreateEx(_T(""), szSizesOfLayers, szTransFcnOfLayers, inputMinMax, szTrainFcn);
+	bResult = createEx(_T(""), szSizesOfLayers, szTransFcnOfLayers, inputMinMax, szTrainFcn);
 	return bResult;
 }
 
