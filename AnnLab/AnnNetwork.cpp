@@ -175,6 +175,7 @@ CxNetLayers::CxNetLayers( const TCHAR *szSizesOfLayers )
 		int _numLayers = parseNetLayers(szSizesOfLayers, 0);
 		// more than 2 layers
 		if (_numLayers > 1) {
+			// parse net layer info from string 'szSizesOfLayers'
 			_numLayers = parseNetLayers(szSizesOfLayers, _numLayers);
 		}
 	}
@@ -807,6 +808,8 @@ int CAnnNetwork::parseTransFcns( const TCHAR *szTransFcnOfLayers,
 	TCHAR *pszOffset, *pszEndOf, *pszDest, *pszDelim;
 	TCHAR szBuffer[512], szFcnName[512];
 	DWORD dwBufSize = 512;
+
+	TRACE(_T("CAnnNetwork::parseTransFcns() Enter.\n"));
 	if (szTransFcnOfLayers == NULL)
 		return -1;
 
@@ -844,7 +847,7 @@ int CAnnNetwork::parseTransFcns( const TCHAR *szTransFcnOfLayers,
 		else
 			break;
 	}
-	TRACE(_T("parseTransFcns(): _indexFcns = %d.\n"), _indexFcns);
+	TRACE(_T("CAnnNetwork::parseTransFcns() Exit: _indexFcns = %d.\n"), _indexFcns);
 	return _indexFcns;
 }
 
