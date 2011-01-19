@@ -91,7 +91,11 @@ int CAnnLabDlg::BpNetwork_Test()
 	CxMatrix temp, rands;
 	temp = MatUtils::ones(16, 16);
 	rands = MatUtils::rands2(16, 16);
-	temp -= rands;
+	temp = 1.0 - rands;
+	temp = 1.0 + rands;
+	temp *= 3.0;
+	temp /= 3.0;
+	temp = 3.0 / rands;
 
 	CxMatrix inputMinMax;
 	inputMinMax.createEx( _T("inputMinMax"), 64, 2, MAT_INIT_ONES );

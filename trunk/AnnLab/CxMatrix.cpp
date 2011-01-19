@@ -529,21 +529,49 @@ BOOL CxMatrix::operator != ( CxMatrix & _Right )
 	return !(*this == _Right);
 }
 
-CxMatrix & CxMatrix::operator + ( CxMatrix & _Right )
+CxMatrix CxMatrix::operator + ( double _value )
+{
+	// 复制目标矩阵
+	CxMatrix _Result((CxMatrix &)*this);		// 拷贝构造
+
+	// 矩阵加法
+	for (int i=0; i<rows; ++i) {
+		for (int j=0; j<cols; ++j)
+			_Result.setElement(i, j, getElement(i, j) + _value);
+	}
+
+	return _Result;
+}
+
+CxMatrix operator + ( double _value, CxMatrix & _Right )
+{
+	// 复制目标矩阵
+	CxMatrix _Result((CxMatrix &)_Right);		// 拷贝构造
+
+	// 进行减法操作
+	for (int i=0; i<_Right.rows; ++i) {
+		for (int j=0; j<_Right.cols; ++j)
+			_Result.setElement(i, j, _value + _Right.getElement(i, j));
+	}
+
+	return _Result;
+}
+
+CxMatrix CxMatrix::operator + ( CxMatrix & _Right )
 {
 	// 首先检查行列数是否相等
 	ASSERT(rows == _Right.rows && cols == _Right.cols);
 
 	// 复制目标矩阵
-	//CxMatrix _Left((CxMatrix &)*this);		// 拷贝构造
+	CxMatrix _Result((CxMatrix &)*this);		// 拷贝构造
 
 	// 矩阵加法
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			setElement(i, j, getElement(i, j) + _Right.getElement(i, j));
+			_Result.setElement(i, j, getElement(i, j) + _Right.getElement(i, j));
 	}
 
-	return *this;
+	return _Result;
 }
 
 CxMatrix & CxMatrix::operator += ( CxMatrix & _Right )
@@ -551,9 +579,6 @@ CxMatrix & CxMatrix::operator += ( CxMatrix & _Right )
 	// 首先检查行列数是否相等
 	ASSERT(rows == _Right.rows && cols == _Right.cols);
 
-	// 复制目标矩阵
-	//CxMatrix _Left((CxMatrix &)*this);		// 拷贝构造
-
 	// 矩阵加法
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
@@ -563,21 +588,49 @@ CxMatrix & CxMatrix::operator += ( CxMatrix & _Right )
 	return *this;
 }
 
-CxMatrix & CxMatrix::operator - ( CxMatrix & _Right )
+CxMatrix CxMatrix::operator - ( double _value )
+{
+	// 复制目标矩阵
+	CxMatrix _Result((CxMatrix &)*this);		// 拷贝构造
+
+	// 进行减法操作
+	for (int i=0; i<rows; ++i) {
+		for (int j=0; j<cols; ++j)
+			_Result.setElement(i, j, getElement(i, j) - _value);
+	}
+
+	return _Result;
+}
+
+CxMatrix operator - ( double _value, CxMatrix & _Right )
+{
+	// 复制目标矩阵
+	CxMatrix _Result((CxMatrix &)_Right);		// 拷贝构造
+
+	// 进行减法操作
+	for (int i=0; i<_Right.rows; ++i) {
+		for (int j=0; j<_Right.cols; ++j)
+			_Result.setElement(i, j, _value - _Right.getElement(i, j));
+	}
+
+	return _Result;
+}
+
+CxMatrix CxMatrix::operator - ( CxMatrix & _Right )
 {
 	// 首先检查行列数是否相等
 	ASSERT(rows == _Right.rows && cols == _Right.cols);
 
 	// 复制目标矩阵
-	//CxMatrix _Left((CxMatrix &)*this);		// 拷贝构造
+	CxMatrix _Result((CxMatrix &)*this);		// 拷贝构造
 
 	// 进行减法操作
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			setElement(i, j, getElement(i, j) - _Right.getElement(i, j));
+			_Result.setElement(i, j, getElement(i, j) - _Right.getElement(i, j));
 	}
 
-	return *this;
+	return _Result;
 }
 
 CxMatrix & CxMatrix::operator -= ( CxMatrix & _Right )
@@ -585,9 +638,6 @@ CxMatrix & CxMatrix::operator -= ( CxMatrix & _Right )
 	// 首先检查行列数是否相等
 	ASSERT(rows == _Right.rows && cols == _Right.cols);
 
-	// 复制目标矩阵
-	//CxMatrix _Left((CxMatrix &)*this);		// 拷贝构造
-
 	// 进行减法操作
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
@@ -597,11 +647,68 @@ CxMatrix & CxMatrix::operator -= ( CxMatrix & _Right )
 	return *this;
 }
 
-CxMatrix & CxMatrix::operator * ( double _value )
+CxMatrix CxMatrix::operator * ( double _value )
 {
 	// 复制目标矩阵
-	//CxMatrix _Left((CxMatrix &)*this);		// copy ourselves
+	CxMatrix _Result((CxMatrix &)*this);		// copy ourselves
 
+	// 进行数乘
+	for (int i=0; i<rows; ++i) {
+		for (int j=0; j<cols; ++j)
+			_Result.setElement(i, j, getElement(i, j) * _value) ;
+	}
+
+	return _Result;
+}
+
+CxMatrix operator * ( double _value, CxMatrix & _Right )
+{
+	// 复制目标矩阵
+	CxMatrix _Result((CxMatrix &)_Right);		// 拷贝构造
+
+	// 进行减法操作
+	for (int i=0; i<_Right.rows; ++i) {
+		for (int j=0; j<_Right.cols; ++j)
+			_Result.setElement(i, j, _value * _Right.getElement(i, j));
+	}
+
+	return _Result;
+}
+
+CxMatrix CxMatrix::operator * ( CxMatrix & _Right )
+{
+	// 首先检查乘矩阵的行数和被乘矩阵的列数是否相同
+	ASSERT(cols == _Right.rows);
+
+	int _newRows, _newCols, _oldCols;
+	_newRows = rows;
+	_newCols = _Right.cols;
+	_oldCols = cols;
+
+	// 创建目标乘积矩阵
+	CxMatrix _Result(_newRows, _newCols);
+
+	// 矩阵乘法，即
+	//
+	// [A][B][C]   [G][H]     [A*G + B*I + C*K][A*H + B*J + C*L]
+	// [D][E][F] * [I][J]  =  [D*G + E*I + F*K][D*H + E*J + F*L]
+	//             [K][L]
+	//
+	double _value;
+	for (int i=0; i<_newRows; ++i) {
+		for (int j=0; j<_newCols; ++j) {
+			_value = 0.0;
+			for (int k=0; k<_oldCols; ++k)
+				_value += getElement(i, k) * _Right.getElement(k, j);
+			_Result.setElement(i, j, _value);
+		}
+	}
+
+	return _Result;
+}
+
+CxMatrix & CxMatrix::operator *= ( double _value )
+{
 	// 进行数乘
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
@@ -611,19 +718,20 @@ CxMatrix & CxMatrix::operator * ( double _value )
 	return *this;
 }
 
-CxMatrix & CxMatrix::operator * ( CxMatrix & _Right )
+CxMatrix & CxMatrix::operator *= ( CxMatrix & _Right )
 {
 	// 首先检查乘矩阵的行数和被乘矩阵的列数是否相同
 	ASSERT(cols == _Right.rows);
 
 	// 复制目标矩阵
-	CxMatrix _Left((CxMatrix &)*this);		// 拷贝构造
+	CxMatrix _Left((CxMatrix &)*this);
 
 	int _newRows, _newCols, _oldCols;
 	_newRows = rows;
 	_newCols = _Right.cols;
 	_oldCols = cols;
 
+	// 创建目标乘积矩阵
 	int _size = resize(_newRows, _newCols);
 
 	// 矩阵乘法，即
@@ -645,10 +753,10 @@ CxMatrix & CxMatrix::operator * ( CxMatrix & _Right )
 	return *this;
 }
 
-CxMatrix & CxMatrix::operator ^ ( double _value )
+CxMatrix CxMatrix::operator ^ ( double _value )
 {
 	// 复制目标矩阵
-	//CxMatrix _Left((CxMatrix &)*this);		// copy ourselves
+	CxMatrix _Result((CxMatrix &)*this);		// copy ourselves
 
 	double _base, _power;
 	// 进行乘方
@@ -656,18 +764,43 @@ CxMatrix & CxMatrix::operator ^ ( double _value )
 		for (int j=0; j<cols; ++j) {
 			_base  = getElement(i, j);
 			_power = pow(_base, _value);
-			setElement(i, j, _power);
+			_Result.setElement(i, j, _power);
 		}
 	}
 
-	return *this;
+	return _Result;
 }
 
-CxMatrix & CxMatrix::operator / ( double _value )
+CxMatrix CxMatrix::operator / ( double _value )
 {
 	// 复制目标矩阵
-	//CxMatrix result((CxMatrix &)*this);		// copy ourselves
+	CxMatrix _Result((CxMatrix &)*this);		// copy ourselves
 
+	// 进行点除
+	for (int i=0; i<rows; ++i) {
+		for (int j=0; j<cols; ++j)
+			_Result.setElement(i, j, getElement(i, j) / _value) ;
+	}
+
+	return _Result;
+}
+
+CxMatrix operator / ( double _value, CxMatrix & _Right )
+{
+	// 复制目标矩阵
+	CxMatrix _Result((CxMatrix &)_Right);		// 拷贝构造
+
+	// 进行减法操作
+	for (int i=0; i<_Right.rows; ++i) {
+		for (int j=0; j<_Right.cols; ++j)
+			_Result.setElement(i, j, _value / _Right.getElement(i, j));
+	}
+
+	return _Result;
+}
+
+CxMatrix & CxMatrix::operator /= ( double _value )
+{
 	// 进行点除
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)

@@ -118,14 +118,24 @@ public:
 	CxMatrix &  operator =  ( CxMatrix & _Right );
 	BOOL        operator == ( CxMatrix & _Right );
 	BOOL        operator != ( CxMatrix & _Right );
-	CxMatrix &	operator +  ( CxMatrix & _Right );
-	CxMatrix &	operator -  ( CxMatrix & _Right );
+	CxMatrix 	operator +  ( double _value     );
+	CxMatrix 	operator +  ( CxMatrix & _Right );
+	CxMatrix 	operator -  ( double _value     );
+	CxMatrix 	operator -  ( CxMatrix & _Right );
 	CxMatrix &	operator += ( CxMatrix & _Right );
 	CxMatrix &	operator -= ( CxMatrix & _Right );
-	CxMatrix &	operator *  ( double _value     );
-	CxMatrix &	operator *  ( CxMatrix & _Right );
-	CxMatrix &	operator /  ( double _value     );
-	CxMatrix &	operator ^  ( double _value     );
+	CxMatrix 	operator *  ( double _value     );
+	CxMatrix 	operator *  ( CxMatrix & _Right );
+	CxMatrix &	operator *= ( double _value     );
+	CxMatrix &	operator *= ( CxMatrix & _Right );
+	CxMatrix 	operator /  ( double _value     );
+	CxMatrix &	operator /= ( double _value     );
+	CxMatrix 	operator ^  ( double _value     );
+
+	friend CxMatrix operator + ( double _value, CxMatrix & _Right );
+	friend CxMatrix operator - ( double _value, CxMatrix & _Right );
+	friend CxMatrix operator * ( double _value, CxMatrix & _Right );
+	friend CxMatrix operator / ( double _value, CxMatrix & _Right );
 
 	// methods
 	void freeMatrix( void );
@@ -198,5 +208,12 @@ public:
 	CxMatrixList( void );
 	virtual ~CxMatrixList( void );
 };
+
+/*
+CxMatrix operator + ( double _value, CxMatrix & _Right );
+CxMatrix operator - ( double _value, CxMatrix & _Right );
+CxMatrix operator * ( double _value, CxMatrix & _Right );
+CxMatrix operator / ( double _value, CxMatrix & _Right );
+//*/
 
 //typedef CxList<CxMatrix> CxMatrixList;
