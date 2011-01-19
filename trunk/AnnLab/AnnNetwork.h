@@ -60,9 +60,20 @@ public:
 	CxNetLayer( void );
 	CxNetLayer( int _numNeurons );
 	CxNetLayer( int _prevNeurons, int _numNeurons );
+	CxNetLayer( int _type, int _prevNeurons, int _numNeurons );
+	CxNetLayer( CxNetLayer & srcNetLayer );
 	virtual ~CxNetLayer( void );
 
 public:
+	// property
+	int index;
+	int type;
+	int prevNeurons;
+	int numNeurons;
+
+	CxNetLayer *prevLayer;
+	CxNetLayer *nextLayer;
+
 	// gets
 	INLINE TCHAR * initFcn     ( void ) const { return (TCHAR *)m_szInitFcn;     };
 	INLINE TCHAR * transferFcn ( void ) const { return (TCHAR *)m_szTransferFcn; };
@@ -71,14 +82,10 @@ public:
 	void setInitFcn     ( const TCHAR *szFcnName );
 	void setTransferFcn ( const TCHAR *szFcnName );
 
-	// property
-	int index;
-	int type;
-	int numNeurons;
-	int prevNeurons;
-
-	CxNetLayer *prevLayer;
-	CxNetLayer *nextLayer;
+	// methods
+	BOOL initNetLayer( int _prevNeurons, int _numNeurons );
+	BOOL initNetLayer( int _index, int _type, int _prevNeurons, int _numNeurons,
+		CxNetLayer *_prevLayer = NULL, CxNetLayer *_nextLayer = NULL );
 
 private:
 	TCHAR     m_szInitFcn[FCN_NAME_LEN];
@@ -90,6 +97,7 @@ class CxNetLayers : public CxBaseObject
 public:
 	CxNetLayers( void );
 	CxNetLayers( int _numLayers );
+	CxNetLayers( const TCHAR *szSizesOfLayers );
 	virtual ~CxNetLayers( void );
 
 public:
@@ -127,8 +135,12 @@ public:
 	int  push_back ( CxNetLayer *pNetLayer );
 
 protected:
+	INLINE void commonConstructor( int _numLayers );
 	BOOL initLayers( int _numLayers );
 	void freeLayers( void );
+
+	int parseNetLayers( const TCHAR *szSizesOfLayers, int _inNumLayers = 0,
+		const TCHAR *szDelim = NULL  );
 
 private:
 	CxNetLayer* m_firstLayer;
@@ -230,9 +242,9 @@ public:
 		CxTrainRecord *trainRecord );
 
 protected:
-	BOOL CommonConstructor( const TCHAR *szSizesOfLayers, const TCHAR *szTransFcnOfLayers,
+	BOOL commonConstructor( const TCHAR *szSizesOfLayers, const TCHAR *szTransFcnOfLayers,
 		const CxMatrix *inputMinMax = NULL, const TCHAR *szTrainFcn = NULL );
-	BOOL CommonConstructor( const TCHAR *szName, const TCHAR *szSizesOfLayers,
+	BOOL commonConstructor( const TCHAR *szName, const TCHAR *szSizesOfLayers,
 		const TCHAR *szTransFcnOfLayers, const CxMatrix *inputMinMax,
 		const TCHAR *szTrainFcn = NULL );
 	void FreeNetwork( void );
