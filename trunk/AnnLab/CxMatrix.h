@@ -30,8 +30,56 @@ enum enumMatInitMode {
 
 #define MAT_INIT_DEFAULT    MAT_INIT_NONE
 
-class CxVector { };
-class CxVectors { };
+class CxVector : public CxBaseObject
+{
+public:
+	CxVector( void );
+	CxVector( int _size );
+	CxVector( CxVector & srcVerctor );
+	virtual ~CxVector( void );
+
+public:
+	// property
+	int length;
+	int mem_alloc;
+
+	// gets
+	double operator [] ( int _index ) const;
+	INLINE int size( void ) const { return length; };
+
+	//sets
+
+	// methos
+	CxVector *copy( const CxVector *srcVector );
+
+protected:
+	void freeVector( void );
+	BOOL initVector( const TCHAR *szName, int _size, int _initMode = INIT_MODE_NONE,
+		int _initFcn = MAT_INIT_NONE );
+	BOOL initData( int _size, int _initFcn = MAT_INIT_NONE );
+	
+private:
+	double *m_pOrigData;
+	double *m_pData;
+};
+
+class CxVectors : public CxBaseObject
+{
+public:
+	CxVectors( void );
+	virtual ~CxVectors( void );
+
+public:
+	int length;
+
+	// gets
+	INLINE int size( void ) const { return length; };
+
+	// sets
+
+protected:
+	void freeVector( void );
+};
 
 class CxMatrix : public CxBaseObject
 {
@@ -144,4 +192,11 @@ private:
 	CxMatrix *pMatrixs;
 };
 
-typedef CxList<CxMatrix> CxMatrixList;
+class CxMatrixList : public CxList<CxMatrix>
+{
+public:
+	CxMatrixList( void );
+	virtual ~CxMatrixList( void );
+};
+
+//typedef CxList<CxMatrix> CxMatrixList;
