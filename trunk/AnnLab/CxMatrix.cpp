@@ -459,25 +459,31 @@ CxMatrix & CxMatrix::operator * ( double _value )
 
 CxMatrix & CxMatrix::operator * ( CxMatrix & _Right )
 {
-	// 首先检查行列数是否符合要求
+	// 首先检查乘矩阵的行数和被乘矩阵的列数是否相同
 	ASSERT(cols == _Right.rows);
 
 	// 复制目标矩阵
 	CxMatrix _Left((CxMatrix &)*this);		// 拷贝构造
 
+	int _newRows, _newCols, _oldCols;
+	_newRows = rows;
+	_newCols = _Right.cols;
+	_oldCols = cols;
+
+	int _size = resize(_newRows, _newCols);
+
 	// 矩阵乘法，即
 	//
 	// [A][B][C]   [G][H]     [A*G + B*I + C*K][A*H + B*J + C*L]
-	// [D][E][F] * [I][J] =   [D*G + E*I + F*K][D*H + E*J + F*L]
+	// [D][E][F] * [I][J]  =  [D*G + E*I + F*K][D*H + E*J + F*L]
 	//             [K][L]
 	//
-	double	_value;
-	for (int i=0; i<rows; ++i) {
-		for (int j=0; j<cols; ++j) {
+	double _value;
+	for (int i=0; i<_newRows; ++i) {
+		for (int j=0; j<_newCols; ++j) {
 			_value = 0.0;
-			for (int k=0; k<cols; ++k) {
+			for (int k=0; k<_oldCols; ++k)
 				_value += _Left.getElement(i, k) * _Right.getElement(k, j);
-			}
 			setElement(i, j, _value);
 		}
 	}
