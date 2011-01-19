@@ -103,6 +103,7 @@ int CAnnLabDlg::BpNetwork_Test()
 	net.trainParam.epochs = 2000;
 
 	CxMatrixList trainP, trainT;
+	trainP.size();
 
 	CxTrainRecord tr;
 	pNetwork = net.train(&trainP, &trainT, &tr);

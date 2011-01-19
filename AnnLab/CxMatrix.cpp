@@ -4,6 +4,169 @@
 #include <math.h>
 
 //////////////////////////////////////////////////////////////////
+// CxVector
+//////////////////////////////////////////////////////////////////
+
+CxVector::CxVector( void )
+{
+	initVector(NULL, 0, TRUE);
+}
+
+CxVector::CxVector( int _size )
+{
+	initVector(NULL, _size, TRUE);
+}
+
+CxVector::CxVector( CxVector & srcVerctor )
+{
+	int _size = srcVerctor.size();
+
+	initVector(srcVerctor.Name(), _size, TRUE);
+
+	CxVector *pVector = copy( &srcVerctor );
+	ASSERT(pVector != NULL);
+}
+
+CxVector::~CxVector( void )
+{
+	freeVector();
+}
+
+void CxVector::freeVector( void )
+{
+	if (m_pOrigData != NULL) {
+		delete[] m_pOrigData;
+		m_pOrigData = NULL;
+		m_pData = NULL;
+	}
+	length    = 0;
+	mem_alloc = 0;
+}
+
+BOOL CxVector::initVector( const TCHAR *szName, int _size,
+						  int _initMode, /*= INIT_MODE_NONE */
+						  int _initFcn   /*= MAT_INIT_NONE */ )
+{
+	BOOL bResult = FALSE;
+	if (_initMode == INIT_MODE_FIRST) {
+		length      = 0;
+		mem_alloc   = 0;
+		m_pOrigData = NULL;
+		m_pData     = NULL;
+	}
+
+	if (_initMode != INIT_MODE_RESIZE) {
+		if (szName != NULL)
+			_tcscpy_s(m_szName, _countof(m_szName), szName);
+		else
+			_tcscpy_s(m_szName, _countof(m_szName), _T(""));
+	}
+
+	if (_size >= 0) {
+		freeVector();
+
+		length = _size;
+		if (length > 0) {
+			mem_alloc = length + MET_ADDR_ALIGN_SIZE;
+			m_pOrigData = new double[mem_alloc];
+			if (m_pOrigData != NULL) {
+				m_pData = (double *)MET_ADDR_ALIGN(m_pOrigData);
+				// init vector data
+				bResult = initData(length, _initFcn);
+			}
+		}
+		else {
+			mem_alloc = 0;
+			bResult = TRUE;
+		}
+	}
+	return bResult;
+}
+
+BOOL CxVector::initData(int _size, int _initFcn /*= MAT_INIT_NONE */ )
+{
+	ASSERT(m_pData != NULL);
+	if (m_pData == NULL)
+		return FALSE;
+
+	_size = (_size < length) ? _size : length;
+	ASSERT(_size >= 0);
+
+	// init vector data
+	if (_size <= 0) {
+		if (_size == 0)
+			freeVector();
+		return (_size >= 0);
+	}
+
+	double _dblRand;
+	switch (_initFcn) {
+	case MAT_INIT_ZEROS:		// all zeros
+		for (int i=0; i<_size; i++)
+			m_pData[i] = 0.0;
+		break;
+	case MAT_INIT_ONES:			// all ones
+		for (int i=0; i<_size; i++)
+			m_pData[i] = 1.0;
+		break;
+	case MAT_INIT_RANDS:		// all [-1,1] randomize
+		for (int i=0; i<_size; i++) {
+			_dblRand = 2.0 * (double)rand() / (double)(RAND_MAX + 1) - 1.0;
+			m_pData[i] = _dblRand;
+		}
+		break;
+	case MAT_INIT_RANDS2:		// all [0,1] randomize
+		for (int i=0; i<_size; i++) {
+			_dblRand = (double)rand() / (double)(RAND_MAX + 1);
+			m_pData[i] = _dblRand;
+		}
+		break;
+	case MAT_INIT_NONE:
+		// do nothing
+		break;
+	default:
+		// don't init matrix
+		break;
+	}
+	return TRUE;
+}
+
+double CxVector::operator []( int _index ) const
+{
+	double _value = 0.0;
+
+	return _value;
+}
+
+CxVector * CxVector::copy( const CxVector *srcVector )
+{
+	if (srcVector != NULL) {
+		//
+	}
+	return NULL;
+}
+
+//////////////////////////////////////////////////////////////////
+// CxVectors
+//////////////////////////////////////////////////////////////////
+
+CxVectors::CxVectors( void )
+{
+	length = 0;
+}
+
+CxVectors::~CxVectors( void )
+{
+	freeVector();
+}
+
+void CxVectors::freeVector( void )
+{
+	length = 0;
+}
+
+
+//////////////////////////////////////////////////////////////////
 // CxMatrix
 //////////////////////////////////////////////////////////////////
 
@@ -122,24 +285,15 @@ BOOL CxMatrix::initData( int _rows, int _cols, int _initFcn /*= MAT_INIT_NONE */
 	if (_rows > rows || _rows < 0 || _cols > cols || _cols < 0)
 		return FALSE;
 
-	/*
-	if (_rows > rows)
-		_rows = rows;
-	else if (_rows < 0)
-		_rows = 0;
-
-	if (_cols > cols)
-		_cols = cols;
-	else if (_cols < 0)
-		_cols = 0;
-	//*/
-
 	// init matrix data
 	int _size = _rows * _cols;
+	_size = (_size > length) ? _size : length;
+	ASSERT(_size >= 0);
+
 	if (_size <= 0) {
 		if (_size == 0)
 			freeMatrix();
-		return TRUE;
+		return (_size >= 0);
 	}
 
 	double _dblRand;
@@ -701,4 +855,18 @@ CxMatrixs * CxMatrixs::copy( const CxMatrixs *srcMartixs )
 CxMatrixs * CxMatrixs::clone( const CxMatrixs *srcMartixs )
 {
 	return copy(srcMartixs);
+}
+
+//////////////////////////////////////////////////////////////////
+// CxMatrixList
+//////////////////////////////////////////////////////////////////
+
+CxMatrixList::CxMatrixList( void )
+{
+
+}
+
+CxMatrixList::~CxMatrixList( void )
+{
+
 }
