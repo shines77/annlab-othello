@@ -198,6 +198,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CxList.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CxMatrix.cpp"
 				>
 			</File>
@@ -248,7 +252,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CxList.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CxMatrix.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gsl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gyvals.h"
 				>
 			</File>
 			<File

@@ -36,23 +36,23 @@ CxTrainParam::CxTrainParam( void )
 	epochs   = 0;				// 最大迭代次数 1-∞
 	max_fail = 6;				// 最大验证失败次数
 
-	lr   = 0.05;				// 学习率 (0.01-0.5)
-	mc   = 0.9;					// 动量因子 (0.8-0.99)
-	goal = 0.0001;				// 训练目标精度
-	time = 0.0;					// 最大迭代时间 默认为0, 表示不限制
+	lr       = 0.05;			// 学习率 (0.01-0.5)
+	mc       = 0.9;				// 动量因子 (0.8-0.99)
+	goal     = 0.0001;			// 训练目标精度
+	time     = 0.0;				// 最大迭代时间 默认为0, 表示不限制
 
 	min_grad = 1E-6;			// Minimum performance gradient
 	max_grad = 1.0;				// Maximum performance gradient
 
-	alpha   = 0.001;			// Scale factor which determines sufficient reduction in perf.
-	beta    = 0.1;				// Scale factor which determines sufficiently large step size.
-	delta   = 0.01;				// Initial step size in interval location step.
-	gama    = 0.1;				// Parameter to avoid small reductions in performance. Usually set to 0.1. (See use in srch_cha.)
-	minstep = 1E-6;				// Minimum step length.
-	maxstep = 100;				// Maximum step length.
-	low_lim = 0.1;				// Lower limit on change in step size.
-	up_lim  = 0.5;				// Upper limit on change in step size.
-	bmax    = 26.0;				// Maximum step size.
+	alpha    = 0.001;			// Scale factor which determines sufficient reduction in perf.
+	beta     = 0.1;				// Scale factor which determines sufficiently large step size.
+	delta    = 0.01;			// Initial step size in interval location step.
+	gama     = 0.1;				// Parameter to avoid small reductions in performance. Usually set to 0.1. (See use in srch_cha.)
+	minstep  = 1E-6;			// Minimum step length.
+	maxstep  = 100;				// Maximum step length.
+	low_lim  = 0.1;				// Lower limit on change in step size.
+	up_lim   = 0.5;				// Upper limit on change in step size.
+	bmax     = 26.0;			// Maximum step size.
 
 	// 搜寻函数名称
 	_tcscpy_s(szSearchFcn, _countof(szSearchFcn), _T(""));
@@ -244,7 +244,7 @@ CxNetLayer * CxNetLayers::getLayer( int _index ) const
 {
 	CxNetLayer *nextLayer;
 	CxNetLayer *curLayer = m_firstLayer;
-	int _nowIndex = 0, _numNeurons = -1;
+	int _nowIndex = 0;
 
 	ASSERT(_index >= 0 && _index < numLayers);
 	if (_index < 0 || _index >= numLayers)
@@ -266,15 +266,85 @@ CxNetLayer * CxNetLayers::getLayer( int _index ) const
 	return NULL;
 }
 
-int CxNetLayers::clear( void )
+int CxNetLayers::size( void ) const
 {
-	int oldLayers = numLayers;
-	freeLayers();
-	numLayers = 0;
-	return oldLayers;
+	CxNetLayer *nextLayer;
+	CxNetLayer *curLayer = m_firstLayer;
+	int _numLayers = 0;
+
+	while (curLayer != NULL) {
+		_numLayers++;
+		if (_numLayers > numLayers)
+			break;
+		nextLayer = curLayer->nextLayer;
+		if (nextLayer != NULL)
+			curLayer = nextLayer;
+		else
+			break;
+	}
+	return _numLayers;
 }
 
-int CxNetLayers::append( CxNetLayer *pNetLayer )
+BOOL CxNetLayers::empty( void ) const
+{
+	int _numLayers = size();
+	return (_numLayers <= 0);
+}
+
+int CxNetLayers::pop_front( void )
+{
+	CxNetLayer *nextLayer;
+	CxNetLayer *curLayer = m_firstLayer;
+	if (curLayer != NULL) {
+		nextLayer = curLayer->nextLayer;
+		delete curLayer;
+		numLayers--;
+		m_firstLayer = nextLayer;
+		if (nextLayer == NULL || numLayers <= 0)
+			m_lastLayer  = NULL;
+		return numLayers;
+	}
+	return -1;
+}
+
+int CxNetLayers::pop_back( void )
+{
+	CxNetLayer *prevLayer;
+	CxNetLayer *curLayer = m_lastLayer;
+	if (curLayer != NULL) {
+		prevLayer = curLayer->prevLayer;
+		delete curLayer;
+		numLayers--;
+		m_lastLayer = prevLayer;
+		if (prevLayer == NULL || numLayers <= 0)
+			m_firstLayer = NULL;
+		return numLayers;
+	}
+	return -1;
+}
+
+int CxNetLayers::push_front( CxNetLayer *pNetLayer )
+{
+	if (pNetLayer != NULL) {
+		pNetLayer->index = numLayers;
+		if (m_firstLayer == NULL || numLayers == 0) {
+			m_firstLayer = pNetLayer;
+			m_lastLayer  = pNetLayer;
+		}
+		else {
+			m_lastLayer->prevLayer = pNetLayer;
+			pNetLayer->nextLayer   = m_lastLayer;
+			pNetLayer->prevLayer   = NULL;
+
+			m_firstLayer = pNetLayer;
+		}
+		numLayers++;
+		return (numLayers - 1);
+	}
+	return -1;
+}
+
+int CxNetLayers::push_back( CxNetLayer *pNetLayer )
 {
 	if (pNetLayer != NULL) {
 		pNetLayer->index = numLayers;
@@ -293,6 +363,19 @@ int CxNetLayers::append( CxNetLayer *pNetLayer )
 		return (numLayers - 1);
 	}
 	return -1;
+}
+
+int CxNetLayers::clear( void )
+{
+	int oldLayers = numLayers;
+	freeLayers();
+	numLayers = 0;
+	return oldLayers;
+}
+
+int CxNetLayers::append( CxNetLayer *pNetLayer )
+{
+	return push_back(pNetLayer);
 }
 
 int CxNetLayers::append( int _prevNeurons, int _numNeurons )
@@ -692,7 +775,7 @@ CAnnNetwork * CAnnNetwork::init( void )
 	return pNetwork;
 }
 
-CAnnNetwork * CAnnNetwork::train( const CxMatrix *trainP, const CxMatrix *trainT,
+CAnnNetwork * CAnnNetwork::train( const CxMatrixList *trainP, const CxMatrixList *trainT,
 								 CxTrainRecord *trainRecord )
 {
 	CAnnNetwork *pNetwork = NULL;

@@ -86,7 +86,7 @@ private:
 };
 
 class CxNetLayers : public CxBaseObject
-{
+{ 
 public:
 	CxNetLayers( void );
 	CxNetLayers( int _numLayers );
@@ -100,6 +100,14 @@ public:
 	CxNetLayer & operator [] ( int _index ) const;
 	CxNetLayer & layer( int _index ) const;
 	CxNetLayer * getLayer( int _index ) const;
+ 
+	int  size( void ) const;
+	BOOL empty( void ) const;
+
+	CxNetLayer * begin( void ) const;
+	CxNetLayer * end  ( void ) const;
+	CxNetLayer & first( void ) const;
+	CxNetLayer & last ( void ) const;
 
 	// sets
 	BOOL setNumLayers( int _numLayers );
@@ -111,6 +119,11 @@ public:
 	int  append( CxNetLayer *pNetLayer );
 	BOOL remove( int _index );
 	BOOL modify( int _index, int _numNeuron );
+
+	int  pop_front ( void );
+	int  pop_back  ( void );
+	int  push_front( CxNetLayer *pNetLayer );
+	int  push_back ( CxNetLayer *pNetLayer );
 
 protected:
 	BOOL initLayers( int _numLayers );
@@ -212,7 +225,7 @@ public:
 		BOOL bInitWeightsNow = FALSE );
 
 	CAnnNetwork * init( void );
-	CAnnNetwork * train( const CxMatrix *trainP, const CxMatrix *trainT,
+	CAnnNetwork * train( const CxMatrixList *trainP, const CxMatrixList *trainT,
 		CxTrainRecord *trainRecord );
 
 protected:
