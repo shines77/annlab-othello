@@ -7,8 +7,8 @@
 
 namespace MatUtils {
 
-	CxMatrix ones    ( int _rows, int _cols );
 	CxMatrix zeros   ( int _rows, int _cols );
+	CxMatrix ones    ( int _rows, int _cols );
 	CxMatrix rands   ( int _rows, int _cols );
 	CxMatrix rands2  ( int _rows, int _cols );
 

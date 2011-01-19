@@ -73,6 +73,7 @@ public:
 	CxMatrix &	operator +  ( CxMatrix & _Right );
 	CxMatrix &	operator -  ( CxMatrix & _Right );
 	CxMatrix &	operator += ( CxMatrix & _Right );
+	CxMatrix &	operator -= ( CxMatrix & _Right );
 	CxMatrix &	operator *  ( double _value     );
 	CxMatrix &	operator *  ( CxMatrix & _Right );
 	CxMatrix &	operator /  ( double _value     );
@@ -96,11 +97,13 @@ public:
 	// ¾ØÕóµÄ×ªÖÃ
 	CxMatrix & transpose( void );
 
-	int ones   ( int _rows, int _cols );
 	int zeros  ( int _rows, int _cols );
+	int ones   ( int _rows, int _cols );
 	int rands  ( int _rows, int _cols );
 	int rands2 ( int _rows, int _cols );
 
+	CxMatrix _zeros  ( int _rows, int _cols ) const;
+	CxMatrix _ones   ( int _rows, int _cols ) const;
 	CxMatrix _rands  ( int _rows, int _cols ) const;
 	CxMatrix _rands2 ( int _rows, int _cols ) const;
 

@@ -1,4 +1,4 @@
-// Guozi Standard Library standard header
+// Guo Standard Library standard header
 #pragma once
 #ifndef _GSL_H_
 #define _GSL_H_
