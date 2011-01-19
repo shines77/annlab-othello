@@ -28,7 +28,7 @@ CxMatrix::CxMatrix( const TCHAR *szName, int _rows, int _cols,
 	initMatrix(szName, _rows, _cols, TRUE, _initFcn);
 }
 
-CxMatrix::CxMatrix( CxMatrix& scrMatrix )
+CxMatrix::CxMatrix( CxMatrix & scrMatrix )
 {
 	int _rows, _cols;
 	_rows = scrMatrix.rows;
@@ -426,6 +426,23 @@ CxMatrix & CxMatrix::operator - ( CxMatrix & _Right )
 	return *this;
 }
 
+CxMatrix & CxMatrix::operator -= ( CxMatrix & _Right )
+{
+	// 首先检查行列数是否相等
+	ASSERT(rows == _Right.rows && cols == _Right.cols);
+
+	// 复制目标矩阵
+	//CxMatrix _Left((CxMatrix &)*this);		// 拷贝构造
+
+	// 进行减法操作
+	for (int i=0; i<rows; ++i) {
+		for (int j=0; j<cols; ++j)
+			setElement(i, j, getElement(i, j) - _Right.getElement(i, j));
+	}
+
+	return *this;
+}
+
 CxMatrix & CxMatrix::operator * ( double _value )
 {
 	// 复制目标矩阵
@@ -529,16 +546,16 @@ CxMatrix & CxMatrix::transpose( void )
 	return *this;
 }
 
-int CxMatrix::ones( int _rows, int _cols )
-{
-	// 重置大小并初始化为全1矩阵
-	return resize(_rows, _cols, MAT_INIT_ONES);
-}
-
 int CxMatrix::zeros( int _rows, int _cols )
 {
 	// 重置大小并初始化为全0矩阵
 	return resize(_rows, _cols, MAT_INIT_ZEROS);
+}
+
+int CxMatrix::ones( int _rows, int _cols )
+{
+	// 重置大小并初始化为全1矩阵
+	return resize(_rows, _cols, MAT_INIT_ONES);
 }
 
 int CxMatrix::rands( int _rows, int _cols )
@@ -553,12 +570,39 @@ int CxMatrix::rands2( int _rows, int _cols )
 	return resize(_rows, _cols, MAT_INIT_RANDS2);
 }
 
+CxMatrix CxMatrix::_zeros( int _rows, int _cols ) const
+{
+	// 复制目标矩阵
+	CxMatrix _zeros0(_rows, _cols);
+
+	// 所有元素置0
+	for (int i=0; i<_rows; ++i) {
+		for (int j=0; j<_cols; ++j)
+			_zeros0.setElement(i, j, 0.0);
+	}
+
+	return _zeros0;
+}
+
+CxMatrix CxMatrix::_ones( int _rows, int _cols ) const
+{
+	// 复制目标矩阵
+	CxMatrix _ones0(_rows, _cols);
+
+	// 所有元素置1
+	for (int i=0; i<_rows; ++i) {
+		for (int j=0; j<_cols; ++j)
+			_ones0.setElement(i, j, 1.0);
+	}
+
+	return _ones0;
+}
+
 CxMatrix CxMatrix::_rands( int _rows, int _cols ) const
 {
 	// 复制目标矩阵
 	CxMatrix _rands(_rows, _cols);
 
-	///*
 	// 所有元素置[-1,1]的随机数
 	double _dblRand;
 	for (int i=0; i<_rows; ++i) {
@@ -567,7 +611,6 @@ CxMatrix CxMatrix::_rands( int _rows, int _cols ) const
 			_rands.setElement(i, j, _dblRand);
 		}
 	}
-	//*/
 
 	return _rands;
 }
@@ -577,7 +620,6 @@ CxMatrix CxMatrix::_rands2( int _rows, int _cols ) const
 	// 复制目标矩阵
 	CxMatrix _rands(_rows, _cols);
 
-	///*
 	// 所有元素置[-1,1]的随机数
 	double _dblRand;
 	for (int i=0; i<_rows; ++i) {
@@ -586,7 +628,6 @@ CxMatrix CxMatrix::_rands2( int _rows, int _cols ) const
 			_rands.setElement(i, j, _dblRand);
 		}
 	}
-	//*/
 
 	return _rands;
 }

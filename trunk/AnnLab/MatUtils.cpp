@@ -3,17 +3,17 @@
 
 namespace MatUtils {
 
-	// 重置大小并初始化为全1矩阵
-	CxMatrix ones( int _rows, int _cols )
-	{
-		CxMatrix _result(_rows, _cols, MAT_INIT_ONES);
-		return _result;
-	}
-
 	// 重置大小并初始化为全0矩阵
 	CxMatrix zeros( int _rows, int _cols )
 	{
 		CxMatrix _result(_rows, _cols, MAT_INIT_ZEROS);
+		return _result;
+	}
+
+	// 重置大小并初始化为全1矩阵
+	CxMatrix ones( int _rows, int _cols )
+	{
+		CxMatrix _result(_rows, _cols, MAT_INIT_ONES);
 		return _result;
 	}
 
