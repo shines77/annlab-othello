@@ -74,48 +74,72 @@ void CxTrainParam::setSearchFcn( const TCHAR *szFcnName )
 
 CxNetLayer::CxNetLayer( void )
 {
-	index       = -1;
-	type        = LAYER_TYPE_NONE;
-	numNeurons  = 0;
-	prevNeurons = 0;
-
-	prevLayer   = NULL;
-	nextLayer   = NULL;
-
-	_tcscpy_s(m_szInitFcn,     _countof(m_szInitFcn),     _T(""));
-	_tcscpy_s(m_szTransferFcn, _countof(m_szTransferFcn), _T(""));
+	initNetLayer(0, 0);
 }
 
 CxNetLayer::CxNetLayer( int _numNeurons )
 {
-	index       = -1;
-	type        = LAYER_TYPE_NONE;
-	numNeurons  = _numNeurons;
-	prevNeurons = 0;
-
-	prevLayer   = NULL;
-	nextLayer   = NULL;
-
-	_tcscpy_s(m_szInitFcn,     _countof(m_szInitFcn),     _T(""));
-	_tcscpy_s(m_szTransferFcn, _countof(m_szTransferFcn), _T(""));
+	initNetLayer(0, _numNeurons);
 }
 
 CxNetLayer::CxNetLayer( int _prevNeurons, int _numNeurons )
 {
-	index       = -1;
-	type        = LAYER_TYPE_NONE;
-	numNeurons  = _numNeurons;
+	initNetLayer(_prevNeurons, _numNeurons);
+}
+
+CxNetLayer::CxNetLayer( int _type, int _prevNeurons, int _numNeurons )
+{
+	initNetLayer(-1, _type, _prevNeurons, _numNeurons);
+}
+
+CxNetLayer::CxNetLayer( CxNetLayer & srcNetLayer )
+{
+	int _index, _type;
+	int _prevNeurons, _numNeurons;
+	CxNetLayer *_prevLayer, *_nextLayer;
+
+	_index       = srcNetLayer.index;
+	_type        = srcNetLayer.type;
+	_prevNeurons = srcNetLayer.prevNeurons;
+	_numNeurons  = srcNetLayer.numNeurons;
+
+	_prevLayer   = srcNetLayer.prevLayer;
+	_nextLayer   = srcNetLayer.nextLayer;
+
+	initNetLayer(_index, _type, _prevNeurons, _numNeurons,
+		_prevLayer, _nextLayer);
+
+	setInitFcn    (srcNetLayer.initFcn());
+	setTransferFcn(srcNetLayer.transferFcn());
+}
+
+CxNetLayer::~CxNetLayer( void )
+{
+}
+
+BOOL CxNetLayer::initNetLayer( int _index, int _type,
+							  int _prevNeurons,
+							  int _numNeurons,
+							  CxNetLayer *_prevLayer, /*= NULL */
+							  CxNetLayer *_nextLayer  /*= NULL */ )
+{
+	index       = _index;
+	type        = _type;
 	prevNeurons = _prevNeurons;
+	numNeurons  = _numNeurons;
 
 	prevLayer   = NULL;
 	nextLayer   = NULL;
 
 	_tcscpy_s(m_szInitFcn,     _countof(m_szInitFcn),     _T(""));
 	_tcscpy_s(m_szTransferFcn, _countof(m_szTransferFcn), _T(""));
+
+	return TRUE;
 }
 
-CxNetLayer::~CxNetLayer( void )
+BOOL CxNetLayer::initNetLayer( int _prevNeurons, int _numNeurons )
 {
+	return initNetLayer(-1, LAYER_TYPE_NONE, _prevNeurons, _numNeurons);
 }
 
 void CxNetLayer::setInitFcn( const TCHAR *szFcnName )
@@ -134,23 +158,40 @@ void CxNetLayer::setTransferFcn( const TCHAR *szFcnName )
 
 CxNetLayers::CxNetLayers( void )
 {
-	numLayers    = 0;
-	m_firstLayer = NULL;
-	m_lastLayer  = NULL;
+	commonConstructor(0);
 }
 
 CxNetLayers::CxNetLayers( int _numLayers )
+{
+	commonConstructor(_numLayers);
+}
+
+CxNetLayers::CxNetLayers( const TCHAR *szSizesOfLayers )
+{
+	commonConstructor(0);
+
+	if (szSizesOfLayers != NULL) {
+		// first time to get the num layers
+		int _numLayers = parseNetLayers(szSizesOfLayers, 0);
+		// more than 2 layers
+		if (_numLayers > 1) {
+			_numLayers = parseNetLayers(szSizesOfLayers, _numLayers);
+		}
+	}
+}
+
+CxNetLayers::~CxNetLayers( void )
+{
+	freeLayers();
+}
+
+INLINE void CxNetLayers::commonConstructor( int _numLayers )
 {
 	numLayers    = 0;
 	m_firstLayer = NULL;
 	m_lastLayer  = NULL;
 
 	initLayers(_numLayers);
-}
-
-CxNetLayers::~CxNetLayers( void )
-{
-	freeLayers();
 }
 
 int CxNetLayers::initLayers( int _numLayers )
@@ -195,6 +236,70 @@ void CxNetLayers::freeLayers( void )
 		m_firstLayer = NULL;
 		m_lastLayer  = NULL;
 	//}
+}
+
+int CxNetLayers::parseNetLayers( const TCHAR *szSizesOfLayers,
+								int _inNumLayers, /*= 0 */
+								const TCHAR *szDelim /*= NULL */ )
+{
+	TCHAR *pszOffset, *pszEndOf, *pszDest, *pszDelim;
+	TCHAR szBuffer[512];
+	DWORD dwBufSize = 512;
+
+	TRACE(_T("CxNetLayers::parseNetLayers() Enter.\n"));
+	if (szSizesOfLayers == NULL)
+		return -1;
+
+	int lenNumber, lenDelim;
+	int _indexLayer = 0, _numNeuron;
+	int prevNeuron = 0;
+
+	pszDelim = (szDelim == NULL) ? _T(",") : szDelim;
+	lenDelim = _tcslen(pszDelim);
+
+	pszOffset = (TCHAR *)szSizesOfLayers;
+	pszEndOf  = (TCHAR *)szSizesOfLayers + _tcslen(szSizesOfLayers);
+	while (pszOffset <= pszEndOf) {
+		pszDest = _tcsstr(pszOffset, pszDelim);
+		if (pszDest != NULL)
+			lenNumber = pszDest - pszOffset;
+		else
+			lenNumber = pszEndOf - pszOffset;
+		if (lenNumber > 0) {
+			if (_inNumLayers > 0) {
+				if (lenNumber > (int)dwBufSize)
+					lenNumber = dwBufSize - 1;
+				memcpy_s(szBuffer, _countof(szBuffer), pszOffset, sizeof(TCHAR) * lenNumber);
+				szBuffer[lenNumber] = 0;
+				_numNeuron = _tstoi(szBuffer);
+				if (_numNeuron > 0) {
+					if (_indexLayer == 0)
+						freeLayers();
+					int _index = append(prevNeuron, _numNeuron);
+					if (_index >= 0) {
+						if (_indexLayer == 0) {
+							layer(_index).type = LAYER_TYPE_INPUT;
+						}
+						else if (_indexLayer == _inNumLayers - 1) {
+							layer(_index).type = LAYER_TYPE_OUTPUT;
+						}
+						else {
+							layer(_index).type = LAYER_TYPE_HIDDEN;
+						}
+					}
+				}
+				TRACE(_T("numNeuron[%d] = %d.\n"), _indexLayer, _numNeuron);
+				prevNeuron = _numNeuron;
+			}
+			_indexLayer++;
+		}
+		if (pszDest != NULL)
+			pszOffset += lenNumber + lenDelim;
+		else
+			break;
+	}
+	TRACE(_T("CxNetLayers::parseNetLayers() Exit: _indexLayer = %d.\n"), _indexLayer);
+	return _indexLayer;
 }
 
 BOOL CxNetLayers::setNumLayers( int _numLayers )
@@ -447,12 +552,12 @@ CBaseAnnNetwork::~CBaseAnnNetwork( void )
 
 CAnnNetwork::CAnnNetwork( void )
 {
-	CommonConstructor(_T(""), _T(""));
+	commonConstructor(_T(""), _T(""));
 }
 
 CAnnNetwork::CAnnNetwork( const TCHAR *szName )
 {
-	CommonConstructor(szName, _T(""), _T(""), NULL);
+	commonConstructor(szName, _T(""), _T(""), NULL);
 }
 
 CAnnNetwork::~CAnnNetwork( void )
@@ -465,7 +570,7 @@ void CAnnNetwork::FreeNetwork( void )
 	//
 }
 
-BOOL CAnnNetwork::CommonConstructor( const TCHAR *szName,
+BOOL CAnnNetwork::commonConstructor( const TCHAR *szName,
 									const TCHAR *szSizesOfLayers,
 									const TCHAR *szTransFcnOfLayers,
 									const CxMatrix *inputMinMax,
@@ -499,12 +604,12 @@ BOOL CAnnNetwork::CommonConstructor( const TCHAR *szName,
 	return TRUE;
 }
 
-BOOL CAnnNetwork::CommonConstructor( const TCHAR *szSizesOfLayers,
+BOOL CAnnNetwork::commonConstructor( const TCHAR *szSizesOfLayers,
 									const TCHAR *szTransFcnOfLayers,
 									const CxMatrix *inputMinMax, /*= NULL */
 									const TCHAR *szTrainFcn /*= NULL */)
 {
-	return CommonConstructor(_T(""), szSizesOfLayers, szTransFcnOfLayers, inputMinMax, szTrainFcn);
+	return commonConstructor(_T(""), szSizesOfLayers, szTransFcnOfLayers, inputMinMax, szTrainFcn);
 }
 
 BOOL CAnnNetwork::createEx( const TCHAR *szName,
@@ -514,7 +619,7 @@ BOOL CAnnNetwork::createEx( const TCHAR *szName,
 						   const TCHAR *szTrainFcn /*= NULL */ )
 {
 	BOOL bResult;
-	bResult = CommonConstructor(szName, szSizesOfLayers, szTransFcnOfLayers, inputMinMax, szTrainFcn);
+	bResult = commonConstructor(szName, szSizesOfLayers, szTransFcnOfLayers, inputMinMax, szTrainFcn);
 	return bResult;
 }
 
@@ -638,6 +743,8 @@ int CAnnNetwork::parseNetLayers( const TCHAR *szSizesOfLayers,
 	TCHAR *pszOffset, *pszEndOf, *pszDest, *pszDelim;
 	TCHAR szBuffer[512];
 	DWORD dwBufSize = 512;
+
+	TRACE(_T("CAnnNetwork::parseNetLayers() Enter.\n"));
 	if (szSizesOfLayers == NULL)
 		return -1;
 
@@ -689,7 +796,7 @@ int CAnnNetwork::parseNetLayers( const TCHAR *szSizesOfLayers,
 		else
 			break;
 	}
-	TRACE(_T("parseNetLayers(): _indexLayer = %d.\n"), _indexLayer);
+	TRACE(_T("CAnnNetwork::parseNetLayers() Exit: _indexLayer = %d.\n"), _indexLayer);
 	return _indexLayer;
 }
 

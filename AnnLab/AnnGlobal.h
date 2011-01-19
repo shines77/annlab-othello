@@ -4,7 +4,7 @@
 
 #pragma once
 
-#define INLINE __inline
+#define INLINE inline
 
 #define FCN_NAME_LEN      64
 

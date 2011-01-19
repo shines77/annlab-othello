@@ -13,7 +13,7 @@ void ShowMessage( HWND hWnd, const TCHAR *szValName, int nValue, UINT nType )
 		_stprintf_s(szText, _countof(szText), _T("%s = %d."), szValName, nValue);
 	else
 		_stprintf_s(szText, _countof(szText), _T("Var = %d."), nValue);
-	::MessageBox(hWnd, szText, _T("Variable's Value"), nType);
+	::MessageBox(hWnd, szText, _T("Value of Var..."), nType);
 
 }
 
@@ -24,7 +24,7 @@ void ShowMessage( HWND hWnd, const TCHAR *szValName, UINT nType )
 		_stprintf_s(szText, _countof(szText), _T("%s"), szValName);
 	else
 		_stprintf_s(szText, _countof(szText), _T("%s"), szValName);
-	::MessageBox(hWnd, szText, _T("Information"), nType);
+	::MessageBox(hWnd, szText, _T("Information..."), nType);
 
 }
 
