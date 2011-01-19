@@ -2,6 +2,9 @@
 
 #include "AnnGlobal.h"
 #include "CxBaseObject.h"
+#include "CxList.h"
+
+using namespace std;
 
 #define MAT_NAN_ITEM         (-99.99)
 
@@ -136,3 +139,5 @@ public:
 private:
 	CxMatrix *pMatrixs;
 };
+
+typedef CxList<CxMatrix> CxMatrixList;

@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include "AnnLab.h"
 #include "AnnLabDlg.h"
+#include "CxList.h"
+#include "CxMatrix.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -42,9 +44,6 @@ END_MESSAGE_MAP()
 
 // CAnnLabDlg ¶Ô»°¿ò
 
-
-
-
 CAnnLabDlg::CAnnLabDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CAnnLabDlg::IDD, pParent)
 {
@@ -74,7 +73,7 @@ int CAnnLabDlg::BpNetwork_Test()
 	int indexLayer = 0;
 	net.layers.append( 2 );
 	try {
-		indexLayer = net.layers[5].index;
+		indexLayer = net.layers[0].index;
 	}
 	catch( TCHAR *errStr ) {
 		::ShowMessage( GetSafeHwnd(), errStr );
@@ -84,9 +83,9 @@ int CAnnLabDlg::BpNetwork_Test()
 	}
 	net.setName( _T("BP Network") );
 
-	CxMatrix trainP, trainT;
-	trainP.rands(64, 64);
-	trainT.rands(64, 1);
+	CxMatrix trainPx, trainTx;
+	trainPx.rands(64, 64);
+	trainTx.rands(64, 1);
 
 	CxMatrix inputMinMax;
 	inputMinMax.CreateEx( _T("inputMinMax"), 64, 2, MAT_INIT_ONES );
@@ -96,6 +95,8 @@ int CAnnLabDlg::BpNetwork_Test()
 
 	net.trainParam.show = TRUE;
 	net.trainParam.epochs = 2000;
+
+	CxMatrixList trainP, trainT;
 
 	CxTrainRecord tr;
 	pNetwork = net.train(&trainP, &trainT, &tr);
