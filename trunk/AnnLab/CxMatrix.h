@@ -40,7 +40,7 @@ public:
 	CxMatrix( int _size );
 	CxMatrix( int _rows, int _cols, int _initFcn = MAT_INIT_NONE );
 	CxMatrix( const TCHAR *szName, int _rows, int _cols, int _initFcn = MAT_INIT_NONE );
-	CxMatrix( const CxMatrix& other );								// 拷贝构造函数
+	CxMatrix( CxMatrix & scrMatrix );								// 拷贝构造函数
 	virtual ~CxMatrix( void );
 
 public:
@@ -67,15 +67,16 @@ public:
 	int mem_alloc;
 
 	// 重载运算符
-	CxMatrix &  operator =  ( const CxMatrix & other );
-	BOOL        operator == ( const CxMatrix & other ) const;
-	BOOL        operator != ( const CxMatrix & other ) const;
-	CxMatrix	operator +  ( const CxMatrix & other ) const;
-	CxMatrix	operator -  ( const CxMatrix & other ) const;
-	CxMatrix	operator *  ( double _value ) const;
-	CxMatrix	operator *  ( const CxMatrix & other ) const;
-	CxMatrix	operator /  ( double _value ) const;
-	CxMatrix	operator ^  ( double _value ) const;
+	CxMatrix &  operator =  ( CxMatrix & _Right );
+	BOOL        operator == ( CxMatrix & _Right );
+	BOOL        operator != ( CxMatrix & _Right );
+	CxMatrix &	operator +  ( CxMatrix & _Right );
+	CxMatrix &	operator -  ( CxMatrix & _Right );
+	CxMatrix &	operator += ( CxMatrix & _Right );
+	CxMatrix &	operator *  ( double _value     );
+	CxMatrix &	operator *  ( CxMatrix & _Right );
+	CxMatrix &	operator /  ( double _value     );
+	CxMatrix &	operator ^  ( double _value     );
 
 	// methods
 	void freeMatrix( void );
@@ -84,7 +85,7 @@ public:
 	BOOL initData( int _rows, int _cols, int _initFcn = MAT_INIT_DEFAULT );
 
 	BOOL Create  ( int _rows, int _cols, int _initFcn = MAT_INIT_DEFAULT );
-	BOOL CreateEx( const TCHAR *szName, int _rows, int _cols, int _initFcn = MAT_INIT_DEFAULT );
+	BOOL createEx( const TCHAR *szName, int _rows, int _cols, int _initFcn = MAT_INIT_DEFAULT );
 
 	CxMatrix * copy ( const CxMatrix *srcMartix );
 	CxMatrix * clone( const CxMatrix *srcMartix );
@@ -93,7 +94,7 @@ public:
 	BOOL makeUnitMatrix( int _size );
 
 	// 矩阵的转置
-	CxMatrix transpose( void ) const;
+	CxMatrix & transpose( void );
 
 	int ones   ( int _rows, int _cols );
 	int zeros  ( int _rows, int _cols );
@@ -131,7 +132,7 @@ public:
 	void freeMatrixs( void );
 	BOOL initMatrix ( const TCHAR *szName, int _numMatrixs );
 
-	virtual BOOL Create( const TCHAR *szName, int _numMatrixs );
+	BOOL create( const TCHAR *szName, int _numMatrixs );
 
 	CxMatrixs * copy ( const CxMatrixs *srcMartixs );
 	CxMatrixs * clone( const CxMatrixs *srcMartixs );

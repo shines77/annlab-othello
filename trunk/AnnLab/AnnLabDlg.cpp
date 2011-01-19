@@ -6,6 +6,7 @@
 #include "AnnLabDlg.h"
 #include "CxList.h"
 #include "CxMatrix.h"
+#include "MatUtils.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -87,8 +88,13 @@ int CAnnLabDlg::BpNetwork_Test()
 	trainPx.rands(64, 64);
 	trainTx.rands(64, 1);
 
+	CxMatrix temp, rands;
+	temp = MatUtils::ones(16, 16);
+	rands = MatUtils::rands2(16, 16);
+	temp += rands;
+
 	CxMatrix inputMinMax;
-	inputMinMax.CreateEx( _T("inputMinMax"), 64, 2, MAT_INIT_ONES );
+	inputMinMax.createEx( _T("inputMinMax"), 64, 2, MAT_INIT_ONES );
 
 	pNetwork = net.newff( &inputMinMax, _T("64, 65, 65, 33, 1"), _T("tansig, tansig, tansig, purelin"), _T("traincgf") );
 	pNetwork = net.init();

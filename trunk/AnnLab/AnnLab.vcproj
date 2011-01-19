@@ -206,6 +206,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MatUtils.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -265,6 +269,10 @@
 			</File>
 			<File
 				RelativePath=".\gyvals.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MatUtils.h"
 				>
 			</File>
 			<File

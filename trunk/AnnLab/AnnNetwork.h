@@ -117,7 +117,8 @@ public:
 	int  append( int _numNeurons );
 	int  append( int _prevNeurons, int _numNeurons );
 	int  append( CxNetLayer *pNetLayer );
-	BOOL remove( int _index );
+	int  remove( int _index );
+	int  insert( int _index, CxNetLayer *pNetLayer );
 	BOOL modify( int _index, int _numNeuron );
 
 	int  pop_front ( void );
@@ -142,9 +143,9 @@ public:
 	virtual ~CBaseAnnNetwork( void );
 
 	// methods
-	virtual BOOL Create( const TCHAR *szSizesOfLayers, const TCHAR *szTransFcnOfLayers,
+	virtual BOOL create( const TCHAR *szSizesOfLayers, const TCHAR *szTransFcnOfLayers,
 		const CxMatrix *inputMinMax = NULL, const TCHAR *szTrainFcn = NULL ) = 0;
-	virtual BOOL CreateEx( const TCHAR *szName, const TCHAR *szSizesOfLayers,
+	virtual BOOL createEx( const TCHAR *szName, const TCHAR *szSizesOfLayers,
 		const TCHAR *szTransFcnOfLayers, const CxMatrix *inputMinMax,
 		const TCHAR *szTrainFcn = NULL ) = 0;
 };
@@ -203,9 +204,9 @@ public:
 	void setTrainFcn    ( const TCHAR *szFcnName );
 
 	// methods
-	BOOL Create( const TCHAR *szSizesOfLayers, const TCHAR *szTransFcnOfLayers,
+	BOOL create( const TCHAR *szSizesOfLayers, const TCHAR *szTransFcnOfLayers,
 		const CxMatrix *inputMinMax = NULL, const TCHAR *szTrainFcn = NULL );
-	BOOL CreateEx( const TCHAR *szName, const TCHAR *szSizesOfLayers,
+	BOOL createEx( const TCHAR *szName, const TCHAR *szSizesOfLayers,
 		const TCHAR *szTransFcnOfLayers, const CxMatrix *inputMinMax,
 		const TCHAR *szTrainFcn = NULL );
 
