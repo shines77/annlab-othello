@@ -54,6 +54,49 @@ private:
 
 class CxTrainRecord { int m, n, k, l; };
 
+class CxNetInOutputs : public CxBaseObject
+{
+public:
+	CxNetInOutputs( void );
+	CxNetInOutputs( const TCHAR *szName );
+	virtual ~CxNetInOutputs( void );
+
+public:
+	void clear( void );
+};
+
+class CxNetInputs : public CxNetInOutputs
+{
+public:
+	CxNetInputs( void );
+	CxNetInputs( const TCHAR *szName );
+	virtual ~CxNetInputs( void );
+
+public:
+	//
+};
+
+class CxNetOutputs : public CxNetInOutputs
+{
+public:
+	CxNetOutputs( void );
+	CxNetOutputs( const TCHAR *szName );
+	virtual ~CxNetOutputs( void );
+
+public:
+	//
+};
+
+class CxNetWeights {
+public:
+	void clear( void ) {};
+};
+
+class CxNetBiases {
+public:
+	void clear( void ) {};
+};
+
 class CxNetLayer : public CxBaseObject
 {
 public:
@@ -160,24 +203,23 @@ public:
 	int numInputs;
 	int numLayers;
 	int numOutputs;
-
-	CxNetLayers layers;
-
-	CxMatrix inputMinMax;
-
-	CxMatrixs IW;
-	CxMatrixs LW;
-	CxMatrixs b;
+	int numCounter;
 
 	CxMatrix input;
 	CxMatrix output;
+	CxMatrix inputRange;
 
-	CxMatrixs inputs;
-	CxMatrixs outputs;
+	CxNetInputs  inputs;
+	CxNetLayers  layers;
+	CxNetOutputs outputs;
 
-	CxMatrixs biases;
-	CxMatrixs inputWeights;
-	CxMatrixs layerWeights;
+	CxMatrixList IW;
+	CxMatrixList LW;
+	CxMatrixList b;
+
+	CxNetWeights inputWeights;
+	CxNetWeights layerWeights;
+	CxNetBiases  biases;
 
 	CxTrainParam trainParam;
 
@@ -233,7 +275,7 @@ protected:
 	BOOL commonConstructor( const TCHAR *szName, const TCHAR *szSizesOfLayers,
 		const TCHAR *szTransFcnOfLayers, const CxMatrix *inputMinMax,
 		const TCHAR *szTrainFcn = NULL );
-	void FreeNetwork( void );
+	void freeNetwork( void );
 
 	static int trimString(const TCHAR *szString, TCHAR *szBuffer, DWORD dwBufSize);
 
