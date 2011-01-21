@@ -190,7 +190,7 @@ CxMatrix::CxMatrix( const TCHAR *szName, int _rows, int _cols,
 	initMatrix(szName, _rows, _cols, TRUE, _initFcn);
 }
 
-CxMatrix::CxMatrix( CxMatrix & scrMatrix )
+CxMatrix::CxMatrix( const CxMatrix & scrMatrix )
 {
 	int _rows, _cols;
 	_rows = scrMatrix.rows;
@@ -274,7 +274,8 @@ BOOL CxMatrix::createEx( const TCHAR *szName, int _rows, int _cols,
 	return initMatrix(szName, _rows, _cols, FALSE, _initFcn);
 }
 
-BOOL CxMatrix::initData( int _rows, int _cols, int _initFcn /*= MAT_INIT_NONE */ )
+BOOL CxMatrix::initData( int _rows, int _cols, double _fillVal, /*= 0.0 */
+						int _initFcn /*= MAT_INIT_NONE */ )
 {
 	ASSERT(m_pData != NULL);
 	if (m_pData == NULL)
@@ -362,11 +363,16 @@ BOOL CxMatrix::sameSize( const CxMatrix *target, int n /*= 0 */ )
 	return FALSE;
 }
 
-int CxMatrix::resize( int _rows, int _cols, int _initFcn /*= 0 */ )
+void CxMatrix::clear( void )
+{
+	freeMatrix();
+}
+
+int CxMatrix::resize( int _rows, int _cols, double _fillVal /*= 0.0 */, int _initFcn /*= 0 */ )
 {
 	int _size = -1;
 	if (_rows == rows && _cols == cols) {
-		if (initData(_rows, _cols, _initFcn)) {
+		if (initData(_rows, _cols, _fillVal, _initFcn)) {
 			_size = rows * cols;
 			length = _size;
 		}

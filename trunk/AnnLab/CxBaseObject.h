@@ -13,7 +13,9 @@ public:
 
 public:
 	// gets
-	INLINE TCHAR * Name( void ) const { return (TCHAR *)m_szName; };
+	INLINE TCHAR * Name( void ) const {
+		return (TCHAR *)m_szName;
+	};
 
 	// sets
 	void setName( const TCHAR *szName ) {

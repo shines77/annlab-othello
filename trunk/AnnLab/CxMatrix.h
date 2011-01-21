@@ -91,7 +91,7 @@ public:
 	CxMatrix( int _size );
 	CxMatrix( int _rows, int _cols, int _initFcn = MAT_INIT_NONE );
 	CxMatrix( const TCHAR *szName, int _rows, int _cols, int _initFcn = MAT_INIT_NONE );
-	CxMatrix( CxMatrix & scrMatrix );								// 拷贝构造函数
+	CxMatrix( const CxMatrix & scrMatrix );								// 拷贝构造函数
 	virtual ~CxMatrix( void );
 
 public:
@@ -166,7 +166,7 @@ public:
 	void freeMatrix( void );
 	BOOL initMatrix( const TCHAR *szName, int _rows, int _cols, int _initMode = INIT_MODE_NONE,
 		int _initFcn = MAT_INIT_DEFAULT );
-	BOOL initData  ( int _rows, int _cols, int _initFcn = MAT_INIT_DEFAULT );
+	BOOL initData  ( int _rows, int _cols, double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
 
 	BOOL Create  ( int _rows, int _cols, int _initFcn = MAT_INIT_DEFAULT );
 	BOOL createEx( const TCHAR *szName, int _rows, int _cols, int _initFcn = MAT_INIT_DEFAULT );
@@ -174,7 +174,8 @@ public:
 	CxMatrix * copy ( const CxMatrix *srcMartix );
 	CxMatrix * clone( const CxMatrix *srcMartix );
 
-	int resize( int _rows, int _cols, int _initFcn = MAT_INIT_DEFAULT );
+	void clear( void );
+	int  resize( int _rows, int _cols, double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
 	BOOL makeUnitMatrix( int _size );
 
 	// 矩阵的转置
