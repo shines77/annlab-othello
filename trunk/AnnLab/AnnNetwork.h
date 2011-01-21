@@ -106,6 +106,7 @@ public:
 
 	// gets
 	CxNetLayer & operator [] ( int _index ) const;
+	CxNetLayer & operator () ( int _index ) const;
 	CxNetLayer & layer( int _index ) const;
 	CxNetLayer * getLayer( int _index ) const;
  
@@ -147,22 +148,7 @@ private:
 	CxNetLayer* m_lastLayer;
 };
 
-class CBaseAnnNetwork : public CxBaseObject
-{
-public:
-	CBaseAnnNetwork( void );
-	CBaseAnnNetwork( const TCHAR *szName );
-	virtual ~CBaseAnnNetwork( void );
-
-	// methods
-	virtual BOOL create( const TCHAR *szSizesOfLayers, const TCHAR *szTransFcnOfLayers,
-		const CxMatrix *inputMinMax = NULL, const TCHAR *szTrainFcn = NULL ) = 0;
-	virtual BOOL createEx( const TCHAR *szName, const TCHAR *szSizesOfLayers,
-		const TCHAR *szTransFcnOfLayers, const CxMatrix *inputMinMax,
-		const TCHAR *szTrainFcn = NULL ) = 0;
-};
-
-class CAnnNetwork : public CBaseAnnNetwork
+class CAnnNetwork : public CxBaseObject
 {
 public:
 	CAnnNetwork( void );
@@ -181,7 +167,7 @@ public:
 
 	CxMatrixs IW;
 	CxMatrixs LW;
-	CxVectors b;
+	CxMatrixs b;
 
 	CxMatrix input;
 	CxMatrix output;
@@ -189,9 +175,9 @@ public:
 	CxMatrixs inputs;
 	CxMatrixs outputs;
 
-	CxCells biases;
-	CxCells inputWeights;
-	CxCells layerWeights;
+	CxMatrixs biases;
+	CxMatrixs inputWeights;
+	CxMatrixs layerWeights;
 
 	CxTrainParam trainParam;
 

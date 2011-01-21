@@ -3,6 +3,8 @@
 #include "AnnGlobal.h"
 #include "CxBaseObject.h"
 #include "CxList.h"
+#include <list>
+#include <vector>
 
 using namespace std;
 
@@ -98,17 +100,34 @@ public:
 	BOOL   sameSize    ( const CxMatrix *target, int n = 0 );
 	double getElement  ( int _index ) const;						// 获取指定元素的值
 	double getElement  ( int _row, int _col ) const;				// 获取指定元素的值
-	int    getRowVector( int _row, double* pVector ) const;			// 获取矩阵的指定行矩阵
-	int    getColVector( int _col, double* pVector ) const;			// 获取矩阵的指定列矩阵
 
-	double *getDataPtr ( void ) const { return m_pData; };			// 获得数据指针
-	double *getOrigDataPtr ( void ) const { return m_pOrigData; };	// 获得原始数据指针
+	// 获取矩阵的指定行矩阵
+	int    getRowVector( int _row, double* pVector ) const;
+	// 获取矩阵的指定列矩阵
+	int    getColVector( int _col, double* pVector ) const;
+
+	// 获取矩阵的指定行矩阵
+	int    getRowVector( int _row, CxMatrix* pMatrix ) const;
+	// 获取矩阵的指定列矩阵
+	int    getColVector( int _col, CxMatrix* pMatrix ) const;
+
+	// 把第x行至第y行的数据转换成为新的矩阵
+	int    getRowVector( int _rowStart, int _rowEnd, CxMatrix* pMatrix ) const;
+	// 把第x列至第y列的数据转换成为新的矩阵
+	int    getColVector( int _colStart, int _colEnd, CxMatrix* pMatrix ) const;
+
+	/* 把第x行至第y行的第m列至第n列的数据转换成为新的矩阵 */
+	int    getPartOfMatrix( int _rowStart, int _rowEnd,
+							int _colStart, int _colEnd, CxMatrix* pMatrix ) const;
+
+	double *getData    ( void ) const { return m_pData;     };		// 获得数据指针
+	double *getOrigData( void ) const { return m_pOrigData; };		// 获得原始数据指针
 
 	// sets
 	BOOL   setElement  ( int _row, int _col, double _value );		// 设置指定元素的值
 	BOOL   setElement  ( int _index, double _value );				// 设置指定元素的值
-	double *setDataBuf ( double *pBuffer, int _length );			// 从缓冲区写入数据
-	double *setDataBuf ( double *pBuffer, int _rows, int _cols );	// 从缓冲区写入数据
+	double *setData    ( double *pBuffer, int _length );			// 从缓冲区写入数据
+	double *setData    ( double *pBuffer, int _rows, int _cols );	// 从缓冲区写入数据
 
 	// property
 	int rows, cols;
@@ -116,6 +135,10 @@ public:
 	int mem_alloc;
 
 	// operator(重载运算符)
+	double      operator () ( int _index );
+	double      operator () ( int _row, int _col );
+	double      operator [] ( int _index );
+
 	CxMatrix &  operator =  ( CxMatrix & _Right );
 	BOOL        operator == ( CxMatrix & _Right );
 	BOOL        operator != ( CxMatrix & _Right );
@@ -143,7 +166,7 @@ public:
 	void freeMatrix( void );
 	BOOL initMatrix( const TCHAR *szName, int _rows, int _cols, int _initMode = INIT_MODE_NONE,
 		int _initFcn = MAT_INIT_DEFAULT );
-	BOOL initData( int _rows, int _cols, int _initFcn = MAT_INIT_DEFAULT );
+	BOOL initData  ( int _rows, int _cols, int _initFcn = MAT_INIT_DEFAULT );
 
 	BOOL Create  ( int _rows, int _cols, int _initFcn = MAT_INIT_DEFAULT );
 	BOOL createEx( const TCHAR *szName, int _rows, int _cols, int _initFcn = MAT_INIT_DEFAULT );
@@ -204,7 +227,14 @@ private:
 	CxMatrix *pMatrixs;
 };
 
-class CxMatrixList : public CxList<CxMatrix>
+class CxMatrixVector : public vector<CxMatrix>, public CxBaseObject
+{
+public:
+	CxMatrixVector( void );
+	virtual ~CxMatrixVector( void );
+};
+
+class CxMatrixList : public list<CxMatrix>, public CxBaseObject
 {
 public:
 	CxMatrixList( void );
