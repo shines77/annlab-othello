@@ -312,7 +312,13 @@ CxNetLayer & CxNetLayers::operator [] ( int _index ) const
 {
 	CxNetLayer &_layer = (CxNetLayer &)layer(_index);
 	return _layer;
-};
+}
+
+CxNetLayer & CxNetLayers::operator () ( int _index ) const
+{
+	CxNetLayer &_layer = (CxNetLayer &)layer(_index);
+	return _layer;
+}
 
 CxNetLayer & CxNetLayers::layer( int _index ) const
 {
@@ -526,25 +532,6 @@ int CxNetLayers::remove( int _index )
 BOOL CxNetLayers::modify( int _index, int _numNeuron )
 {
 	return FALSE;
-}
-
-//////////////////////////////////////////////////////////////////
-// CBaseAnnNetwork
-//////////////////////////////////////////////////////////////////
-
-CBaseAnnNetwork::CBaseAnnNetwork( void )
-{
-
-}
-
-CBaseAnnNetwork::CBaseAnnNetwork( const TCHAR *szName )
-{
-
-}
-
-CBaseAnnNetwork::~CBaseAnnNetwork( void )
-{
-
 }
 
 //////////////////////////////////////////////////////////////////

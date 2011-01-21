@@ -395,7 +395,7 @@ CxMatrix * CxMatrix::copy( const CxMatrix *srcMartix )
 		if (_rows >= 0 && _cols >= 0) {
 			int _size = resize(_rows, _cols);
 			if (_size == (_rows * _cols) && _size >= 0) {
-				srcDataPtr = srcMartix->getDataPtr();
+				srcDataPtr = srcMartix->getData();
 				if (m_pData != NULL && srcDataPtr != NULL) {
 					int _sizeNew = rows * cols;
 #if 1
@@ -471,7 +471,7 @@ BOOL CxMatrix::setElement( int _row, int _col, double _value )
 	return FALSE;
 }
 
-double * CxMatrix::setDataBuf( double *pBuffer, int _length )
+double * CxMatrix::setData( double *pBuffer, int _length )
 {
 	if (pBuffer != NULL) {
 		int _size = rows * cols;
@@ -485,12 +485,27 @@ double * CxMatrix::setDataBuf( double *pBuffer, int _length )
 	return NULL;
 }
 
-double * CxMatrix::setDataBuf( double *pBuffer, int _rows, int _cols )
+double * CxMatrix::setData( double *pBuffer, int _rows, int _cols )
 {
 	if (_rows >= 0 && _rows <= rows && _cols >= 0 && _cols <= cols) {
-		return setDataBuf(pBuffer, _rows * _cols);
+		return setData(pBuffer, _rows * _cols);
 	}
 	return NULL;
+}
+
+double CxMatrix::operator[]( int _index )
+{
+	return getElement(_index);
+}
+
+double CxMatrix::operator()( int _index )
+{
+	return getElement(_index);
+}
+
+double CxMatrix::operator()( int _row, int _col )
+{
+	return getElement(_row, _col);
 }
 
 CxMatrix & CxMatrix::operator = ( CxMatrix & _Right )
@@ -1014,6 +1029,16 @@ CxMatrixList::CxMatrixList( void )
 }
 
 CxMatrixList::~CxMatrixList( void )
+{
+
+}
+
+CxMatrixVector::CxMatrixVector( void )
+{
+
+}
+
+CxMatrixVector::~CxMatrixVector( void )
 {
 
 }
