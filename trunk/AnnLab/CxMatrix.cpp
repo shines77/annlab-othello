@@ -258,6 +258,12 @@ BOOL CxMatrix::initMatrix( const TCHAR *szName, int _rows, int _cols,
 				else {
 					// copy data from old data buffer
 					bResult = copyData(pNewData, _rows, _cols, _fillVal, _initFcn);
+					// clear old data
+					if (m_pOrigData != NULL) {
+						delete[] m_pOrigData;
+						m_pOrigData = NULL;
+						m_pData = NULL;
+					}
 					// save the new data buffer
 					m_pOrigData = pNewOrigData;
 					m_pData = pNewData;
@@ -394,7 +400,7 @@ BOOL CxMatrix::copyData( double *pNewData, int _rows, int _cols,
 
 	// copy the old data
 	if (_copySize != 0)
-		memcpy_s(pNewData, sizeof(double) * _copySize, m_pData, sizeof(double) * _oldSize);
+		memcpy_s(pNewData, sizeof(double) * _copySize, m_pData, sizeof(double) * _copySize);
 
 	if (_fillSize <= 0)
 		return TRUE;
@@ -808,8 +814,8 @@ CxMatrix CxMatrix::operator * ( CxMatrix & _Right )
 	// 首先检查乘矩阵的行数和被乘矩阵的列数是否相同
 	ASSERT(cols == _Right.rows);
 
-	_Right.display();
-	display();
+	//_Right.display();
+	//display();
 
 	int _newRows, _newCols, _oldCols;
 	_newRows = rows;
@@ -1089,7 +1095,21 @@ CxMatrix CxMatrix::_rands2( int _rows, int _cols ) const
 
 void CxMatrix::display( void )
 {
-	TRACE(_T("CxMatrix: Name = [%s], [%d, %d]\n"), Name(), rows, cols);
+	TRACE(_T("CxMatrix: Name = [ %s ], [rows = %d, cols = %d]\n"), Name(), rows, cols);
+	TRACE(_T("============================================================================================================\n\n"));
+	for (int r=0; r<rows; r++) {
+		TRACE(_T("\t"));
+		for (int c=0; c<cols; c++) {
+			TRACE(_T("%0.4f  \t"), getElement(r, c));
+		}
+		TRACE(_T("\n\n"));
+	}
+	TRACE(_T("============================================================================================================\n\n"));
+}
+
+void CxMatrix::display( const TCHAR *szName )
+{
+	TRACE(_T("CxMatrix: Name = [ %s ], [rows = %d, cols = %d]\n"), szName, rows, cols);
 	TRACE(_T("============================================================================================================\n\n"));
 	for (int r=0; r<rows; r++) {
 		TRACE(_T("\t"));

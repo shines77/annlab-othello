@@ -183,6 +183,7 @@ public:
 	BOOL makeUnitMatrix( int _size );
 
 	void display( void );
+	void display( const TCHAR *szName );
 
 	// ¾ØÕóµÄ×ªÖÃ
 	CxMatrix & transpose( void );
