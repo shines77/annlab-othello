@@ -153,6 +153,7 @@ public:
 	CxMatrix &  operator *= ( double _value     );
 	CxMatrix &  operator *= ( CxMatrix & _Right );
 	CxMatrix    operator /  ( double _value     );
+	CxMatrix    operator /  ( CxMatrix &_Right  );
 	CxMatrix &  operator /= ( double _value     );
 	CxMatrix    operator ^  ( double _value     );
 	CxMatrix &  operator ^= ( double _value     );
@@ -165,11 +166,14 @@ public:
 	// methods
 	void freeMatrix( void );
 	BOOL initMatrix( const TCHAR *szName, int _rows, int _cols, int _initMode = INIT_MODE_NONE,
-		int _initFcn = MAT_INIT_DEFAULT );
+		double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
 	BOOL initData  ( int _rows, int _cols, double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
+	BOOL copyData  ( double *pNewData, int _rows, int _cols, double _fillVal = 0.0,
+		int _initFcn = MAT_INIT_DEFAULT );
 
-	BOOL Create  ( int _rows, int _cols, int _initFcn = MAT_INIT_DEFAULT );
-	BOOL createEx( const TCHAR *szName, int _rows, int _cols, int _initFcn = MAT_INIT_DEFAULT );
+	BOOL Create  ( int _rows, int _cols, double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
+	BOOL createEx( const TCHAR *szName, int _rows, int _cols, double _fillVal = 0.0,
+		int _initFcn = MAT_INIT_DEFAULT );
 
 	CxMatrix * copy ( const CxMatrix *srcMartix );
 	CxMatrix * clone( const CxMatrix *srcMartix );
@@ -177,6 +181,8 @@ public:
 	void clear( void );
 	int  resize( int _rows, int _cols, double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
 	BOOL makeUnitMatrix( int _size );
+
+	void display( void );
 
 	// ¾ØÕóµÄ×ªÖÃ
 	CxMatrix & transpose( void );
