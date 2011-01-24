@@ -1,8 +1,12 @@
 #include "StdAfx.h"
 #include "AnnGlobal.h"
+#include "MatUtils.h"
 #include "AnnNetwork.h"
 #include <excpt.h>
 #include <Winbase.h>
+#include <math.h>
+
+#define error printf
 
 #define ADAPTFCN_DEFAULT      _T("trains")
 #define DIVIDEFCN_DEFAULT     _T("")
@@ -155,7 +159,7 @@ CxNetLayer::CxNetLayer( int _type, int _prevNeurons, int _numNeurons )
 	initNetLayer(-1, _type, _prevNeurons, _numNeurons);
 }
 
-CxNetLayer::CxNetLayer( CxNetLayer & srcNetLayer )
+CxNetLayer::CxNetLayer( const CxNetLayer & srcNetLayer )
 {
 	int _index, _type;
 	int _prevNeurons, _numNeurons;
@@ -749,11 +753,14 @@ int CAnnNetwork::appendNetLayer( int _prevNeurons, int _numNeurons )
 			else {
 				if (_prevNeurons > 0) {
 					if (numCounter == 1) {
+						/*
 						CxMatrix *inputWeight = new CxMatrix(_prevNeurons, _numNeurons);
 						if (inputWeight != NULL) {
 							IW.push_back(*inputWeight);
 							delete inputWeight;
 						}
+						//*/
+						IW.resize(_prevNeurons, _numNeurons);
 					}
 					else {
 						CxMatrix *layerWeight = new CxMatrix(_prevNeurons, _numNeurons);
@@ -984,6 +991,36 @@ CAnnNetwork * CAnnNetwork::newff( const CxMatrix *_inputMinMax, const TCHAR *szS
 CAnnNetwork * CAnnNetwork::init( void )
 {
 	CAnnNetwork *pNetwork = NULL;
+	int _numInputs, _numNeurons;
+	CxMatrix _inputRange, _activeRange;
+	int _rows, _cols;
+
+	for (int _index=0; _index<numLayers; _index++) {
+		CxNetLayer *pNetLayer = layers.getLayer(_index);
+		if (pNetLayer != NULL) {
+			_numInputs  = pNetLayer->prevNeurons;
+			_numNeurons = pNetLayer->numNeurons;
+			if (_index == 0) {
+				if (_tcsicmp(pNetLayer->initFcn(), _T("initnw")) == 0) {
+					// 'initnw': Nguyen-Widrow method
+					initnw(&IW, _numInputs, _numNeurons, &_inputRange, &_activeRange);
+				}
+				if (_tcsicmp(pNetLayer->initFcn(), _T("initwb")) == 0) {
+					// 'initwb': Init weights and biases
+					//initwb(&IW, numInputs, numNeurons, inputRange, activeRange);
+				}
+				else {
+					// dafault is 'initwb' and 'rands'
+					_rows = IW.rows;
+					_cols = IW.cols;
+					IW.rands(_rows, _cols);
+				}
+			}
+			else {
+				//
+			}
+		}
+	}
 	pNetwork = this;
 	return pNetwork;
 }
@@ -994,4 +1031,66 @@ CAnnNetwork * CAnnNetwork::train( const CxMatrixList *trainP, const CxMatrixList
 	CAnnNetwork *pNetwork = NULL;
 	pNetwork = this;
 	return pNetwork;
+}
+
+BOOL CAnnNetwork::initnw( CxMatrix *pMatrix, int _numInputs, int _numNeurons,
+						   CxMatrix *pInputRange, CxMatrix *pActiveRange )
+{
+	/*****************************************************************
+		function [w,b] = calcnw(pr,s,n)
+		%CALCNW Calculates Nguyen-Widrow initial conditions.
+		%
+		%  PR
+		%  S - Number of neurons.
+		%  N - Active region of transfer function N = [Nmin Nmax].
+
+		r = size(pr,1);
+
+		% Nguyen-Widrow Method
+		% --------------------
+
+		% Assume inputs and net inputs range in [-1 1].
+
+		% Weights
+		wMag = 0.7*s^(1/r);
+		wDir = randnr(s,r);
+		w = wMag*wDir;
+
+		% Biases
+		if (s==1)
+			b = 0;
+		else
+			b = wMag*linspace(-1,1,s)'.*sign(w(:,1));
+		end
+
+		% Conversions
+		% -----------
+
+		% Conversion of net inputs of [-1 1] to [Nmin Nmax]
+		x = 0.5*(n(2)-n(1));
+		y = 0.5*(n(2)+n(1));
+		w = x*w;
+		b = x*b+y;
+
+		% Conversion of inputs of PR to [-1 1]
+		x = 2./(pr(:,2)-pr(:,1));
+		y = 1-pr(:,2).*x;
+
+		xp = x';
+		b = w*y+b;
+		w = w.*xp(ones(1,s),:);
+
+	*****************************************************************/
+
+	// Assume inputs and net inputs range in [-1 1].
+
+	// Weights
+	double wMag;
+	CxMatrix wDir, w;
+	// wMag = 0.7*s^(1/r);
+	wMag = 0.7 * pow((double)_numNeurons, 1.0/(double)_numInputs);
+	// wDir = randnr(s,r);
+	wDir = randnr(_numNeurons, _numInputs);
+	w = wMag * wDir;
+	return TRUE;
 }

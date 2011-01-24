@@ -104,7 +104,7 @@ public:
 	CxNetLayer( int _numNeurons );
 	CxNetLayer( int _prevNeurons, int _numNeurons );
 	CxNetLayer( int _type, int _prevNeurons, int _numNeurons );
-	CxNetLayer( CxNetLayer & srcNetLayer );
+	CxNetLayer( const CxNetLayer & srcNetLayer );
 	virtual ~CxNetLayer( void );
 
 public:
@@ -124,6 +124,8 @@ public:
 	// sets
 	void setInitFcn     ( const TCHAR *szFcnName );
 	void setTransferFcn ( const TCHAR *szFcnName );
+
+	void setType ( int _type ) { type = _type; };
 
 	// methods
 	BOOL initNetLayer( int _prevNeurons, int _numNeurons );
@@ -153,7 +155,7 @@ public:
 	CxNetLayer & layer( int _index ) const;
 	CxNetLayer * getLayer( int _index ) const;
  
-	int  size( void ) const;
+	int  size ( void ) const;
 	BOOL empty( void ) const;
 
 	CxNetLayer * begin( void ) const;
@@ -184,7 +186,7 @@ protected:
 	void freeLayers( void );
 
 	int parseNetLayers( const TCHAR *szSizesOfLayers, int _inNumLayers = 0,
-		const TCHAR *szDelim = NULL  );
+		const TCHAR *szDelim = NULL );
 
 private:
 	CxNetLayer* m_firstLayer;
@@ -213,7 +215,7 @@ public:
 	CxNetLayers  layers;
 	CxNetOutputs outputs;
 
-	CxMatrixList IW;
+	CxMatrix     IW;
 	CxMatrixList LW;
 	CxMatrixList b;
 
@@ -268,6 +270,9 @@ public:
 	CAnnNetwork * init( void );
 	CAnnNetwork * train( const CxMatrixList *trainP, const CxMatrixList *trainT,
 		CxTrainRecord *trainRecord );
+
+	BOOL initnw( CxMatrix *pMatrix, int _numInputs, int _numNeurons,
+		CxMatrix *pInputRange, CxMatrix *pActiveRange );
 
 protected:
 	BOOL commonConstructor( const TCHAR *szSizesOfLayers, const TCHAR *szTransFcnOfLayers,

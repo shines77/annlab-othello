@@ -181,13 +181,13 @@ CxMatrix::CxMatrix( int _size )
 
 CxMatrix::CxMatrix( int _rows, int _cols, int _initFcn /*= MAT_INIT_NONE */ )
 {
-	initMatrix(NULL, _rows, _cols, TRUE, _initFcn);
+	initMatrix(NULL, _rows, _cols, TRUE, 0.0, _initFcn);
 }
 
 CxMatrix::CxMatrix( const TCHAR *szName, int _rows, int _cols,
 				   int _initFcn /*= MAT_INIT_NONE */ )
 {
-	initMatrix(szName, _rows, _cols, TRUE, _initFcn);
+	initMatrix(szName, _rows, _cols, TRUE, 0.0, _initFcn);
 }
 
 CxMatrix::CxMatrix( const CxMatrix & scrMatrix )
@@ -221,6 +221,7 @@ void CxMatrix::freeMatrix( void )
 
 BOOL CxMatrix::initMatrix( const TCHAR *szName, int _rows, int _cols,
 						  int _initMode, /*= INIT_MODE_NONE */
+						  double _fillVal,  /*= 0.0 */
 						  int _initFcn   /*= MAT_INIT_NONE */ )
 {
 	BOOL bResult = FALSE;
@@ -239,23 +240,44 @@ BOOL CxMatrix::initMatrix( const TCHAR *szName, int _rows, int _cols,
 			_tcscpy_s(m_szName, _countof(m_szName), _T(""));
 	}
 
+	int _mem_alloc;
 	int _size = _rows * _cols;
 	if (_size >= 0 && _rows >= 0 && _cols >= 0) {
-		freeMatrix();
-		rows = _rows;
-		cols = _cols;
-		length = cols * rows;
-
 		if (_size > 0) {
-			mem_alloc = _size + MET_ADDR_ALIGN_SIZE;
-			m_pOrigData = new double[mem_alloc];
-			if (m_pOrigData != NULL) {
-				m_pData = (double *)MET_ADDR_ALIGN(m_pOrigData);
-				// init matrix data
-				bResult = initData(rows, cols, _initFcn);
+			_mem_alloc = _size + MET_ADDR_ALIGN_SIZE;
+			double *pNewOrigData = new double[_mem_alloc];
+			if (pNewOrigData != NULL) {
+				double *pNewData = (double *)MET_ADDR_ALIGN(pNewOrigData);
+				if (m_pOrigData == NULL) {
+					// save the new data buffer
+					m_pOrigData = pNewOrigData;
+					m_pData = pNewData;
+					// init data for matrix
+					bResult = initData(_rows, _cols, _fillVal, _initFcn);
+				}
+				else {
+					// copy data from old data buffer
+					bResult = copyData(pNewData, _rows, _cols, _fillVal, _initFcn);
+					// save the new data buffer
+					m_pOrigData = pNewOrigData;
+					m_pData = pNewData;
+				}				
+				// save the new sizes
+				rows = _rows;
+				cols = _cols;
+				length = cols * rows;
+				mem_alloc = _mem_alloc;
 			}
 		}
 		else {
+			if (m_pOrigData != NULL) {
+				delete[] m_pOrigData;
+				m_pOrigData = NULL;
+				m_pData = NULL;
+			}
+			rows = _rows;
+			cols = _cols;
+			length = cols * rows;
 			mem_alloc = 0;
 			bResult = TRUE;
 		}
@@ -263,15 +285,17 @@ BOOL CxMatrix::initMatrix( const TCHAR *szName, int _rows, int _cols,
 	return bResult;
 }
 
-BOOL CxMatrix::Create( int _rows, int _cols, int _initFcn /*= MAT_INIT_NONE */ )
+BOOL CxMatrix::Create( int _rows, int _cols, double _fillVal, /*= 0 */
+					  int _initFcn /*= MAT_INIT_NONE */ )
 {
-	return initMatrix(_T(""), _rows, _cols, FALSE, _initFcn);
+	return initMatrix(_T(""), _rows, _cols, FALSE, _fillVal, _initFcn);
 }
 
 BOOL CxMatrix::createEx( const TCHAR *szName, int _rows, int _cols,
+						double _fillVal, /*= 0 */
 						int _initFcn /*= MAT_INIT_NONE */ )
 {
-	return initMatrix(szName, _rows, _cols, FALSE, _initFcn);
+	return initMatrix(szName, _rows, _cols, FALSE, _fillVal, _initFcn);
 }
 
 BOOL CxMatrix::initData( int _rows, int _cols, double _fillVal, /*= 0.0 */
@@ -281,19 +305,23 @@ BOOL CxMatrix::initData( int _rows, int _cols, double _fillVal, /*= 0.0 */
 	if (m_pData == NULL)
 		return FALSE;
 
+	/*
 	ASSERT(_rows <= rows && _rows >= 0 && _cols <= cols && _cols >= 0);
 	if (_rows > rows || _rows < 0 || _cols > cols || _cols < 0)
+		return FALSE;
+	//*/
+
+	ASSERT(_rows >= 0 && _cols >= 0);
+	if (_rows < 0 || _cols < 0)
 		return FALSE;
 
 	// init matrix data
 	int _size = _rows * _cols;
-	_size = (_size > length) ? _size : length;
-	ASSERT(_size >= 0);
 
-	if (_size <= 0) {
-		if (_size == 0)
-			freeMatrix();
-		return (_size >= 0);
+	ASSERT(_size >= 0);
+	if (_size == 0) {
+		freeMatrix();
+		return TRUE;
 	}
 
 	double _dblRand;
@@ -325,6 +353,86 @@ BOOL CxMatrix::initData( int _rows, int _cols, double _fillVal, /*= 0.0 */
 		// don't init matrix
 		break;
 	}
+	return TRUE;
+}
+
+BOOL CxMatrix::copyData( double *pNewData, int _rows, int _cols,
+						double _fillVal, /*= 0.0*/
+						int _initFcn /*= MAT_INIT_DEFAULT */ )
+{
+	ASSERT(m_pData != NULL && pNewData != NULL);
+	if (m_pData == NULL || pNewData == NULL)
+		return FALSE;
+
+	ASSERT(pNewData != m_pData);
+	if (pNewData == m_pData)
+		return FALSE;
+
+	/*
+	ASSERT(_rows <= rows && _rows >= 0 && _cols <= cols && _cols >= 0);
+	if (_rows > rows || _rows < 0 || _cols > cols || _cols < 0)
+		return FALSE;
+	//*/
+
+	ASSERT(_rows >= 0 && _cols >= 0);
+	if (_rows < 0 || _cols < 0)
+		return FALSE;
+
+	// init matrix data
+	int _newSize, _oldSize, _copySize, _fillSize;
+	_newSize = _rows * _cols;
+
+	ASSERT(_newSize >= 0);
+	if (_newSize == 0) {
+		freeMatrix();
+		return TRUE;
+	}
+
+	_oldSize  = rows * cols;
+	_copySize = MIN(_newSize, _oldSize);
+	_fillSize = _newSize - _oldSize;
+
+	// copy the old data
+	if (_copySize != 0)
+		memcpy_s(pNewData, sizeof(double) * _copySize, m_pData, sizeof(double) * _oldSize);
+
+	if (_fillSize <= 0)
+		return TRUE;
+
+	double *pNewDataFill = pNewData + _copySize;
+	if (pNewDataFill == NULL)
+		return FALSE;
+
+	double _dblRand;
+	switch (_initFcn) {
+	case MAT_INIT_ZEROS:		// all zeros
+		for (int i=0; i<_fillSize; i++)
+			pNewDataFill[i] = 0.0;
+		break;
+	case MAT_INIT_ONES:			// all ones
+		for (int i=0; i<_fillSize; i++)
+			pNewDataFill[i] = 1.0;
+		break;
+	case MAT_INIT_RANDS:		// all [-1,1] randomize
+		for (int i=0; i<_fillSize; i++) {
+			_dblRand = 2.0 * (double)rand() / (double)(RAND_MAX + 1) - 1.0;
+			pNewDataFill[i] = _dblRand;
+		}
+		break;
+	case MAT_INIT_RANDS2:		// all [0,1] randomize
+		for (int i=0; i<_fillSize; i++) {
+			_dblRand = (double)rand() / (double)(RAND_MAX + 1);
+			pNewDataFill[i] = _dblRand;
+		}
+		break;
+	case MAT_INIT_NONE:
+		// do nothing
+		break;
+	default:
+		// don't init matrix
+		break;
+	}
+
 	return TRUE;
 }
 
@@ -378,7 +486,7 @@ int CxMatrix::resize( int _rows, int _cols, double _fillVal /*= 0.0 */, int _ini
 		}
 	}
 	else {
-		if (initMatrix(NULL, _rows, _cols, INIT_MODE_RESIZE, _initFcn)) {
+		if (initMatrix(NULL, _rows, _cols, INIT_MODE_RESIZE, _fillVal, _initFcn)) {
 			_size = rows * cols;
 			length = _size;
 		}
@@ -700,6 +808,9 @@ CxMatrix CxMatrix::operator * ( CxMatrix & _Right )
 	// 首先检查乘矩阵的行数和被乘矩阵的列数是否相同
 	ASSERT(cols == _Right.rows);
 
+	_Right.display();
+	display();
+
 	int _newRows, _newCols, _oldCols;
 	_newRows = rows;
 	_newCols = _Right.cols;
@@ -815,6 +926,22 @@ CxMatrix CxMatrix::operator / ( double _value )
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
 			_Result.setElement(i, j, getElement(i, j) / _value) ;
+	}
+
+	return _Result;
+}
+
+CxMatrix CxMatrix::operator / ( CxMatrix &_Right )
+{
+	ASSERT(rows == _Right.rows && cols == _Right.cols);
+
+	// 复制目标矩阵
+	CxMatrix _Result((CxMatrix &)*this);		// copy ourselves
+
+	// 进行点除
+	for (int i=0; i<rows; ++i) {
+		for (int j=0; j<cols; ++j)
+			_Result.setElement(i, j, getElement(i, j) / _Right.getElement(i, j)) ;
 	}
 
 	return _Result;
@@ -958,6 +1085,20 @@ CxMatrix CxMatrix::_rands2( int _rows, int _cols ) const
 	}
 
 	return _rands;
+}
+
+void CxMatrix::display( void )
+{
+	TRACE(_T("CxMatrix: Name = [%s], [%d, %d]\n"), Name(), rows, cols);
+	TRACE(_T("============================================================================================================\n\n"));
+	for (int r=0; r<rows; r++) {
+		TRACE(_T("\t"));
+		for (int c=0; c<cols; c++) {
+			TRACE(_T("%0.4f  \t"), getElement(r, c));
+		}
+		TRACE(_T("\n\n"));
+	}
+	TRACE(_T("============================================================================================================\n\n"));
 }
 
 //////////////////////////////////////////////////////////////////

@@ -111,6 +111,12 @@ int CAnnLabDlg::BpNetwork_Test()
 
 	CxTrainRecord tr;
 	pNetwork = net.train(&trainP, &trainT, &tr);
+
+	CxMatrix m(3, 4), n;
+	double data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+	m.setData(data, 3, 4);
+	n = normr(m);
+	n.display();
 	return indexLayer;
 }
 
