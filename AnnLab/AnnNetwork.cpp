@@ -8,12 +8,15 @@
 
 #define error printf
 
-#define ADAPTFCN_DEFAULT      _T("trains")
-#define DIVIDEFCN_DEFAULT     _T("")
-#define INITFCN_DEFAULT       _T("initlay")
-#define GRADIENTFCN_DEFAULT   _T("gdefaults")
-#define PERFORMFCN_DEFAULT    _T("mse")
-#define TRAINFCN_DEFAULT      _T("traingd")
+#define LAYER_INITFCN_DEFAULT      _T("initnw")
+#define LAYER_TRANSFERFCN_DEFAULT  _T("tansig")
+
+#define NNET_ADAPTFCN_DEFAULT      _T("trains")
+#define NNET_DIVIDEFCN_DEFAULT     _T("")
+#define NNET_INITFCN_DEFAULT       _T("initlay")
+#define NNET_GRADIENTFCN_DEFAULT   _T("gdefaults")
+#define NNET_PERFORMFCN_DEFAULT    _T("mse")
+#define NNET_TRAINFCN_DEFAULT      _T("traingd")
 
 INLINE void setFcnName( TCHAR *szDstFuncName, int nNameSize, const TCHAR *szFcnName )
 {
@@ -198,8 +201,12 @@ BOOL CxNetLayer::initNetLayer( int _index, int _type,
 	prevLayer   = NULL;
 	nextLayer   = NULL;
 
-	_tcscpy_s(m_szInitFcn,     _countof(m_szInitFcn),     _T(""));
-	_tcscpy_s(m_szTransferFcn, _countof(m_szTransferFcn), _T(""));
+	
+	//_tcscpy_s(m_szInitFcn,     _countof(m_szInitFcn),     _T(""));
+	//_tcscpy_s(m_szTransferFcn, _countof(m_szTransferFcn), _T(""));
+
+	_tcscpy_s(m_szInitFcn,     _countof(m_szInitFcn),     LAYER_INITFCN_DEFAULT);
+	_tcscpy_s(m_szTransferFcn, _countof(m_szInitFcn),     LAYER_TRANSFERFCN_DEFAULT);
 
 	return TRUE;
 }
@@ -641,17 +648,17 @@ BOOL CAnnNetwork::commonConstructor( const TCHAR *szName,
 	numCounter = 0;
 
 	// adaptFcn => 'trains'
-	_tcscpy_s(m_szAdaptFcn, _countof(m_szAdaptFcn), ADAPTFCN_DEFAULT);
+	_tcscpy_s(m_szAdaptFcn, _countof(m_szAdaptFcn), NNET_ADAPTFCN_DEFAULT);
 	// divideFcn => ''
-	_tcscpy_s(m_szDivideFcn, _countof(m_szDivideFcn), DIVIDEFCN_DEFAULT);
+	_tcscpy_s(m_szDivideFcn, _countof(m_szDivideFcn), NNET_DIVIDEFCN_DEFAULT);
 	// initFcn => 'initlay'
-	_tcscpy_s(m_szInitFcn, _countof(m_szInitFcn), INITFCN_DEFAULT);
+	_tcscpy_s(m_szInitFcn, _countof(m_szInitFcn), NNET_INITFCN_DEFAULT);
 	// gradientFcn => 'gdefaults'
-	_tcscpy_s(m_szGradientFcn, _countof(m_szGradientFcn), GRADIENTFCN_DEFAULT);
+	_tcscpy_s(m_szGradientFcn, _countof(m_szGradientFcn), NNET_GRADIENTFCN_DEFAULT);
 	// performFcn => 'mse'
-	_tcscpy_s(m_szPerformFcn, _countof(m_szPerformFcn), PERFORMFCN_DEFAULT);
+	_tcscpy_s(m_szPerformFcn, _countof(m_szPerformFcn), NNET_PERFORMFCN_DEFAULT);
 	// trainFcn => 'traingd'
-	_tcscpy_s(m_szTrainFcn, _countof(m_szTrainFcn), (szTrainFcn == NULL) ? TRAINFCN_DEFAULT : szTrainFcn);
+	_tcscpy_s(m_szTrainFcn, _countof(m_szTrainFcn), (szTrainFcn == NULL) ? NNET_TRAINFCN_DEFAULT : szTrainFcn);
 
 	return TRUE;
 }
@@ -1000,8 +1007,10 @@ CAnnNetwork * CAnnNetwork::init( void )
 		if (pNetLayer != NULL) {
 			_numInputs  = pNetLayer->prevNeurons;
 			_numNeurons = pNetLayer->numNeurons;
-			if (_index == 0) {
-				if (_tcsicmp(pNetLayer->initFcn(), _T("initnw")) == 0) {
+			if (_index == 1) {
+				TRACE(_T("_tcsicmp(pNetLayer->initFcn(): [%s]\n"), pNetLayer->initFcn());
+				if (_tcsicmp(pNetLayer->initFcn(), _T("initnw")) == 0
+					|| _tcsicmp(pNetLayer->initFcn(), _T("initlay")) == 0) {
 					// 'initnw': Nguyen-Widrow method
 					initnw(&IW, _numInputs, _numNeurons, &_inputRange, &_activeRange);
 				}
@@ -1091,6 +1100,8 @@ BOOL CAnnNetwork::initnw( CxMatrix *pMatrix, int _numInputs, int _numNeurons,
 	wMag = 0.7 * pow((double)_numNeurons, 1.0/(double)_numInputs);
 	// wDir = randnr(s,r);
 	wDir = randnr(_numNeurons, _numInputs);
+	//wDir.display(_T("wDir = randnr(_numNeurons, _numInputs);"));
 	w = wMag * wDir;
+	//w.display(_T("w = wMag * wDir;"));
 	return TRUE;
 }

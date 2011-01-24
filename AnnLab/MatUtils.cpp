@@ -44,6 +44,22 @@ CxMatrix transpose( CxMatrix &m )
 	return _Result;
 }
 
+CxMatrix diag( CxMatrix &m )
+{
+	CxMatrix _Result;
+	int _size = MIN(m.rows, m.cols);
+	_size = MAX(_size, 0);
+	ASSERT(_size > 0);
+
+	if (_size > 0) {
+		_Result.resize(_size, 1, MAT_INIT_ZEROS);
+		for (int i=0; i<_size; i++) {
+			_Result.setElement(i, 0, m.getElement(i, i));
+		}
+	}
+	return _Result;
+}
+
 CxMatrix abs( CxMatrix &m )
 {
 	CxMatrix _Result(m);
@@ -93,6 +109,61 @@ CxMatrix sum( CxMatrix &m )
 	return _Result;
 }
 
+CxMatrix sumsqrt( CxMatrix &m )
+{
+	int _cols = m.cols;
+	CxMatrix _Result(1, _cols);
+	for (int i=0; i<m.cols; i++) {
+		double _sum = 0.0;
+		for (int j=0; j<m.rows; j++)
+			_sum += m.getElement(j, i);
+		_Result.setElement(0, i, ::sqrt(_sum));
+	}
+	return _Result;
+}
+
+CxMatrix norm( CxMatrix &m )
+{
+	/**********************************************************************
+		%NORM Normalize of a matrix.
+		%
+		%  Syntax
+		%
+		%    norm(M)
+		%
+		%  Description
+		%
+		%    NORM(M) normalizes the matrix of M to a length of 1.
+		%
+		%  Examples
+		%
+		%    m = [1 2; 3 4]
+		%    n = norm(m)
+		%
+		%  See also NORMC, NORMR.
+
+		% Mark Beale, 1-31-92
+		% Copyright 1992-2007 The MathWorks, Inc.
+		% $Revision: 1.1.6.5 $  $Date: 2007/11/09 20:49:53 $
+
+		if nargin < 1,error('NNET:Arguments','Not enough input arguments.'); end
+
+		[mr,mc]=size(m);
+		if (mc == 1)
+			n = m ./ abs(m);
+		else
+			n = sqrt(sum(m.*m));
+		end
+	**********************************************************************/
+	int mr, mc;
+	CxMatrix n;
+	mr = m.rows;
+	mc = m.cols;
+	/* n = sqrt(sum(diag(m'*m))); <== 'fro'²ÎÊý */
+	n = sqrt(sum(diag(transpose(m) * m)));
+	return n;
+}
+
 CxMatrix normr( CxMatrix &m )
 {
 	/**********************************************************************
@@ -123,7 +194,7 @@ CxMatrix normr( CxMatrix &m )
 		if (mc == 1)
 			n = m ./ abs(m);
 		else
-			n=sqrt(ones./(sum((m.*m)')))'*ones(1,mc).*m;
+			n = sqrt(ones./(sum((m.*m)')))'*ones(1,mc).*m;
 		end
 	**********************************************************************/
 	int mr, mc;
@@ -131,14 +202,14 @@ CxMatrix normr( CxMatrix &m )
 	mr = m.rows;
 	mc = m.cols;
 	if (mc == 1) {
-		// n = m ./ abs(m);
+		/* n = m ./ abs(m); */
 		n = dotdiv(m, abs(m));
 	}
 	else {
-		// n = sqrt(ones./(sum((m.*m)')))'*ones(1,mc).*m;
-		//n = dotprod(transpose(sqrt(ones(1, mr) / sum(transpose(dotprod(m, m))))) * ones(1, mc), m);
-		//n = ones(1, mr) / sum(transpose(dotprod(m, m)));
-		n = (transpose(dotprod(m, m)));
+		/* n = sqrt(ones./(sum((m.*m)')))'*ones(1,mc).*m; */
+		n = dotprod(transpose(sqrt(ones(1, mr) / sum(transpose(dotprod(m, m))))) * ones(1, mc), m);
+		//n = transpose(sqrt(ones(1, mr) / sum(transpose(dotprod(m, m)))));
+		//n = (transpose(dotprod(m, m)));
 	}
 	return n;
 }

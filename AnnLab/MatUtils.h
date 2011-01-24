@@ -14,10 +14,15 @@ CxMatrix rands2 ( int _rows, int _cols );
 
 CxMatrix transpose( CxMatrix &m );
 
+CxMatrix diag( CxMatrix &m );
+
 CxMatrix abs ( CxMatrix &m );
 CxMatrix sqrt( CxMatrix &m );
 CxMatrix sum ( CxMatrix &m );
 
+CxMatrix sumsqrt ( CxMatrix &m );
+
+CxMatrix norm  ( CxMatrix &m );
 CxMatrix normr ( CxMatrix &m );
 
 CxMatrix randnr( int _rows, int _cols );

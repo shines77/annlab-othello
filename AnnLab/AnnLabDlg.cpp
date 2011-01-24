@@ -113,10 +113,17 @@ int CAnnLabDlg::BpNetwork_Test()
 	pNetwork = net.train(&trainP, &trainT, &tr);
 
 	CxMatrix m(3, 4), n;
-	double data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+	//double data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+	double data[] = {1, 5, 9, 2, 6, 10, 3, 7, 11, 4, 8, 12};
 	m.setData(data, 3, 4);
 	n = normr(m);
-	n.display();
+	n.display(_T("n = normr(m);"));
+
+	n = norm(m);
+	n.display(_T("n = norm(m);"));
+
+	n = diag(m);
+	n.display(_T("n = norm(m);"));
 	return indexLayer;
 }
 
