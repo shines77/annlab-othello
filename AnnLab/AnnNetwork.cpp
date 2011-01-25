@@ -1130,21 +1130,21 @@ BOOL CAnnNetwork::initnw( CxMatrix *pMatrix, int _numInputs, int _numNeurons,
 	minInput = -1.0;
 	maxInput = 1.0;
 
-	x = 2 / (maxInput - minInput);
-	y = 1 - maxInput * x;
+	x = 2.0 / (maxInput - minInput);
+	y = 1.0 - maxInput * x;
 
 	CxMatrix mx, my, mxp;
 	mx = x * ones(_numInputs, 1);
 	my = y * ones(_numInputs, 1);
 
-	// xp = x';
+	// mxp = mx';
 	mxp = transpose(mx);
 
-	// b = w*y+b;
-	_biases  = _weights * y + _biases;
-	_biases.display();
-	// w = w.*xp(ones(1,s),:);
-	_weights = dotprod(_weights, mxp * ones(1, _numNeurons));
-	_weights.display();
+	// b = w*my+b;
+	_biases  = _weights * my + _biases;
+	_biases.display(_T("_biases"));
+	// w = w.*mxp(ones(1,s),:);
+	_weights = dotprod(_weights, expand_row(mxp ,_numNeurons));
+	_weights.display(_T("_weights"));
 	return TRUE;
 }

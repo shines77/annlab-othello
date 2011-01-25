@@ -188,6 +188,7 @@ public:
 
 	void clear( void );
 	int  resize( int _rows, int _cols, double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
+	BOOL empty( void ) const;
 	BOOL makeUnitMatrix( int _size );
 
 	void display( void );
