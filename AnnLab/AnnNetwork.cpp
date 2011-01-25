@@ -1025,8 +1025,9 @@ CAnnNetwork * CAnnNetwork::init( void )
 					IW.rands(_rows, _cols);
 				}
 			}
-			else {
-				//
+			else if (_index >= 2) {
+				//CxMatrix *pMatrix = LW[_index - 2];
+				initnw(LW[_index - 2], _numInputs, _numNeurons, &_inputRange, &_activeRange);
 			}
 		}
 	}

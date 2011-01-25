@@ -1264,6 +1264,21 @@ CxMatrixList::~CxMatrixList( void )
 
 }
 
+CxMatrix * CxMatrixList::operator[]( int _index )
+{
+	if (_index < 0)
+		return NULL;
+
+	list<CxMatrix>::iterator itList;
+	int _counter = 0;
+	for (itList = begin(); itList != end(); itList++) {
+		if (_counter == _index)
+			return (CxMatrix *)&(*itList);
+		_counter++;
+	}
+	return NULL;
+}
+
 CxMatrixVector::CxMatrixVector( void )
 {
 
