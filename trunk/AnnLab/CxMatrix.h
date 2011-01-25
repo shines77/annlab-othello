@@ -256,6 +256,9 @@ class CxMatrixList : public list<CxMatrix>, public CxBaseObject
 public:
 	CxMatrixList( void );
 	virtual ~CxMatrixList( void );
+
+public:
+	CxMatrix * operator [] ( int _index );
 };
 
 /*
