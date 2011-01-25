@@ -41,10 +41,31 @@ CxMatrix rands2( int _rows, int _cols )
 CxMatrix transpose( CxMatrix &m )
 {
 	CxMatrix _Result(m.cols, m.rows);
-	int _index = 0;
 	for (int i=0; i<_Result.cols; i++) {
 		for (int j=0; j<_Result.rows; j++) {
 			_Result.setElement(j, i, m.getElement(i, j));
+		}
+	}
+	return _Result;
+}
+
+CxMatrix expand_row( CxMatrix &m, int _rows )
+{
+	CxMatrix _Result(_rows, m.cols);
+	for (int i=0; i<_Result.rows; i++) {
+		for (int j=0; j<_Result.cols; j++) {
+			_Result.setElement(i, j, m.getElement(0, j));
+		}
+	}
+	return _Result;
+}
+
+CxMatrix expand_col( CxMatrix &m, int _cols )
+{
+	CxMatrix _Result(m.rows, _cols);
+	for (int i=0; i<_Result.cols; i++) {
+		for (int j=0; j<_Result.rows; j++) {
+			_Result.setElement(j, i, m.getElement(j, 0));
 		}
 	}
 	return _Result;
@@ -139,7 +160,7 @@ CxMatrix sign( CxMatrix &m )
 				_sign = 0.0;
 			else
 				_sign = _val / ::abs(_val);
-			_Result.setElement(0, i, _sign);
+			_Result.setElement(j, i, _sign);
 		}
 	}
 	return _Result;

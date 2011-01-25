@@ -454,6 +454,11 @@ int CxMatrix::size( int n ) const
 	return _size;
 }
 
+BOOL CxMatrix::empty( void ) const
+{
+	return (size() == 0);
+}
+
 //////////////////////////////////////////////////////////////////////
 //
 // sameSize() 判断矩阵行数或列数是否相同
@@ -486,7 +491,11 @@ int CxMatrix::resize( int _rows, int _cols, double _fillVal /*= 0.0 */, int _ini
 {
 	int _size = -1;
 	if (_rows == rows && _cols == cols) {
-		if (initData(_rows, _cols, _fillVal, _initFcn)) {
+		if (_rows == 0 && _cols == 0) {
+			clear();
+			_size = 0;
+		}
+		else if (initData(_rows, _cols, _fillVal, _initFcn)) {
 			_size = rows * cols;
 			length = _size;
 		}
@@ -715,11 +724,13 @@ CxMatrix operator + ( double _value, CxMatrix & _Right )
 
 CxMatrix CxMatrix::operator + ( CxMatrix & _Right )
 {
-	// 首先检查行列数是否相等
-	ASSERT(rows == _Right.rows && cols == _Right.cols);
-
 	// 复制目标矩阵
 	CxMatrix _Result((CxMatrix &)*this);		// 拷贝构造
+	if (_Right.empty())
+		return _Result;
+
+	// 首先检查行列数是否相等
+	ASSERT(rows == _Right.rows && cols == _Right.cols);
 
 	// 矩阵加法
 	for (int i=0; i<rows; ++i) {
@@ -732,6 +743,9 @@ CxMatrix CxMatrix::operator + ( CxMatrix & _Right )
 
 CxMatrix & CxMatrix::operator += ( CxMatrix & _Right )
 {
+	if (_Right.empty())
+		return *this;
+
 	// 首先检查行列数是否相等
 	ASSERT(rows == _Right.rows && cols == _Right.cols);
 
@@ -762,6 +776,8 @@ CxMatrix operator - ( double _value, CxMatrix & _Right )
 {
 	// 复制目标矩阵
 	CxMatrix _Result((CxMatrix &)_Right);		// 拷贝构造
+	if (_Right.empty())
+		return _Result;
 
 	// 进行减法操作
 	for (int i=0; i<_Right.rows; ++i) {
@@ -774,11 +790,13 @@ CxMatrix operator - ( double _value, CxMatrix & _Right )
 
 CxMatrix CxMatrix::operator - ( CxMatrix & _Right )
 {
-	// 首先检查行列数是否相等
-	ASSERT(rows == _Right.rows && cols == _Right.cols);
-
 	// 复制目标矩阵
 	CxMatrix _Result((CxMatrix &)*this);		// 拷贝构造
+	if (_Right.empty())
+		return _Result;
+
+	// 首先检查行列数是否相等
+	ASSERT(rows == _Right.rows && cols == _Right.cols);
 
 	// 进行减法操作
 	for (int i=0; i<rows; ++i) {
@@ -1120,7 +1138,7 @@ CxMatrix CxMatrix::getRowVector( int _row ) const
 {
 	CxMatrix _Result;
 	if (_row >= 0 && _row < rows) {
-		_Result.resize(1, _row + 1);
+		_Result.resize(1, cols);
 		for (int i= 0; i<cols; i++)
 			_Result.setElement(0, i, getElement(_row, i));
 	}
@@ -1132,7 +1150,7 @@ CxMatrix CxMatrix::getColVector( int _col ) const
 {
 	CxMatrix _Result;
 	if (_col >= 0 && _col < cols) {
-		_Result.resize(_col + 1, 1);
+		_Result.resize(rows, 1);
 		for (int i= 0; i<rows; i++)
 			_Result.setElement(i, 0, getElement(i, _col));
 	}
