@@ -117,13 +117,13 @@ int CAnnLabDlg::BpNetwork_Test()
 	double data[] = {1, 5, 9, 2, 6, 10, 3, 7, 11, 4, 8, 12};
 	m.setData(data, 3, 4);
 	n = normr(m);
-	n.display(_T("n = normr(m);"));
+	//n.display(_T("n = normr(m);"));
 
 	n = norm(m);
-	n.display(_T("n = norm(m);"));
+	//n.display(_T("n = norm(m);"));
 
 	n = diag(m);
-	n.display(_T("n = norm(m);"));
+	//n.display(_T("n = diag(m);"));
 	return indexLayer;
 }
 

@@ -1002,32 +1002,48 @@ CAnnNetwork * CAnnNetwork::init( void )
 	CxMatrix _inputRange, _activeRange;
 	int _rows, _cols;
 
-	for (int _index=0; _index<numLayers; _index++) {
+	for (int _index=1; _index<=numLayers; _index++) {
 		CxNetLayer *pNetLayer = layers.getLayer(_index);
 		if (pNetLayer != NULL) {
 			_numInputs  = pNetLayer->prevNeurons;
 			_numNeurons = pNetLayer->numNeurons;
-			if (_index == 1) {
-				TRACE(_T("_tcsicmp(pNetLayer->initFcn(): [%s]\n"), pNetLayer->initFcn());
-				if (_tcsicmp(pNetLayer->initFcn(), _T("initnw")) == 0
-					|| _tcsicmp(pNetLayer->initFcn(), _T("initlay")) == 0) {
-					// 'initnw': Nguyen-Widrow method
-					initnw(&IW, _numInputs, _numNeurons, &_inputRange, &_activeRange);
+			TRACE(_T("_tcsicmp(pNetLayer->initFcn(): [%s]\n"), pNetLayer->initFcn());
+			if (_tcsicmp(pNetLayer->initFcn(), _T("initnw")) == 0
+				|| _tcsicmp(pNetLayer->initFcn(), _T("initlay")) == 0) {
+				// 'initnw': Nguyen-Widrow method
+				if (_index == 1) {
+					initnw(&IW, _index, _numInputs, _numNeurons, &_inputRange, &_activeRange);
 				}
-				if (_tcsicmp(pNetLayer->initFcn(), _T("initwb")) == 0) {
-					// 'initwb': Init weights and biases
-					//initwb(&IW, numInputs, numNeurons, inputRange, activeRange);
+				else if (_index >= 2) {
+					//CxMatrix *pMatrix = LW[_index - 2];
+					initnw(LW[_index - 2], _index, _numInputs, _numNeurons, &_inputRange, &_activeRange);
 				}
-				else {
-					// dafault is 'initwb' and 'rands'
+			}
+			if (_tcsicmp(pNetLayer->initFcn(), _T("initwb")) == 0) {
+				// 'initwb': Init weights and biases
+				if (_index == 1) {
+					initwb(&IW, _numInputs, _index, _numNeurons, &_inputRange, &_activeRange);
+				}
+				else if (_index >= 2) {
+					//CxMatrix *pMatrix = LW[_index - 2];
+					initwb(LW[_index - 2], _index, _numInputs, _numNeurons, &_inputRange, &_activeRange);
+				}
+			}
+			else {
+				// dafault is 'initwb' and 'rands'
+				if (_index == 1) {
 					_rows = IW.rows;
 					_cols = IW.cols;
 					IW.rands(_rows, _cols);
 				}
-			}
-			else if (_index >= 2) {
-				//CxMatrix *pMatrix = LW[_index - 2];
-				initnw(LW[_index - 2], _numInputs, _numNeurons, &_inputRange, &_activeRange);
+				else {
+					CxMatrix *pMatrix = LW[_index - 2];
+					if (pMatrix != NULL) {
+						_rows = pMatrix->rows;
+						_cols = pMatrix->cols;
+						pMatrix->rands(_rows, _cols);
+					}
+				}
 			}
 		}
 	}
@@ -1043,7 +1059,7 @@ CAnnNetwork * CAnnNetwork::train( const CxMatrixList *trainP, const CxMatrixList
 	return pNetwork;
 }
 
-BOOL CAnnNetwork::initnw( CxMatrix *pMatrix, int _numInputs, int _numNeurons,
+BOOL CAnnNetwork::initnw( CxMatrix *pMatrix, int _index, int _numInputs, int _numNeurons,
 						   CxMatrix *pInputRange, CxMatrix *pActiveRange )
 {
 	/*****************************************************************
@@ -1092,6 +1108,7 @@ BOOL CAnnNetwork::initnw( CxMatrix *pMatrix, int _numInputs, int _numNeurons,
 
 	*****************************************************************/
 
+	TCHAR szText[512];
 	// Assume inputs and net inputs range in [-1 1].
 
 	// Weights
@@ -1141,11 +1158,20 @@ BOOL CAnnNetwork::initnw( CxMatrix *pMatrix, int _numInputs, int _numNeurons,
 	// mxp = mx';
 	mxp = transpose(mx);
 
-	// b = w*my+b;
-	_biases  = _weights * my + _biases;
-	_biases.display(_T("_biases"));
 	// w = w.*mxp(ones(1,s),:);
 	_weights = dotprod(_weights, expand_row(mxp ,_numNeurons));
-	_weights.display(_T("_weights"));
+	_stprintf_s(szText, _countof(szText), _T("_weights[%d]"), _index);
+	_weights.display(szText);
+
+	// b = w*my+b;
+	_biases  = _weights * my + _biases;
+	_stprintf_s(szText, _countof(szText), _T("_biases[%d]"), _index);
+	_biases.display(szText);
+	return TRUE;
+}
+
+BOOL CAnnNetwork::initwb( CxMatrix *pMatrix, int _index, int _numInputs, int _numNeurons,
+						 CxMatrix *pInputRange, CxMatrix *pActiveRange )
+{
 	return TRUE;
 }

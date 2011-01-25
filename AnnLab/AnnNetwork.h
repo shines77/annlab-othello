@@ -271,7 +271,9 @@ public:
 	CAnnNetwork * train( const CxMatrixList *trainP, const CxMatrixList *trainT,
 		CxTrainRecord *trainRecord );
 
-	BOOL initnw( CxMatrix *pMatrix, int _numInputs, int _numNeurons,
+	BOOL initnw( CxMatrix *pMatrix, int _index, int _numInputs, int _numNeurons,
+		CxMatrix *pInputRange, CxMatrix *pActiveRange );
+	BOOL initwb( CxMatrix *pMatrix, int _index, int _numInputs, int _numNeurons,
 		CxMatrix *pInputRange, CxMatrix *pActiveRange );
 
 protected:
@@ -283,7 +285,6 @@ protected:
 	void freeNetwork( void );
 
 	static int trimString(const TCHAR *szString, TCHAR *szBuffer, DWORD dwBufSize);
-
 private:
 	TCHAR   m_szAdaptFcn[FCN_NAME_LEN];
 	TCHAR   m_szDivideFcn[FCN_NAME_LEN];
