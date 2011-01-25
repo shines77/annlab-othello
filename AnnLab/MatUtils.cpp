@@ -18,6 +18,12 @@ CxMatrix ones( int _rows, int _cols )
 	return _result;
 }
 
+CxMatrix eyes( int _rows, int _cols )
+{
+	CxMatrix _result(_rows, _cols, MAT_INIT_EYES);
+	return _result;
+}
+
 // 重置大小并初始化为[-1,1]随机数矩阵
 CxMatrix rands( int _rows, int _cols )
 {
@@ -122,6 +128,23 @@ CxMatrix sumsqrt( CxMatrix &m )
 	return _Result;
 }
 
+CxMatrix sign( CxMatrix &m )
+{
+	double _sign;
+	CxMatrix _Result(m);
+	for (int i=0; i<m.cols; i++) {
+		for (int j=0; j<m.rows; j++) {
+			double _val = m.getElement(j, i);
+			if (_val == 0.0)
+				_sign = 0.0;
+			else
+				_sign = _val / ::abs(_val);
+			_Result.setElement(0, i, _sign);
+		}
+	}
+	return _Result;
+}
+
 CxMatrix norm( CxMatrix &m )
 {
 	/**********************************************************************
@@ -214,6 +237,48 @@ CxMatrix normr( CxMatrix &m )
 	return n;
 }
 
+CxMatrix linspace(double d1, double d2, int n)
+{
+	/*****************************************************************
+
+		function y = linspace(d1, d2, n)
+		%LINSPACE Linearly spaced vector.
+		%   LINSPACE(X1, X2) generates a row vector of 100 linearly
+		%   equally spaced points between X1 and X2.
+		%
+		%   LINSPACE(X1, X2, N) generates N points between X1 and X2.
+		%   For N < 2, LINSPACE returns X2.
+		%
+		%   Class support for inputs X1,X2:
+		%      float: double, single
+		%
+		%   See also LOGSPACE, :.
+
+		%   Copyright 1984-2004 The MathWorks, Inc. 
+		%   $Revision: 5.12.4.1 $  $Date: 2004/07/05 17:01:20 $
+
+		if nargin == 2
+			n = 100;
+		end
+
+		n = double(n);
+		y = [d1+(0:n-2)*(d2-d1)/(floor(n)-1) d2];
+
+	*******************************************************************/
+	CxMatrix _Result;
+	if (n > 1) {
+		_Result.resize(1, n);
+		for (int i=0; i<n; i++) {
+			_Result.setElement(0, i, d1 + i * (d2 - d1)/( n - 1));
+		}
+	}
+	else if (n == 1) {
+		_Result.resize(1, 1);
+		_Result.setElement(0, 0, (d1 + d2) / 2);
+	}
+	return _Result;
+}
+
 CxMatrix randnr( int _rows, int _cols )
 {
 	CxMatrix _Result;
@@ -242,7 +307,7 @@ CxMatrix dotprod( const CxMatrix &x, const CxMatrix &y )
 
 	// Check for compatible dimensions:
 	if (x.size() != y.size()) {
-		throw _T("Incompatible dimensions in dot(). ");
+		//throw _T("Incompatible dimensions in dot(). ");
 		//exit(1);
 		return _Result;
 	}

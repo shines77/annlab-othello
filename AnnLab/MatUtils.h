@@ -9,16 +9,19 @@ namespace MatUtils {
 
 CxMatrix zeros  ( int _rows, int _cols );
 CxMatrix ones   ( int _rows, int _cols );
+CxMatrix eyes   ( int _rows, int _cols );
 CxMatrix rands  ( int _rows, int _cols );
 CxMatrix rands2 ( int _rows, int _cols );
 
 CxMatrix transpose( CxMatrix &m );
+CxMatrix linspace ( double d1, double d2, int n );
 
 CxMatrix diag( CxMatrix &m );
 
-CxMatrix abs ( CxMatrix &m );
-CxMatrix sqrt( CxMatrix &m );
-CxMatrix sum ( CxMatrix &m );
+CxMatrix abs  ( CxMatrix &m );
+CxMatrix sqrt ( CxMatrix &m );
+CxMatrix sum  ( CxMatrix &m );
+CxMatrix sign ( CxMatrix &m );
 
 CxMatrix sumsqrt ( CxMatrix &m );
 

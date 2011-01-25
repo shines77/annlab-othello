@@ -18,6 +18,7 @@ enum enumMatrixInit {
 	MAT_INIT_NONE,
 	MAT_INIT_ZEROS,
 	MAT_INIT_ONES,
+	MAT_INIT_EYES,
 	MAT_INIT_RANDS,
 	MAT_INIT_RANDS2,
 	MAT_INIT_MAX
@@ -120,6 +121,11 @@ public:
 	int    getPartOfMatrix( int _rowStart, int _rowEnd,
 							int _colStart, int _colEnd, CxMatrix* pMatrix ) const;
 
+	// 获取矩阵的指定行矩阵
+	CxMatrix getRowVector( int _row ) const;
+	// 获取矩阵的指定列矩阵
+	CxMatrix getColVector( int _col ) const;
+
 	double *getData    ( void ) const { return m_pData;     };		// 获得数据指针
 	double *getOrigData( void ) const { return m_pOrigData; };		// 获得原始数据指针
 
@@ -140,6 +146,8 @@ public:
 	double      operator [] ( int _index );
 
 	CxMatrix &  operator =  ( CxMatrix & _Right );
+	CxMatrix &  operator =  ( int _Right        );
+	CxMatrix &  operator =  ( double _Right     );
 	BOOL        operator == ( CxMatrix & _Right );
 	BOOL        operator != ( CxMatrix & _Right );
 	CxMatrix    operator +  ( double _value     );

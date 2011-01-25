@@ -1095,13 +1095,56 @@ BOOL CAnnNetwork::initnw( CxMatrix *pMatrix, int _numInputs, int _numNeurons,
 
 	// Weights
 	double wMag;
-	CxMatrix wDir, w;
+	CxMatrix wDir, _weights, _biases;
 	// wMag = 0.7*s^(1/r);
 	wMag = 0.7 * pow((double)_numNeurons, 1.0/(double)_numInputs);
 	// wDir = randnr(s,r);
 	wDir = randnr(_numNeurons, _numInputs);
 	//wDir.display(_T("wDir = randnr(_numNeurons, _numInputs);"));
-	w = wMag * wDir;
-	//w.display(_T("w = wMag * wDir;"));
+	_weights = wMag * wDir;
+	//_weights.display(_T("_weights = wMag * wDir;"));
+
+	// Biases
+	if (_numNeurons == 1) {
+		_biases = 0;
+	}
+	else {
+		// b = wMag*linspace(-1,1,s)'.*sign(w(:,1));
+		_biases = wMag * dotprod(transpose(linspace(-1, 1, _numNeurons)), sign(_weights.getColVector(0)));
+	}
+
+	// Conversions
+
+	// Conversion of net inputs of [-1 1] to [Nmin Nmax]
+	double x, y, minActive, maxActive;
+	minActive = -2.0;
+	maxActive = 2.0;
+	x = 0.5 * (maxActive - minActive);
+	y = 0.5 * (maxActive + minActive);
+
+	_weights = x * _weights;
+	_biases  = x * _biases + y;
+
+	// % Conversion of inputs of PR to [-1 1]
+	double minInput, maxInput;
+	minInput = -1.0;
+	maxInput = 1.0;
+
+	x = 2 / (maxInput - minInput);
+	y = 1 - maxInput * x;
+
+	CxMatrix mx, my, mxp;
+	mx = x * ones(_numInputs, 1);
+	my = y * ones(_numInputs, 1);
+
+	// xp = x';
+	mxp = transpose(mx);
+
+	// b = w*y+b;
+	_biases  = _weights * y + _biases;
+	_biases.display();
+	// w = w.*xp(ones(1,s),:);
+	_weights = dotprod(_weights, mxp * ones(1, _numNeurons));
+	_weights.display();
 	return TRUE;
 }
