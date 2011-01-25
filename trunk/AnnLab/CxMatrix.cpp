@@ -628,6 +628,28 @@ double CxMatrix::operator()( int _row, int _col )
 	return getElement(_row, _col);
 }
 
+CxMatrix & CxMatrix::operator = ( int _Right )
+{
+	// resize to one item matrix
+	resize(1, 1);
+	// set the single data
+	setElement(0, 0, (double)_Right);
+
+	// finally return a reference to ourselves
+	return *this;
+}
+
+CxMatrix & CxMatrix::operator = ( double _Right )
+{
+	// resize to one item matrix
+	resize(1, 1);
+	// set the single data
+	setElement(0, 0, _Right);
+
+	// finally return a reference to ourselves
+	return *this;
+}
+
 CxMatrix & CxMatrix::operator = ( CxMatrix & _Right )
 {
 	if (&_Right != this) {
@@ -1091,6 +1113,30 @@ CxMatrix CxMatrix::_rands2( int _rows, int _cols ) const
 	}
 
 	return _rands;
+}
+
+// 获取矩阵的指定行矩阵, _row下标从0开始
+CxMatrix CxMatrix::getRowVector( int _row ) const
+{
+	CxMatrix _Result;
+	if (_row >= 0 && _row < rows) {
+		_Result.resize(1, _row + 1);
+		for (int i= 0; i<cols; i++)
+			_Result.setElement(0, i, getElement(_row, i));
+	}
+	return _Result;
+}
+
+// 获取矩阵的指定列矩阵, _col下标从0开始
+CxMatrix CxMatrix::getColVector( int _col ) const
+{
+	CxMatrix _Result;
+	if (_col >= 0 && _col < cols) {
+		_Result.resize(_col + 1, 1);
+		for (int i= 0; i<rows; i++)
+			_Result.setElement(i, 0, getElement(i, _col));
+	}
+	return _Result;
 }
 
 void CxMatrix::display( void )
