@@ -295,7 +295,7 @@ CxMatrix linspace(double d1, double d2, int n)
 	}
 	else if (n == 1) {
 		_Result.resize(1, 1);
-		_Result.setElement(0, 0, (d1 + d2) / 2);
+		_Result.setElement(0, 0, d2);
 	}
 	return _Result;
 }
