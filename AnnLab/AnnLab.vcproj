@@ -206,10 +206,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MatUtils.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -272,10 +268,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MatUtils.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Resource.h"
 				>
 			</File>
@@ -305,6 +297,46 @@
 				RelativePath=".\res\AnnLab.rc2"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="toolbox"
+			>
+			<File
+				RelativePath=".\toolbox\nnet.h"
+				>
+			</File>
+			<Filter
+				Name="nnet"
+				>
+				<File
+					RelativePath=".\toolbox\nnet\nnnetwork.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\toolbox\nnet\nnnetwork.h"
+					>
+				</File>
+				<File
+					RelativePath=".\toolbox\nnet\nnutils.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\toolbox\nnet\nnutils.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="matlab"
+				>
+				<File
+					RelativePath=".\toolbox\matlab\elmat.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\toolbox\matlab\elmat.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"

@@ -32,12 +32,13 @@
 #include <afxcmn.h>                     // MFC 对 Windows 公共控件的支持
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
+#include "toolbox\nnet.h"
+using namespace matlab;
+
 #include "gsl.h"
-#include "MatUtils.h"
 
 using namespace gsl;
 using namespace std;
-using namespace MatUtils;
 
 void ShowMessage( HWND hWnd, const TCHAR *szValName, int nValue, UINT nType = MB_OK );
 void ShowMessage( HWND hWnd, const TCHAR *szValName, UINT nType = MB_OK );
