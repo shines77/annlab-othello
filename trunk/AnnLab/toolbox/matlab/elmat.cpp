@@ -1,8 +1,11 @@
-#include "StdAfx.h"
-#include <math.h>
-#include "MatUtils.h"
 
-namespace MatUtils {
+#include "StdAfx.h"
+#include "elmat.h"
+#include <math.h>
+
+_USING_NAMESPACE_MATLAB;
+
+_MATLAB_BEGIN
 
 // 重置大小并初始化为全0矩阵
 CxMatrix zeros( int _rows, int _cols )
@@ -400,4 +403,4 @@ CxMatrix dotdiv( const CxMatrix &x, const CxMatrix &y )
 	return _Result;
 }
 
-};  /* namespace MatUtils */
+_MATLAB_END

@@ -1,10 +1,13 @@
 #include "StdAfx.h"
 #include "AnnGlobal.h"
-#include "MatUtils.h"
 #include "AnnNetwork.h"
+#include "toolbox\matlab\elmat.h"
+#include "toolbox\nnet\nnnetwork.h"
 #include <excpt.h>
 #include <Winbase.h>
 #include <math.h>
+
+using namespace matlab;
 
 #define error printf
 

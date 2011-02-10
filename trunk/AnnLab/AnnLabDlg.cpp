@@ -6,11 +6,14 @@
 #include "AnnLabDlg.h"
 #include "CxList.h"
 #include "CxMatrix.h"
-#include "MatUtils.h"
+#include "toolbox\matlab\elmat.h"
+#include "toolbox\nnet\nnnetwork.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+using namespace matlab;
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -89,8 +92,8 @@ int CAnnLabDlg::BpNetwork_Test()
 	trainTx.rands(64, 1);
 
 	CxMatrix temp, rands;
-	temp = MatUtils::ones(16, 16);
-	rands = MatUtils::rands2(16, 16);
+	temp = matlab::ones(16, 16);
+	rands = matlab::rands2(16, 16);
 	temp = 1.0 - rands;
 	temp = 1.0 + rands;
 	temp *= 3.0;
@@ -116,13 +119,13 @@ int CAnnLabDlg::BpNetwork_Test()
 	//double data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
 	double data[] = {1, 5, 9, 2, 6, 10, 3, 7, 11, 4, 8, 12};
 	m.setData(data, 3, 4);
-	n = normr(m);
+	n = matlab::normr(m);
 	//n.display(_T("n = normr(m);"));
 
-	n = norm(m);
+	n = matlab::norm(m);
 	//n.display(_T("n = norm(m);"));
 
-	n = diag(m);
+	n = matlab::diag(m);
 	//n.display(_T("n = diag(m);"));
 	return indexLayer;
 }
