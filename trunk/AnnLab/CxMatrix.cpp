@@ -3,25 +3,28 @@
 #include <assert.h>
 #include <math.h>
 
+/* whether use optimization of matrix operations */
+#define MATRIX_FAST_MODE       1
+
 //////////////////////////////////////////////////////////////////
 // CxVector
 //////////////////////////////////////////////////////////////////
 
 CxVector::CxVector( void )
 {
-	initVector(NULL, 0, TRUE);
+	initVector(NULL, 0, INIT_MODE_FIRST);
 }
 
 CxVector::CxVector( int _size )
 {
-	initVector(NULL, _size, TRUE);
+	initVector(NULL, _size, INIT_MODE_FIRST);
 }
 
 CxVector::CxVector( CxVector & srcVerctor )
 {
 	int _size = srcVerctor.size();
 
-	initVector(srcVerctor.Name(), _size, TRUE);
+	initVector(srcVerctor.Name(), _size, INIT_MODE_FIRST);
 
 	CxVector *pVector = copy( &srcVerctor );
 	ASSERT(pVector != NULL);
@@ -171,23 +174,23 @@ void CxVectors::freeVector( void )
 
 CxMatrix::CxMatrix( void )
 {
-	initMatrix(NULL, 0, 0, TRUE);
+	initMatrix(NULL, 0, 0, INIT_MODE_FIRST);
 }
 
 CxMatrix::CxMatrix( int _size )
 {
-	initMatrix(NULL, _size, _size, TRUE);
+	initMatrix(NULL, _size, _size, INIT_MODE_FIRST);
 }
 
 CxMatrix::CxMatrix( int _rows, int _cols, int _initFcn /*= MAT_INIT_NONE */ )
 {
-	initMatrix(NULL, _rows, _cols, TRUE, 0.0, _initFcn);
+	initMatrix(NULL, _rows, _cols, INIT_MODE_FIRST, 0.0, _initFcn);
 }
 
 CxMatrix::CxMatrix( const TCHAR *szName, int _rows, int _cols,
 				   int _initFcn /*= MAT_INIT_NONE */ )
 {
-	initMatrix(szName, _rows, _cols, TRUE, 0.0, _initFcn);
+	initMatrix(szName, _rows, _cols, INIT_MODE_FIRST, 0.0, _initFcn);
 }
 
 CxMatrix::CxMatrix( const CxMatrix & scrMatrix )
@@ -196,10 +199,24 @@ CxMatrix::CxMatrix( const CxMatrix & scrMatrix )
 	_rows = scrMatrix.rows;
 	_cols = scrMatrix.cols;
 
-	initMatrix(NULL, _rows, _cols, TRUE);
+	initMatrix(NULL, _rows, _cols, INIT_MODE_FIRST);
 
 	CxMatrix *pMatrix = copy( &scrMatrix );
 	ASSERT(pMatrix != NULL);
+}
+
+CxMatrix::CxMatrix( const CxMatrix & scrMatrix, BOOL bCopyData )
+{
+	int _rows, _cols;
+	_rows = scrMatrix.rows;
+	_cols = scrMatrix.cols;
+
+	initMatrix(NULL, _rows, _cols, INIT_MODE_FIRST);
+
+	if (bCopyData) {
+		CxMatrix *pMatrix = copy( &scrMatrix );
+		ASSERT(pMatrix != NULL);
+	}
 }
 
 CxMatrix::~CxMatrix( void )
@@ -216,7 +233,7 @@ void CxMatrix::freeMatrix( void )
 	}
 	rows = cols = 0;
 	length = 0;
-	mem_alloc = 0;
+	malloc_size = 0;
 }
 
 BOOL CxMatrix::initMatrix( const TCHAR *szName, int _rows, int _cols,
@@ -227,10 +244,10 @@ BOOL CxMatrix::initMatrix( const TCHAR *szName, int _rows, int _cols,
 	BOOL bResult = FALSE;
 	if (_initMode == INIT_MODE_FIRST) {
 		rows = cols = 0;
-		length = 0;
-		mem_alloc = 0;
+		length      = 0;
+		malloc_size = 0;
 		m_pOrigData = NULL;
-		m_pData = NULL;
+		m_pData     = NULL;
 	}
 
 	if (_initMode != INIT_MODE_RESIZE) {
@@ -240,12 +257,14 @@ BOOL CxMatrix::initMatrix( const TCHAR *szName, int _rows, int _cols,
 			_tcscpy_s(m_szName, _countof(m_szName), _T(""));
 	}
 
-	int _mem_alloc;
-	int _size = _rows * _cols;
-	if (_size >= 0 && _rows >= 0 && _cols >= 0) {
-		if (_size > 0) {
-			_mem_alloc = _size + MET_ADDR_ALIGN_SIZE;
-			double *pNewOrigData = new double[_mem_alloc];
+	const int nAdditionSize = (int)ceil(double(MET_ADDR_ALIGN_SIZE) / (double)sizeof(double));
+
+	int _malloc_size;
+	int _length = _rows * _cols;
+	if (_length >= 0 && _rows >= 0 && _cols >= 0) {
+		if (_length > 0) {
+			_malloc_size = _length + nAdditionSize;
+			double *pNewOrigData = new double[_malloc_size];
 			if (pNewOrigData != NULL) {
 				double *pNewData = (double *)MET_ADDR_ALIGN(pNewOrigData);
 				if (m_pOrigData == NULL) {
@@ -272,7 +291,7 @@ BOOL CxMatrix::initMatrix( const TCHAR *szName, int _rows, int _cols,
 				rows = _rows;
 				cols = _cols;
 				length = cols * rows;
-				mem_alloc = _mem_alloc;
+				malloc_size = _malloc_size;
 			}
 		}
 		else {
@@ -284,7 +303,7 @@ BOOL CxMatrix::initMatrix( const TCHAR *szName, int _rows, int _cols,
 			rows = _rows;
 			cols = _cols;
 			length = cols * rows;
-			mem_alloc = 0;
+			malloc_size = 0;
 			bResult = TRUE;
 		}
 	}
@@ -322,10 +341,10 @@ BOOL CxMatrix::initData( int _rows, int _cols, double _fillVal, /*= 0.0 */
 		return FALSE;
 
 	// init matrix data
-	int _size = _rows * _cols;
+	int _length = _rows * _cols;
 
-	ASSERT(_size >= 0);
-	if (_size == 0) {
+	ASSERT(_length >= 0);
+	if (_length == 0) {
 		freeMatrix();
 		return TRUE;
 	}
@@ -333,21 +352,21 @@ BOOL CxMatrix::initData( int _rows, int _cols, double _fillVal, /*= 0.0 */
 	double _dblRand;
 	switch (_initFcn) {
 	case MAT_INIT_ZEROS:		// all zeros
-		for (int i=0; i<_size; i++)
+		for (int i=0; i<_length; i++)
 			m_pData[i] = 0.0;
 		break;
 	case MAT_INIT_ONES:			// all ones
-		for (int i=0; i<_size; i++)
+		for (int i=0; i<_length; i++)
 			m_pData[i] = 1.0;
 		break;
 	case MAT_INIT_RANDS:		// all [-1,1] randomize
-		for (int i=0; i<_size; i++) {
+		for (int i=0; i<_length; i++) {
 			_dblRand = 2.0 * (double)rand() / (double)(RAND_MAX + 1) - 1.0;
 			m_pData[i] = _dblRand;
 		}
 		break;
 	case MAT_INIT_RANDS2:		// all [0,1] randomize
-		for (int i=0; i<_size; i++) {
+		for (int i=0; i<_length; i++) {
 			_dblRand = (double)rand() / (double)(RAND_MAX + 1);
 			m_pData[i] = _dblRand;
 		}
@@ -385,48 +404,48 @@ BOOL CxMatrix::copyData( double *pNewData, int _rows, int _cols,
 		return FALSE;
 
 	// init matrix data
-	int _newSize, _oldSize, _copySize, _fillSize;
-	_newSize = _rows * _cols;
+	int _newLength, _oldLength, _copyLength, _fillLength;
+	_newLength = _rows * _cols;
 
-	ASSERT(_newSize >= 0);
-	if (_newSize == 0) {
+	ASSERT(_newLength >= 0);
+	if (_newLength == 0) {
 		freeMatrix();
 		return TRUE;
 	}
 
-	_oldSize  = rows * cols;
-	_copySize = MIN(_newSize, _oldSize);
-	_fillSize = _newSize - _oldSize;
+	_oldLength  = rows * cols;
+	_copyLength = MIN(_newLength, _oldLength);
+	_fillLength = _newLength - _oldLength;
 
 	// copy the old data
-	if (_copySize != 0)
-		memcpy_s(pNewData, sizeof(double) * _copySize, m_pData, sizeof(double) * _copySize);
+	if (_copyLength != 0)
+		memcpy_s(pNewData, sizeof(double) * _copyLength, m_pData, sizeof(double) * _copyLength);
 
-	if (_fillSize <= 0)
+	if (_fillLength <= 0)
 		return TRUE;
 
-	double *pNewDataFill = pNewData + _copySize;
+	double *pNewDataFill = pNewData + _copyLength;
 	if (pNewDataFill == NULL)
 		return FALSE;
 
 	double _dblRand;
 	switch (_initFcn) {
 	case MAT_INIT_ZEROS:		// all zeros
-		for (int i=0; i<_fillSize; i++)
+		for (int i=0; i<_fillLength; i++)
 			pNewDataFill[i] = 0.0;
 		break;
 	case MAT_INIT_ONES:			// all ones
-		for (int i=0; i<_fillSize; i++)
+		for (int i=0; i<_fillLength; i++)
 			pNewDataFill[i] = 1.0;
 		break;
 	case MAT_INIT_RANDS:		// all [-1,1] randomize
-		for (int i=0; i<_fillSize; i++) {
+		for (int i=0; i<_fillLength; i++) {
 			_dblRand = 2.0 * (double)rand() / (double)(RAND_MAX + 1) - 1.0;
 			pNewDataFill[i] = _dblRand;
 		}
 		break;
 	case MAT_INIT_RANDS2:		// all [0,1] randomize
-		for (int i=0; i<_fillSize; i++) {
+		for (int i=0; i<_fillLength; i++) {
 			_dblRand = (double)rand() / (double)(RAND_MAX + 1);
 			pNewDataFill[i] = _dblRand;
 		}
@@ -489,30 +508,31 @@ void CxMatrix::clear( void )
 
 int CxMatrix::resize( int _rows, int _cols, double _fillVal /*= 0.0 */, int _initFcn /*= 0 */ )
 {
-	int _size = -1;
-	if (_rows == rows && _cols == cols) {
-		if (_rows == 0 && _cols == 0) {
-			clear();
-			_size = 0;
-		}
-		else if (initData(_rows, _cols, _fillVal, _initFcn)) {
-			_size = rows * cols;
-			length = _size;
-		}
+	int _length = -1;
+	if (_rows <= 0 || _cols <= 0) {
+		clear();
+		_length = 0;
 	}
 	else {
-		if (initMatrix(NULL, _rows, _cols, INIT_MODE_RESIZE, _fillVal, _initFcn)) {
-			_size = rows * cols;
-			length = _size;
+		if (_rows == rows && _cols == cols) {
+			if (initData(_rows, _cols, _fillVal, _initFcn)) {
+				_length = rows * cols;
+				length = _length;
+			}
+		}
+		else {
+			if (initMatrix(NULL, _rows, _cols, INIT_MODE_RESIZE, _fillVal, _initFcn)) {
+				_length = rows * cols;
+				length = _length;
+			}
 		}
 	}
-	return _size;
+	return _length;
 }
 
 CxMatrix * CxMatrix::copy( const CxMatrix *srcMartix )
 {
-	CxMatrix *dstMartix = NULL;
-	double *srcDataPtr = NULL;
+	CxMatrix *pMartix = NULL;
 	int _rows, _cols;
 
 	if (srcMartix == this)
@@ -522,34 +542,36 @@ CxMatrix * CxMatrix::copy( const CxMatrix *srcMartix )
 		_rows = srcMartix->rows;
 		_cols = srcMartix->cols;
 		if (_rows >= 0 && _cols >= 0) {
-			int _size = resize(_rows, _cols);
-			if (_size == (_rows * _cols) && _size >= 0) {
-				srcDataPtr = srcMartix->getData();
-				if (m_pData != NULL && srcDataPtr != NULL) {
-					int _sizeNew = rows * cols;
+			int _length = resize(_rows, _cols);
+			if (_length == (_rows * _cols) && _length >= 0) {
+				double *dstDataPtr = getData();
+				double *srcDataPtr = srcMartix->getData();
+				if (dstDataPtr != NULL && srcDataPtr != NULL) {
+					int _newLength = rows * cols;
 #if 1
 					// copy the pointer
-					if (m_pData != srcDataPtr && _sizeNew > 0)
-						memcpy(m_pData, srcDataPtr, sizeof(double) * _sizeNew);
+					if (dstDataPtr != srcDataPtr && _newLength > 0)
+						memcpy(dstDataPtr, srcDataPtr, sizeof(double) * _newLength);
 #elif 0
-					double *dstItemsPtr = m_pData;
-					for (int i=0; i<_sizeNew; i++)
-						*dstItemsPtr++ = *srcItemsPtr++;
+					if (dstDataPtr != srcDataPtr) {
+						for (int i=0; i<_newLength; i++)
+							*dstDataPtr++ = *srcDataPtr++;
+					}
 #else
 					for (int i=0; i<_cols; i++) {
 						for (int j=0; j<_rows; j++) {
 							int _index = i * _rows + j;
-							if (_index >= 0 && _index < _sizeNew)
+							if (_index >= 0 && _index < _newLength)
 								m_pData[_index] = srcMartix->getElement(j, i);
 						}
 					}
 #endif
 				}
-				dstMartix = this;
+				pMartix = this;
 			}
 		}
 	}
-	return dstMartix;
+	return pMartix;
 }
 
 CxMatrix * CxMatrix::clone( const CxMatrix *srcMartix )
@@ -560,8 +582,8 @@ CxMatrix * CxMatrix::clone( const CxMatrix *srcMartix )
 double CxMatrix::getElement( int _index ) const
 {
 	if (m_pData != NULL) {
-		int _size = rows * cols;
-		if (_index >= 0 && _index < _size) {
+		int _length = rows * cols;
+		if (_index >= 0 && _index < _length) {
 			return m_pData[_index];
 		}
 	}
@@ -581,8 +603,8 @@ double CxMatrix::getElement( int _row, int _col ) const
 BOOL CxMatrix::setElement( int _index, double _value )
 {
 	if (m_pData != NULL) {
-		int _size = rows * cols;
-		if (_index >= 0 && _index < _size) {
+		int _length = rows * cols;
+		if (_index >= 0 && _index < _length) {
 			m_pData[_index] = _value;
 			return TRUE;
 		}
@@ -603,8 +625,8 @@ BOOL CxMatrix::setElement( int _row, int _col, double _value )
 double * CxMatrix::setData( double *pBuffer, int _length )
 {
 	if (pBuffer != NULL) {
-		int _size = rows * cols;
-		if (_length > 0 && _length <= _size) {
+		int _length = rows * cols;
+		if (_length > 0 && _length <= _length) {
 			if (m_pData != NULL && pBuffer != m_pData) {
 				memcpy(m_pData, pBuffer, sizeof(double) * _length);
 				return pBuffer;
@@ -672,21 +694,45 @@ CxMatrix & CxMatrix::operator = ( CxMatrix & _Right )
 
 BOOL CxMatrix::operator == ( CxMatrix & _Right )
 {
-	// 首先检查行列数是否相等
+	// Check whether it is its own matrix
 	if (this == &_Right)
 		return TRUE;
 
+	// Check matrix of rows and columns are equal
 	if (rows != _Right.rows || cols != _Right.cols)
 		return FALSE;
 
-	for (int i=0; i<rows; ++i) {
-		for (int j=0; j<cols; ++j) {
-			if (getElement(i, j) != _Right.getElement(i, j))
-				return FALSE;
+	BOOL bFindDiff = FALSE;
+
+#if MATRIX_FAST_MODE
+	int _length   = size();
+	int _lenRight = _Right.size();
+	double *pData      = getData();
+	double *pDataRight = _Right.getData();
+
+	ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
+	if (pData != NULL && pDataRight != NULL) {
+		for (int i=0; i<_length; ++i) {
+			if ((*pData) != (*pDataRight)) {
+				bFindDiff = TRUE;
+				break;
+			}
+			pData++;
+			pDataRight++;
 		}
 	}
+#else
+	for (int i=0; i<rows; ++i) {
+		for (int j=0; j<cols; ++j) {
+			if (getElement(i, j) != _Right.getElement(i, j)) {
+				bFindDiff = TRUE;
+				break;
+			}
+		}
+	}
+#endif
 
-	return TRUE;
+	return (bFindDiff == FALSE);
 }
 
 BOOL CxMatrix::operator != ( CxMatrix & _Right )
@@ -696,49 +742,128 @@ BOOL CxMatrix::operator != ( CxMatrix & _Right )
 
 CxMatrix CxMatrix::operator + ( double _value )
 {
-	// 复制目标矩阵
-	CxMatrix _Result((CxMatrix &)*this);		// 拷贝构造
+	// Matrix addition
+#if MATRIX_FAST_MODE
+	// Copy the current matrix
+	CxMatrix _Result((CxMatrix &)*this);		// Copy constructor
 
-	// 矩阵加法
+	int _length   = _Result.size();
+	double *pData = _Result.getData();
+
+	ASSERT(pData != NULL);
+	if (pData != NULL) {
+		for (int i=0; i<_length; i++) {
+			(*pData) +=_value;
+			pData++;
+		}
+	}
+#else
+	// Create the result matrix
+	CxMatrix _Result(rows, cols);
+
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
 			_Result.setElement(i, j, getElement(i, j) + _value);
 	}
+#endif
 
 	return _Result;
 }
 
 CxMatrix operator + ( double _value, CxMatrix & _Right )
 {
-	// 复制目标矩阵
-	CxMatrix _Result((CxMatrix &)_Right);		// 拷贝构造
+	// Matrix addition
+#if MATRIX_FAST_MODE
+	// Copy the target matrix
+	CxMatrix _Result((CxMatrix &)_Right);		// Copy constructor
 
-	// 进行减法操作
+	int _length   = _Result.size();
+	double *pData = _Result.getData();
+
+	ASSERT(pData != NULL);
+	if (pData != NULL) {
+		for (int i=0; i<_length; i++) {
+			(*pData) += _value;
+			pData++;
+		}
+	}
+#else
+	// Create the result matrix
+	CxMatrix _Result(_Right.rows, _Right.cols);
+
 	for (int i=0; i<_Right.rows; ++i) {
 		for (int j=0; j<_Right.cols; ++j)
 			_Result.setElement(i, j, _value + _Right.getElement(i, j));
 	}
+#endif
 
 	return _Result;
 }
 
 CxMatrix CxMatrix::operator + ( CxMatrix & _Right )
 {
-	// 复制目标矩阵
-	CxMatrix _Result((CxMatrix &)*this);		// 拷贝构造
+	// Copy the current matrix
+	CxMatrix _Result((CxMatrix &)*this);		// Copy constructor
 	if (_Right.empty())
 		return _Result;
 
-	// 首先检查行列数是否相等
+	// Check whether it is its own matrix
 	ASSERT(rows == _Right.rows && cols == _Right.cols);
 
-	// 矩阵加法
+	if (rows != _Right.rows || cols != _Right.cols) {
+		throw _T("Incompatible dimensions in operator + ( CxMatrix & _Right ).");
+		//exit(1);
+		//_Result.copy(this);
+		return _Result;
+	}
+
+	// Matrix addition
+#if MATRIX_FAST_MODE
+	int _length   = _Result.size();
+	int _lenRight = _Right.size();
+	double *pData      = _Result.getData();
+	double *pDataRight = _Right.getData();
+
+	ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
+	if (pData != NULL && pDataRight != NULL && _length == _lenRight) {
+		for (int i=0; i<_length; i++) {
+			(*pData) += (double)(*pDataRight);
+			pData++;
+			pDataRight++;
+		}
+	}
+#else
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
 			_Result.setElement(i, j, getElement(i, j) + _Right.getElement(i, j));
 	}
+#endif
 
 	return _Result;
+}
+
+CxMatrix & CxMatrix::operator += ( double _value )
+{
+	// Matrix addition
+#if MATRIX_FAST_MODE
+	int _length   = size();
+	double *pData = getData();
+
+	ASSERT(pData != NULL);
+	if (pData != NULL) {
+		for (int i=0; i<_length; i++) {
+			(*pData) += _value;
+			pData++;
+		}
+	}
+#else
+	for (int i=0; i<rows; ++i) {
+		for (int j=0; j<cols; ++j)
+			setElement(i, j, getElement(i, j) + _value);
+	}
+#endif
+
+	return *this;
 }
 
 CxMatrix & CxMatrix::operator += ( CxMatrix & _Right )
@@ -746,105 +871,261 @@ CxMatrix & CxMatrix::operator += ( CxMatrix & _Right )
 	if (_Right.empty())
 		return *this;
 
-	// 首先检查行列数是否相等
+	// Check whether it is its own matrix
 	ASSERT(rows == _Right.rows && cols == _Right.cols);
 
-	// 矩阵加法
+	if (rows != _Right.rows || cols != _Right.cols) {
+		throw _T("Incompatible dimensions in operator += ( CxMatrix & _Right ). ");
+		//exit(1);
+		return *this;
+	}
+
+	// Matrix addition
+#if MATRIX_FAST_MODE
+	int _length   = size();
+	int _lenRight = _Right.size();
+	double *pData      = getData();
+	double *pDataRight = _Right.getData();
+
+	ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
+	if (pData != NULL && pDataRight != NULL && _length == _lenRight) {
+		for (int i=0; i<_length; i++) {
+			(*pData) += (double)(*pDataRight);
+			pData++;
+			pDataRight++;
+		}
+	}
+#else
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
 			setElement(i, j, getElement(i, j) + _Right.getElement(i, j));
 	}
+#endif
 
 	return *this;
 }
 
 CxMatrix CxMatrix::operator - ( double _value )
 {
-	// 复制目标矩阵
-	CxMatrix _Result((CxMatrix &)*this);		// 拷贝构造
+	// Matrix subtraction
+#if MATRIX_FAST_MODE
+	// Copy the current matrix
+	CxMatrix _Result((CxMatrix &)*this);		// Copy constructor
 
-	// 进行减法操作
+	int _length   = _Result.size();
+	double *pData = _Result.getData();
+
+	ASSERT(pData != NULL);
+	if (pData != NULL) {
+		for (int i=0; i<_length; i++) {
+			(*pData) -= _value;
+			pData++;
+		}
+	}
+#else
+	// Create the result matrix
+	CxMatrix _Result(rows, cols);
+
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
 			_Result.setElement(i, j, getElement(i, j) - _value);
 	}
+#endif
 
 	return _Result;
 }
 
 CxMatrix operator - ( double _value, CxMatrix & _Right )
 {
-	// 复制目标矩阵
-	CxMatrix _Result((CxMatrix &)_Right);		// 拷贝构造
-	if (_Right.empty())
-		return _Result;
+	// Matrix subtraction
+#if MATRIX_FAST_MODE
+	// Copy the current matrix
+	CxMatrix _Result((CxMatrix &)_Right);		// Copy constructor
 
-	// 进行减法操作
+	int _length   = _Result.size();
+	double *pData = _Result.getData();
+
+	ASSERT(pData != NULL);
+	if (pData != NULL) {
+		for (int i=0; i<_length; i++) {
+			(*pData) = _value - (double)(*pData);
+			pData++;
+		}
+	}
+#else
+	// Create the result matrix
+	CxMatrix _Result(_Right.rows, _Right.cols);
+
 	for (int i=0; i<_Right.rows; ++i) {
 		for (int j=0; j<_Right.cols; ++j)
 			_Result.setElement(i, j, _value - _Right.getElement(i, j));
 	}
+#endif
 
 	return _Result;
 }
 
 CxMatrix CxMatrix::operator - ( CxMatrix & _Right )
 {
-	// 复制目标矩阵
-	CxMatrix _Result((CxMatrix &)*this);		// 拷贝构造
+	// Copy the current matrix
+	CxMatrix _Result((CxMatrix &)*this);		// Copy constructor
 	if (_Right.empty())
 		return _Result;
 
-	// 首先检查行列数是否相等
+	// Check whether it is its own matrix
 	ASSERT(rows == _Right.rows && cols == _Right.cols);
 
-	// 进行减法操作
+	if (rows != _Right.rows || cols != _Right.cols) {
+		throw _T("Incompatible dimensions in operator - ( CxMatrix & _Right ).");
+		//exit(1);
+		//_Result.copy(this);
+		return _Result;
+	}
+
+	// Matrix subtraction
+#if MATRIX_FAST_MODE
+	int _length   = _Result.size();
+	int _lenRight = _Right.size();
+	double *pData      = _Result.getData();
+	double *pDataRight = _Right.getData();
+
+	ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
+	if (pData != NULL && pDataRight != NULL && _length == _lenRight) {
+		for (int i=0; i<_length; i++) {
+			(*pData) -= (double)(*pDataRight);
+			pData++;
+			pDataRight++;
+		}
+	}
+#else
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
 			_Result.setElement(i, j, getElement(i, j) - _Right.getElement(i, j));
 	}
+#endif
 
 	return _Result;
 }
 
+CxMatrix & CxMatrix::operator -= ( double _value )
+{
+	// Matrix subtraction
+#if MATRIX_FAST_MODE
+	int _length   = size();
+	double *pData = getData();
+
+	ASSERT(pData != NULL);
+	if (pData != NULL) {
+		for (int i=0; i<_length; i++) {
+			(*pData) -= _value;
+			pData++;
+		}
+	}
+#else
+	for (int i=0; i<rows; ++i) {
+		for (int j=0; j<cols; ++j)
+			setElement(i, j, getElement(i, j) - _value);
+	}
+#endif
+
+	return *this;
+}
+
 CxMatrix & CxMatrix::operator -= ( CxMatrix & _Right )
 {
-	// 首先检查行列数是否相等
+	if (_Right.empty())
+		return *this;
+
+	// Check whether it is its own matrix
 	ASSERT(rows == _Right.rows && cols == _Right.cols);
 
-	// 进行减法操作
+	if (rows != _Right.rows || cols != _Right.cols) {
+		throw _T("Incompatible dimensions in operator -= ( CxMatrix & _Right ). ");
+		//exit(1);
+		return *this;
+	}
+
+	// Matrix subtraction
+#if MATRIX_FAST_MODE
+	int _length   = size();
+	int _lenRight = _Right.size();
+	double *pData      = getData();
+	double *pDataRight = _Right.getData();
+
+	ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
+	if (pData != NULL && pDataRight != NULL && _length == _lenRight) {
+		for (int i=0; i<_length; i++) {
+			(*pData) -= (double)(*pDataRight);
+			pData++;
+			pDataRight++;
+		}
+	}
+#else
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
 			setElement(i, j, getElement(i, j) - _Right.getElement(i, j));
 	}
+#endif
 
 	return *this;
 }
 
 CxMatrix CxMatrix::operator * ( double _value )
 {
-	// 复制目标矩阵
+	// Matrix multiplication
+#if MATRIX_FAST_MODE
+	// Copy the current matrix
 	CxMatrix _Result((CxMatrix &)*this);		// copy ourselves
 
-	// 进行数乘
+	int _length   = _Result.size();
+	double *pData = _Result.getData();
+
+	ASSERT(pData != NULL);
+	if (pData != NULL) {
+		for (int i=0; i<_length; i++) {
+			(*pData) *= _value;
+			pData++;
+		}
+	}
+#else
+	// Create the result matrix
+	CxMatrix _Result(rows, cols);
+
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
 			_Result.setElement(i, j, getElement(i, j) * _value) ;
 	}
+#endif
 
 	return _Result;
 }
 
 CxMatrix operator * ( double _value, CxMatrix & _Right )
 {
-	// 复制目标矩阵
-	CxMatrix _Result((CxMatrix &)_Right);		// 拷贝构造
+	// Matrix multiplication
+#if MATRIX_FAST_MODE
+	// Copy the current matrix
+	CxMatrix _Result((CxMatrix &)_Right);		// Copy constructor
 
-	// 进行减法操作
+	int _length   = _Result.size();
+	double *pData = _Result.getData();
+
+	ASSERT(pData != NULL);
+	if (pData != NULL) {
+		for (int i=0; i<_length; i++) {
+			(*pData) *= _value;
+			pData++;
+		}
+	}
+#else
+	// Create the result matrix
+	CxMatrix _Result(_Right.rows, _Right.cols);
+
 	for (int i=0; i<_Right.rows; ++i) {
 		for (int j=0; j<_Right.cols; ++j)
 			_Result.setElement(i, j, _value * _Right.getElement(i, j));
 	}
+#endif
 
 	return _Result;
 }
@@ -865,7 +1146,7 @@ CxMatrix CxMatrix::operator * ( CxMatrix & _Right )
 	// 创建目标乘积矩阵
 	CxMatrix _Result(_newRows, _newCols);
 
-	// 矩阵乘法，即
+	// Matrix multiplication，即
 	//
 	// [A][B][C]   [G][H]     [A*G + B*I + C*K][A*H + B*J + C*L]
 	// [D][E][F] * [I][J]  =  [D*G + E*I + F*K][D*H + E*J + F*L]
@@ -886,7 +1167,7 @@ CxMatrix CxMatrix::operator * ( CxMatrix & _Right )
 
 CxMatrix & CxMatrix::operator *= ( double _value )
 {
-	// 进行数乘
+	// Matrix multiplication
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
 			setElement(i, j, getElement(i, j) * _value) ;
@@ -900,7 +1181,7 @@ CxMatrix & CxMatrix::operator *= ( CxMatrix & _Right )
 	// 首先检查乘矩阵的行数和被乘矩阵的列数是否相同
 	ASSERT(cols == _Right.rows);
 
-	// 复制目标矩阵
+	// Copy the current matrix
 	CxMatrix _Left((CxMatrix &)*this);
 
 	int _newRows, _newCols, _oldCols;
@@ -911,7 +1192,7 @@ CxMatrix & CxMatrix::operator *= ( CxMatrix & _Right )
 	// 创建目标乘积矩阵
 	int _size = resize(_newRows, _newCols);
 
-	// 矩阵乘法，即
+	// Matrix multiplication，即
 	//
 	// [A][B][C]   [G][H]     [A*G + B*I + C*K][A*H + B*J + C*L]
 	// [D][E][F] * [I][J]  =  [D*G + E*I + F*K][D*H + E*J + F*L]
@@ -932,7 +1213,7 @@ CxMatrix & CxMatrix::operator *= ( CxMatrix & _Right )
 
 CxMatrix CxMatrix::operator ^ ( double _value )
 {
-	// 复制目标矩阵
+	// Copy the current matrix
 	CxMatrix _Result((CxMatrix &)*this);		// copy ourselves
 
 	double _base, _power;
@@ -965,51 +1246,104 @@ CxMatrix & CxMatrix::operator ^= ( double _value )
 
 CxMatrix CxMatrix::operator / ( double _value )
 {
-	// 复制目标矩阵
+	// Matrix division: dotdiv
+#if MATRIX_FAST_MODE
+	// Copy the current matrix
 	CxMatrix _Result((CxMatrix &)*this);		// copy ourselves
 
-	// 进行点除
+	int _length   = _Result.size();
+	double *pData = _Result.getData();
+
+	ASSERT(pData != NULL);
+	if (pData != NULL) {
+		for (int i=0; i<_length; i++) {
+			(*pData) /= _value;
+			pData++;
+		}
+	}
+#else
+	// Create the result matrix
+	CxMatrix _Result(rows, cols);
+
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
 			_Result.setElement(i, j, getElement(i, j) / _value) ;
 	}
+#endif
 
 	return _Result;
 }
 
 CxMatrix CxMatrix::operator / ( CxMatrix &_Right )
 {
-	ASSERT(rows == _Right.rows && cols == _Right.cols);
-
-	// 复制目标矩阵
+	// Copy the current matrix
 	CxMatrix _Result((CxMatrix &)*this);		// copy ourselves
 
-	// 进行点除
+	// Check whether it is its own matrix
+	ASSERT(rows == _Right.rows && cols == _Right.cols);
+
+	if (rows != _Right.rows || cols != _Right.cols) {
+		throw _T("Incompatible dimensions in operator / ( CxMatrix & _Right ).");
+		//exit(1);
+		//_Result.copy(this);
+		return _Result;
+	}
+
+	// Matrix division: dotdiv
+#if MATRIX_FAST_MODE
+	int _length   = _Result.size();
+	int _lenRight = _Right.size();
+	double *pData = _Result.getData();
+	double *pDataRight = _Right.getData();
+
+	ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
+	if (pData != NULL && pDataRight != NULL && _length == _lenRight) {
+		for (int i=0; i<_length; i++) {
+			(*pData) /= (double)(*pDataRight);
+			pData++;
+			pDataRight++;
+		}
+	}
+#else
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
 			_Result.setElement(i, j, getElement(i, j) / _Right.getElement(i, j)) ;
 	}
+#endif
 
 	return _Result;
 }
 
 CxMatrix operator / ( double _value, CxMatrix & _Right )
 {
-	// 复制目标矩阵
-	CxMatrix _Result((CxMatrix &)_Right);		// 拷贝构造
+	// Copy the current matrix
+	CxMatrix _Result((CxMatrix &)_Right);		// Copy constructor
 
-	// 进行减法操作
+	// Matrix division
+#if MATRIX_FAST_MODE
+	int _length   = _Result.size();
+	double *pData = _Result.getData();
+
+	ASSERT(pData != NULL);
+	if (pData != NULL) {
+		for (int i=0; i<_length; i++) {
+			(*pData) = _value / (double)(*pData);
+			pData++;
+		}
+	}
+#else
 	for (int i=0; i<_Right.rows; ++i) {
 		for (int j=0; j<_Right.cols; ++j)
 			_Result.setElement(i, j, _value / _Right.getElement(i, j));
 	}
+#endif
 
 	return _Result;
 }
 
 CxMatrix & CxMatrix::operator /= ( double _value )
 {
-	// 进行点除
+	// Matrix division: dotdiv
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
 			setElement(i, j, getElement(i, j) / _value) ;
@@ -1035,7 +1369,7 @@ BOOL CxMatrix::makeUnitMatrix( int _size )
 
 CxMatrix & CxMatrix::transpose( void )
 {
-	// 复制目标矩阵
+	// Copy the current matrix
 	CxMatrix _Trans((CxMatrix &)*this);		// copy ourselves
 
 	// 转置各元素
@@ -1073,7 +1407,7 @@ int CxMatrix::rands2( int _rows, int _cols )
 
 CxMatrix CxMatrix::_zeros( int _rows, int _cols ) const
 {
-	// 复制目标矩阵
+	// Copy the current matrix
 	CxMatrix _zeros0(_rows, _cols);
 
 	// 所有元素置0
@@ -1087,7 +1421,7 @@ CxMatrix CxMatrix::_zeros( int _rows, int _cols ) const
 
 CxMatrix CxMatrix::_ones( int _rows, int _cols ) const
 {
-	// 复制目标矩阵
+	// Copy the current matrix
 	CxMatrix _ones0(_rows, _cols);
 
 	// 所有元素置1
@@ -1101,7 +1435,7 @@ CxMatrix CxMatrix::_ones( int _rows, int _cols ) const
 
 CxMatrix CxMatrix::_rands( int _rows, int _cols ) const
 {
-	// 复制目标矩阵
+	// Copy the current matrix
 	CxMatrix _rands(_rows, _cols);
 
 	// 所有元素置[-1,1]的随机数
@@ -1118,7 +1452,7 @@ CxMatrix CxMatrix::_rands( int _rows, int _cols ) const
 
 CxMatrix CxMatrix::_rands2( int _rows, int _cols ) const
 {
-	// 复制目标矩阵
+	// Copy the current matrix
 	CxMatrix _rands(_rows, _cols);
 
 	// 所有元素置[-1,1]的随机数
@@ -1173,6 +1507,7 @@ void CxMatrix::display( void )
 
 void CxMatrix::display( const TCHAR *szName )
 {
+#if 1
 	TRACE(_T("CxMatrix: Name = [ %s ], [rows = %d, cols = %d]\n"), szName, rows, cols);
 	TRACE(_T("============================================================================================================\n\n"));
 	for (int r=0; r<rows; r++) {
@@ -1183,6 +1518,7 @@ void CxMatrix::display( const TCHAR *szName )
 		TRACE(_T("\n\n"));
 	}
 	TRACE(_T("============================================================================================================\n\n"));
+#endif
 }
 
 //////////////////////////////////////////////////////////////////
