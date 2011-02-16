@@ -93,6 +93,7 @@ public:
 	CxMatrix( int _rows, int _cols, int _initFcn = MAT_INIT_NONE );
 	CxMatrix( const TCHAR *szName, int _rows, int _cols, int _initFcn = MAT_INIT_NONE );
 	CxMatrix( const CxMatrix & scrMatrix );								// 拷贝构造函数
+	CxMatrix( const CxMatrix & scrMatrix, BOOL bCopyData );
 	virtual ~CxMatrix( void );
 
 public:
@@ -138,7 +139,7 @@ public:
 	// property
 	int rows, cols;
 	int length;
-	int mem_alloc;
+	int malloc_size;
 
 	// operator(重载运算符)
 	double      operator () ( int _index );
@@ -152,9 +153,11 @@ public:
 	BOOL        operator != ( CxMatrix & _Right );
 	CxMatrix    operator +  ( double _value     );
 	CxMatrix    operator +  ( CxMatrix & _Right );
+	CxMatrix &  operator += ( double _value     );
 	CxMatrix &  operator += ( CxMatrix & _Right );
 	CxMatrix    operator -  ( double _value     );
 	CxMatrix    operator -  ( CxMatrix & _Right );
+	CxMatrix &  operator -= ( double _value     );
 	CxMatrix &  operator -= ( CxMatrix & _Right );
 	CxMatrix    operator *  ( double _value     );
 	CxMatrix    operator *  ( CxMatrix & _Right );

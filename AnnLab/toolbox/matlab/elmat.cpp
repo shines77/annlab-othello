@@ -328,8 +328,9 @@ CxMatrix dotprod( const CxMatrix &x, const CxMatrix &y )
 	CxMatrix _Result;
 
 	// Check for compatible dimensions:
+	ASSERT(x.size() == y.size());
 	if (x.size() != y.size()) {
-		//throw _T("Incompatible dimensions in dot(). ");
+		throw _T("Incompatible dimensions in dot(). ");
 		//exit(1);
 		return _Result;
 	}
@@ -368,6 +369,7 @@ CxMatrix dotdiv( const CxMatrix &x, const CxMatrix &y )
 	CxMatrix _Result;
 
 	// Check for compatible dimensions:
+	ASSERT(x.size() == y.size());
 	if (x.size() != y.size()) {
 		throw _T("Incompatible dimensions in dot(). ");
 		//exit(1);
