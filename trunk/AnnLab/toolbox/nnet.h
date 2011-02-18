@@ -49,6 +49,8 @@
 
 #endif /* __cplusplus */
 
+#include "nnerror.h"
+
 _MATLAB_BEGIN
 
 _MATLAB_END

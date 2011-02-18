@@ -52,7 +52,14 @@ private:
 	TCHAR  szSearchFcn[64];		// ËÑÑ°º¯ÊýÃû³Æ
 };
 
-class CxTrainRecord { int m, n, k, l; };
+class CxTrainRecord
+{
+public:
+	CxTrainRecord( void );
+	virtual ~CxTrainRecord( void );
+public:
+	int epochs;
+};
 
 class CxNetInOutputs : public CxBaseObject
 {

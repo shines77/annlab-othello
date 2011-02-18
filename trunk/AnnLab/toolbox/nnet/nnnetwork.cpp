@@ -7,7 +7,7 @@ _USING_NAMESPACE_MATLAB;
 
 _MATLAB_BEGIN
 
-int parseNetLayers( CAnnNetwork *pAnnNetwork,
+int parseNetLayers( CAnnNetwork *annNetwork,
 				   const TCHAR *szSizesOfLayers,
 				   CxNetLayers *pNetLayers,
 				   int _inNumLayers /*= 0 */,
@@ -45,18 +45,18 @@ int parseNetLayers( CAnnNetwork *pAnnNetwork,
 				_numNeuron = _tstoi(szBuffer);
 				if (_numNeuron > 0) {
 					if (_indexLayer == 0) {
-						pAnnNetwork->clearNetLayers();
+						annNetwork->clearNetLayers();
 					}
-					int _index = pAnnNetwork->appendNetLayer(prevNeuron, _numNeuron);
+					int _index = annNetwork->appendNetLayer(prevNeuron, _numNeuron);
 					if (_index >= 0) {
 						if (_indexLayer == 0) {
-							pAnnNetwork->layers[_index].type = LAYER_TYPE_INPUT;
+							annNetwork->layers[_index].type = LAYER_TYPE_INPUT;
 						}
 						else if (_indexLayer == _inNumLayers - 1) {
-							pAnnNetwork->layers[_index].type = LAYER_TYPE_OUTPUT;
+							annNetwork->layers[_index].type = LAYER_TYPE_OUTPUT;
 						}
 						else {
-							pAnnNetwork->layers[_index].type = LAYER_TYPE_HIDDEN;
+							annNetwork->layers[_index].type = LAYER_TYPE_HIDDEN;
 						}
 					}
 				}
@@ -70,11 +70,11 @@ int parseNetLayers( CAnnNetwork *pAnnNetwork,
 		else
 			break;
 	}
-	TRACE(_T("CAnnNetwork::parseNetLayers() Exit: _indexLayer = %d.\n"), _indexLayer);
+	TRACE(_T("matlab::parseNetLayers() Exit: _indexLayer = %d.\n"), _indexLayer);
 	return _indexLayer;
 }
 
-int parseTransFcns( CAnnNetwork *pAnnNetwork,
+int parseTransFcns( CAnnNetwork *annNetwork,
 				   const TCHAR *szTransFcnOfLayers,
 				   CxNetLayers *pNetLayers,
 				   const TCHAR *szDelim /*= NULL */ )
@@ -109,8 +109,8 @@ int parseTransFcns( CAnnNetwork *pAnnNetwork,
 				szBuffer[lenFcnName] = 0;
 				int nRetSize = trimString(szBuffer, szFcnName, _countof(szFcnName));
 				if (nRetSize > 0) {
-					if (_indexFcns >= 0 && _indexFcns < pAnnNetwork->layers.numLayers)
-						pAnnNetwork->layers[_indexFcns+1].setTransferFcn(szFcnName);
+					if (_indexFcns >= 0 && _indexFcns < annNetwork->layers.numLayers)
+						annNetwork->layers[_indexFcns+1].setTransferFcn(szFcnName);
 				}
 				TRACE(_T("transFcn[%d] = %s. (nRetSize = %d)\n"), _indexFcns, szFcnName, nRetSize);
 			}
@@ -121,7 +121,7 @@ int parseTransFcns( CAnnNetwork *pAnnNetwork,
 		else
 			break;
 	}
-	TRACE(_T("CAnnNetwork::parseTransFcns() Exit: _indexFcns = %d.\n"), _indexFcns);
+	TRACE(_T("matlab::parseTransFcns() Exit: _indexFcns = %d.\n"), _indexFcns);
 	return _indexFcns;
 }
 
@@ -202,26 +202,26 @@ int parseTransFcns( CAnnNetwork *pAnnNetwork,
 %
 ******************************************************************************/
 
-int newff( CAnnNetwork *pAnnNetwork, const CxMatrix *_inputMinMax,
+int newff( CAnnNetwork *annNetwork, const CxMatrix *_inputMinMax,
 		  const TCHAR *szSizesOfLayers,
 		  const TCHAR *szTransFcnOfLayers, const TCHAR *szTrainFcn,
 		  BOOL bInitWeightsNow /*= FALSE */ )
 {
 	int _numLayers, _numTransFcns;
 	// parseNetLayers
-	_numLayers = parseNetLayers(pAnnNetwork, szSizesOfLayers, NULL);
+	_numLayers = parseNetLayers(annNetwork, szSizesOfLayers, NULL);
 	if (_numLayers <= 0)
 		return NULL;
-	_numLayers = parseNetLayers(pAnnNetwork, szSizesOfLayers, &pAnnNetwork->layers, _numLayers);
+	_numLayers = parseNetLayers(annNetwork, szSizesOfLayers, &annNetwork->layers, _numLayers);
 
 	// parseTransFcns
-	_numTransFcns = parseTransFcns(pAnnNetwork, szTransFcnOfLayers, NULL);
+	_numTransFcns = parseTransFcns(annNetwork, szTransFcnOfLayers, NULL);
 	if (_numTransFcns <= 0 || _numTransFcns != _numLayers - 1)
 		return NULL;
-	_numTransFcns = parseTransFcns(pAnnNetwork, szTransFcnOfLayers, &pAnnNetwork->layers);
+	_numTransFcns = parseTransFcns(annNetwork, szTransFcnOfLayers, &annNetwork->layers);
 
 	if (_inputMinMax != NULL) {
-		pAnnNetwork->inputRange.copy(_inputMinMax);
+		annNetwork->inputRange.copy(_inputMinMax);
 	}
 
 	TCHAR szBuffer[512];
