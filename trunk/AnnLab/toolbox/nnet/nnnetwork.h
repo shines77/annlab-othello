@@ -9,18 +9,18 @@
 
 _MATLAB_BEGIN
 
-int parseNetLayers( CAnnNetwork *annNetwork,
+int parseNetLayers( CAnnNetwork *net,
 				   const TCHAR *szSizesOfLayers,
 				   CxNetLayers *pNetLayers,
 				   int _inNumLayers = 0,
 				   const TCHAR *szDelim = NULL );
 
-int parseTransFcns( CAnnNetwork *annNetwork,
+int parseTransFcns( CAnnNetwork *net,
 				   const TCHAR *szTransFcnOfLayers,
 				   CxNetLayers *pNetLayers,
 				   const TCHAR *szDelim = NULL );
 
-int newff( CAnnNetwork *annNetwork,
+int newff( CAnnNetwork *net,
 		  const CxMatrix *_inputMinMax,
 		  const TCHAR *szSizesOfLayers,
 		  const TCHAR *szTransFcnOfLayers,

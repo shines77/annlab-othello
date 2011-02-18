@@ -276,7 +276,7 @@ public:
 
 	CAnnNetwork * init( void );
 	CAnnNetwork * train( const CxMatrixList *trainP, const CxMatrixList *trainT,
-		CxTrainRecord *trainRecord );
+		CxTrainRecord *tr );
 
 	BOOL initnw( CxMatrix *pMatrix, int _index, int _numInputs, int _numNeurons,
 		CxMatrix *pInputRange, CxMatrix *pActiveRange );

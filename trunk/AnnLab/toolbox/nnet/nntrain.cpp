@@ -136,18 +136,20 @@ _MATLAB_BEGIN
 %
 ******************************************************************************/
 
-int train( CAnnNetwork *annNetwork,
-		  CxTrainRecord *trainRecord,
+int train( CAnnNetwork *net,
+		  CxTrainRecord *tr,
 		  CxMatrixList *trainP,
 		  CxMatrixList *trainT,
 		  CxTrainParam *tainParam )
 {
-	if (annNetwork == NULL)
+	int nRetCode = ERR_NN_NONE;
+
+	ASSERT(net != NULL && trainP != NULL && trainT != NULL);
+	if (net == NULL || trainP == NULL || trainT == NULL)
 		return ERR_NN_INVALID_PARAM;
 
-	int nRetCode = ERR_NN_NONE;
-	if (_tcsicmp(annNetwork->trainFcn(), _T("traincgf")) == 0) {
-		nRetCode = traincgf(annNetwork, trainRecord, trainP, trainT, NULL);
+	if (_tcsicmp(net->trainFcn(), _T("traincgf")) == 0) {
+		nRetCode = traincgf(net, tr, trainP, trainT, NULL);
 	}
 	return nRetCode;
 }
@@ -308,20 +310,25 @@ int train( CAnnNetwork *annNetwork,
 %
 ******************************************************************************/
 
-int traincgf( CAnnNetwork *annNetwork,
-			 CxTrainRecord *trainRecord,
+int traincgf( CAnnNetwork *net,
+			 CxTrainRecord *tr,
 			 CxMatrixList *trainV,
 			 CxMatrixList *valV,
 			 CxMatrixList *testV )
 {
+	int nRetCode = ERR_NN_NONE;
+
+	ASSERT(net != NULL && trainV != NULL);
+	if (net == NULL || trainV == NULL)
+		return ERR_NN_INVALID_PARAM;
+
 	TCHAR szBuffer[512];
 	TCHAR szText[512];
-	int nRetcode;
 	_tcscpy_s(szText, _countof(szText), _T(" "));
-	nRetcode = trimString(szText, szBuffer, _countof(szBuffer));
-	TRACE(_T("traincgf(\"%s\") = %s. (nRetcode = %d)\n"), szText, szBuffer, nRetcode);
+	nRetCode = trimString(szText, szBuffer, _countof(szBuffer));
+	TRACE(_T("traincgf(\"%s\") = %s. (nRetcode = %d)\n"), szText, szBuffer, nRetCode);
 
-	return ERR_NN_NONE;
+	return nRetCode;
 }
 
 _MATLAB_END

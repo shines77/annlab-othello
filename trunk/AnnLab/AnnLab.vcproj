@@ -317,6 +317,14 @@
 				Name="nnet"
 				>
 				<File
+					RelativePath=".\toolbox\nnet\nninit.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\toolbox\nnet\nninit.h"
+					>
+				</File>
+				<File
 					RelativePath=".\toolbox\nnet\nnnetwork.cpp"
 					>
 				</File>

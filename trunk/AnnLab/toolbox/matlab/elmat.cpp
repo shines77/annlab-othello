@@ -169,39 +169,40 @@ CxMatrix sign( CxMatrix &m )
 	return _Result;
 }
 
+/**********************************************************************
+	%NORM Normalize of a matrix.
+	%
+	%  Syntax
+	%
+	%    norm(M)
+	%
+	%  Description
+	%
+	%    NORM(M) normalizes the matrix of M to a length of 1.
+	%
+	%  Examples
+	%
+	%    m = [1 2; 3 4]
+	%    n = norm(m)
+	%
+	%  See also NORMC, NORMR.
+
+	% Mark Beale, 1-31-92
+	% Copyright 1992-2007 The MathWorks, Inc.
+	% $Revision: 1.1.6.5 $  $Date: 2007/11/09 20:49:53 $
+
+	if nargin < 1,error('NNET:Arguments','Not enough input arguments.'); end
+
+	[mr,mc]=size(m);
+	if (mc == 1)
+		n = m ./ abs(m);
+	else
+		n = sqrt(sum(m.*m));
+	end
+**********************************************************************/
+
 CxMatrix norm( CxMatrix &m )
 {
-	/**********************************************************************
-		%NORM Normalize of a matrix.
-		%
-		%  Syntax
-		%
-		%    norm(M)
-		%
-		%  Description
-		%
-		%    NORM(M) normalizes the matrix of M to a length of 1.
-		%
-		%  Examples
-		%
-		%    m = [1 2; 3 4]
-		%    n = norm(m)
-		%
-		%  See also NORMC, NORMR.
-
-		% Mark Beale, 1-31-92
-		% Copyright 1992-2007 The MathWorks, Inc.
-		% $Revision: 1.1.6.5 $  $Date: 2007/11/09 20:49:53 $
-
-		if nargin < 1,error('NNET:Arguments','Not enough input arguments.'); end
-
-		[mr,mc]=size(m);
-		if (mc == 1)
-			n = m ./ abs(m);
-		else
-			n = sqrt(sum(m.*m));
-		end
-	**********************************************************************/
 	int mr, mc;
 	CxMatrix n;
 	mr = m.rows;
@@ -211,39 +212,40 @@ CxMatrix norm( CxMatrix &m )
 	return n;
 }
 
+/**********************************************************************
+	%NORMR Normalize rows of a matrix.
+	%
+	%  Syntax
+	%
+	%    normr(M)
+	%
+	%  Description
+	%
+	%    NORMR(M) normalizes the columns of M to a length of 1.
+	%
+	%  Examples
+	%
+	%    m = [1 2; 3 4]
+	%    n = normr(m)
+	%
+	%  See also NORMC.
+
+	% Mark Beale, 1-31-92
+	% Copyright 1992-2007 The MathWorks, Inc.
+	% $Revision: 1.1.6.5 $  $Date: 2007/11/09 20:49:53 $
+
+	if nargin < 1,error('NNET:Arguments','Not enough input arguments.'); end
+
+	[mr,mc]=size(m);
+	if (mc == 1)
+		n = m ./ abs(m);
+	else
+		n = sqrt(ones./(sum((m.*m)')))'*ones(1,mc).*m;
+	end
+**********************************************************************/
+
 CxMatrix normr( CxMatrix &m )
 {
-	/**********************************************************************
-		%NORMR Normalize rows of a matrix.
-		%
-		%  Syntax
-		%
-		%    normr(M)
-		%
-		%  Description
-		%
-		%    NORMR(M) normalizes the columns of M to a length of 1.
-		%
-		%  Examples
-		%
-		%    m = [1 2; 3 4]
-		%    n = normr(m)
-		%
-		%  See also NORMC.
-
-		% Mark Beale, 1-31-92
-		% Copyright 1992-2007 The MathWorks, Inc.
-		% $Revision: 1.1.6.5 $  $Date: 2007/11/09 20:49:53 $
-
-		if nargin < 1,error('NNET:Arguments','Not enough input arguments.'); end
-
-		[mr,mc]=size(m);
-		if (mc == 1)
-			n = m ./ abs(m);
-		else
-			n = sqrt(ones./(sum((m.*m)')))'*ones(1,mc).*m;
-		end
-	**********************************************************************/
 	int mr, mc;
 	CxMatrix n;
 	mr = m.rows;
@@ -259,34 +261,35 @@ CxMatrix normr( CxMatrix &m )
 	return n;
 }
 
+/*****************************************************************
+
+	function y = linspace(d1, d2, n)
+	%LINSPACE Linearly spaced vector.
+	%   LINSPACE(X1, X2) generates a row vector of 100 linearly
+	%   equally spaced points between X1 and X2.
+	%
+	%   LINSPACE(X1, X2, N) generates N points between X1 and X2.
+	%   For N < 2, LINSPACE returns X2.
+	%
+	%   Class support for inputs X1,X2:
+	%      float: double, single
+	%
+	%   See also LOGSPACE, :.
+
+	%   Copyright 1984-2004 The MathWorks, Inc. 
+	%   $Revision: 5.12.4.1 $  $Date: 2004/07/05 17:01:20 $
+
+	if nargin == 2
+		n = 100;
+	end
+
+	n = double(n);
+	y = [d1+(0:n-2)*(d2-d1)/(floor(n)-1) d2];
+
+*******************************************************************/
+
 CxMatrix linspace(double d1, double d2, int n)
 {
-	/*****************************************************************
-
-		function y = linspace(d1, d2, n)
-		%LINSPACE Linearly spaced vector.
-		%   LINSPACE(X1, X2) generates a row vector of 100 linearly
-		%   equally spaced points between X1 and X2.
-		%
-		%   LINSPACE(X1, X2, N) generates N points between X1 and X2.
-		%   For N < 2, LINSPACE returns X2.
-		%
-		%   Class support for inputs X1,X2:
-		%      float: double, single
-		%
-		%   See also LOGSPACE, :.
-
-		%   Copyright 1984-2004 The MathWorks, Inc. 
-		%   $Revision: 5.12.4.1 $  $Date: 2004/07/05 17:01:20 $
-
-		if nargin == 2
-			n = 100;
-		end
-
-		n = double(n);
-		y = [d1+(0:n-2)*(d2-d1)/(floor(n)-1) d2];
-
-	*******************************************************************/
 	CxMatrix _Result;
 	if (n > 1) {
 		_Result.resize(1, n);

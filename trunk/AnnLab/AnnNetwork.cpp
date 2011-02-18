@@ -1068,62 +1068,62 @@ CAnnNetwork * CAnnNetwork::init( void )
 }
 
 CAnnNetwork * CAnnNetwork::train( const CxMatrixList *trainP, const CxMatrixList *trainT,
-								 CxTrainRecord *trainRecord )
+								 CxTrainRecord *tr )
 {
 	CAnnNetwork *pNetwork = NULL;
 	pNetwork = this;
 	return pNetwork;
 }
 
+/*****************************************************************
+	function [w,b] = calcnw(pr,s,n)
+	%CALCNW Calculates Nguyen-Widrow initial conditions.
+	%
+	%  PR
+	%  S - Number of neurons.
+	%  N - Active region of transfer function N = [Nmin Nmax].
+
+	r = size(pr,1);
+
+	% Nguyen-Widrow Method
+	% --------------------
+
+	% Assume inputs and net inputs range in [-1 1].
+
+	% Weights
+	wMag = 0.7*s^(1/r);
+	wDir = randnr(s,r);
+	w = wMag*wDir;
+
+	% Biases
+	if (s==1)
+		b = 0;
+	else
+		b = wMag*linspace(-1,1,s)'.*sign(w(:,1));
+	end
+
+	% Conversions
+	% -----------
+
+	% Conversion of net inputs of [-1 1] to [Nmin Nmax]
+	x = 0.5*(n(2)-n(1));
+	y = 0.5*(n(2)+n(1));
+	w = x*w;
+	b = x*b+y;
+
+	% Conversion of inputs of PR to [-1 1]
+	x = 2./(pr(:,2)-pr(:,1));
+	y = 1-pr(:,2).*x;
+
+	xp = x';
+	b = w*y+b;
+	w = w.*xp(ones(1,s),:);
+
+*****************************************************************/
+
 BOOL CAnnNetwork::initnw( CxMatrix *pMatrix, int _index, int _numInputs, int _numNeurons,
 						   CxMatrix *pInputRange, CxMatrix *pActiveRange )
 {
-	/*****************************************************************
-		function [w,b] = calcnw(pr,s,n)
-		%CALCNW Calculates Nguyen-Widrow initial conditions.
-		%
-		%  PR
-		%  S - Number of neurons.
-		%  N - Active region of transfer function N = [Nmin Nmax].
-
-		r = size(pr,1);
-
-		% Nguyen-Widrow Method
-		% --------------------
-
-		% Assume inputs and net inputs range in [-1 1].
-
-		% Weights
-		wMag = 0.7*s^(1/r);
-		wDir = randnr(s,r);
-		w = wMag*wDir;
-
-		% Biases
-		if (s==1)
-			b = 0;
-		else
-			b = wMag*linspace(-1,1,s)'.*sign(w(:,1));
-		end
-
-		% Conversions
-		% -----------
-
-		% Conversion of net inputs of [-1 1] to [Nmin Nmax]
-		x = 0.5*(n(2)-n(1));
-		y = 0.5*(n(2)+n(1));
-		w = x*w;
-		b = x*b+y;
-
-		% Conversion of inputs of PR to [-1 1]
-		x = 2./(pr(:,2)-pr(:,1));
-		y = 1-pr(:,2).*x;
-
-		xp = x';
-		b = w*y+b;
-		w = w.*xp(ones(1,s),:);
-
-	*****************************************************************/
-
 	TCHAR szText[512];
 	// Assume inputs and net inputs range in [-1 1].
 
