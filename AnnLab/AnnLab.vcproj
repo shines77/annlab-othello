@@ -302,6 +302,14 @@
 			Name="toolbox"
 			>
 			<File
+				RelativePath=".\toolbox\nnerror.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\nnerror.h"
+				>
+			</File>
+			<File
 				RelativePath=".\toolbox\nnet.h"
 				>
 			</File>
@@ -314,6 +322,14 @@
 				</File>
 				<File
 					RelativePath=".\toolbox\nnet\nnnetwork.h"
+					>
+				</File>
+				<File
+					RelativePath=".\toolbox\nnet\nntrain.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\toolbox\nnet\nntrain.h"
 					>
 				</File>
 				<File
