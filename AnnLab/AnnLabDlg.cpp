@@ -7,6 +7,8 @@
 #include "CxList.h"
 #include "CxMatrix.h"
 #include "toolbox\matlab\elmat.h"
+#include "toolbox\nnet\nninit.h"
+#include "toolbox\nnet\nntrain.h"
 #include "toolbox\nnet\nnnetwork.h"
 
 #ifdef _DEBUG
@@ -70,6 +72,7 @@ SHOWMESSAGE_IMP(CAnnLabDlg)
 
 int CAnnLabDlg::BpNetwork_Test()
 {
+	int nRetCode = 0;
 	CAnnNetwork net, *pNetwork;
 	net.setNumInputs( 0 );
 	net.setDivideFcn( _T("Dividerand") );
@@ -106,6 +109,9 @@ int CAnnLabDlg::BpNetwork_Test()
 	pNetwork = net.newff( &inputMinMax, _T("64, 65, 65, 33, 1"), _T("tansig, tansig, tansig, purelin"), _T("traincgf") );
 	pNetwork = net.init();
 
+	nRetCode = matlab::newff( &net, &inputMinMax, _T("64, 65, 65, 33, 1"), _T("tansig, tansig, tansig, purelin"), _T("traincgf") );
+	nRetCode = matlab::init( &net );
+
 	net.trainParam.show = TRUE;
 	net.trainParam.epochs = 2000;
 
@@ -113,7 +119,8 @@ int CAnnLabDlg::BpNetwork_Test()
 	trainP.size();
 
 	CxTrainRecord tr;
-	pNetwork = net.train(&trainP, &trainT, &tr);
+	pNetwork = net.train( &trainP, &trainT, &tr );
+	nRetCode = matlab::train( &net, NULL, &trainP, &trainT, NULL );
 
 	CxMatrix m(3, 4), n;
 	//double data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};

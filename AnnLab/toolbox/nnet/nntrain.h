@@ -9,14 +9,14 @@
 
 _MATLAB_BEGIN
 
-int train( CAnnNetwork *annNetwork,
-		  CxTrainRecord *trainRecord,
+int train( CAnnNetwork *net,
+		  CxTrainRecord *tr,
 		  CxMatrixList *trainP,
 		  CxMatrixList *trainT,
 		  CxTrainParam *tainParam );
 
-int traincgf( CAnnNetwork *annNetwork,
-		  CxTrainRecord *trainRecord,
+int traincgf( CAnnNetwork *net,
+		  CxTrainRecord *tr,
 		  CxMatrixList *trainV,
 		  CxMatrixList *valV,
 		  CxMatrixList *testV );
