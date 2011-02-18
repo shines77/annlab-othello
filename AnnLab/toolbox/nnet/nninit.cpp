@@ -2,6 +2,7 @@
 #include "StdAfx.h"
 #include "nninit.h"
 #include "..\matlab\elmat.h"
+#include <math.h>
 
 _USING_NAMESPACE_MATLAB;
 
@@ -128,7 +129,7 @@ int initnw( CAnnNetwork *net,
 	double wMag;
 	CxMatrix wDir, _weights, _biases;
 	// wMag = 0.7*s^(1/r);
-	wMag = 0.7 * pow((double)_numNeurons, 1.0/(double)_numInputs);
+	wMag = 0.7 * ::pow((double)_numNeurons, 1.0/(double)_numInputs);
 	// wDir = randnr(s,r);
 	wDir = randnr(_numNeurons, _numInputs);
 	//wDir.display(_T("wDir = randnr(_numNeurons, _numInputs);"));
