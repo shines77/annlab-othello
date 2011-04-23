@@ -24,7 +24,7 @@ CxVector::CxVector( CxVector & srcVerctor )
 {
 	int _size = srcVerctor.size();
 
-	initVector(srcVerctor.Name(), _size, INIT_MODE_FIRST);
+	initVector(srcVerctor.name(), _size, INIT_MODE_FIRST);
 
 	CxVector *pVector = copy( &srcVerctor );
 	ASSERT(pVector != NULL);
@@ -1493,7 +1493,7 @@ CxMatrix CxMatrix::getColVector( int _col ) const
 
 void CxMatrix::display( void )
 {
-	TRACE(_T("CxMatrix: Name = [ %s ], [rows = %d, cols = %d]\n"), Name(), rows, cols);
+	TRACE(_T("CxMatrix: Name = [ %s ], [rows = %d, cols = %d]\n"), name(), rows, cols);
 	TRACE(_T("============================================================================================================\n\n"));
 	for (int r=0; r<rows; r++) {
 		TRACE(_T("\t"));
@@ -1592,7 +1592,18 @@ CxMatrixs * CxMatrixs::clone( const CxMatrixs *srcMartixs )
 
 CxMatrixList::CxMatrixList( void )
 {
+	I       = 0;
+	TS      = 0;
+	Q       = 0;
 
+	X       = NULL;
+	T       = NULL;
+	indices = NULL;
+	Xi      = NULL;
+	Tl      = NULL;
+	Pd      = NULL;
+	Ai      = NULL;
+	Y       = NULL;
 }
 
 CxMatrixList::~CxMatrixList( void )
@@ -1623,4 +1634,40 @@ CxMatrixVector::CxMatrixVector( void )
 CxMatrixVector::~CxMatrixVector( void )
 {
 
+}
+
+CAnnXArray::CAnnXArray( void )
+{
+	length = 0;
+	malloc_size = 0;
+	items = NULL;
+}
+
+CAnnXArray::~CAnnXArray( void )
+{
+	free();
+}
+
+double CAnnXArray::operator[]( int _index )
+{
+	return 0.0;
+}
+
+void CAnnXArray::free( void )
+{
+	if (items)
+		delete[] items;
+
+	length = 0;
+	malloc_size = 0;
+}
+
+void CAnnXArray::clear( void )
+{
+	//
+}
+
+int CAnnXArray::resize( int _size )
+{
+	return 0;
 }

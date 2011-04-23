@@ -15,10 +15,10 @@ CxMatrix eyes   ( int _rows, int _cols );
 CxMatrix rands  ( int _rows, int _cols );
 CxMatrix rands2 ( int _rows, int _cols );
 
-CxMatrix transpose ( CxMatrix &m );
-CxMatrix linspace  ( double d1, double d2, int n );
-CxMatrix expand_row( CxMatrix &m, int _rows );
-CxMatrix expand_col( CxMatrix &m, int _cols );
+CxMatrix transpose  ( CxMatrix &m );
+CxMatrix linspace   ( double d1, double d2, int n );
+CxMatrix expand_row ( CxMatrix &m, int _rows );
+CxMatrix expand_col ( CxMatrix &m, int _cols );
 
 CxMatrix diag( CxMatrix &m );
 

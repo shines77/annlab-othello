@@ -261,7 +261,34 @@ public:
 	virtual ~CxMatrixList( void );
 
 public:
+	int I, TS, Q;
+	double *X, *T, *indices;
+	double *Xi, *Pd, *Tl, *Ai;
+	double *Y;
+
+public:
 	CxMatrix * operator [] ( int _index );
+};
+
+class CAnnXArray : public CxBaseObject
+{
+public:
+	CAnnXArray( void );
+	virtual ~CAnnXArray( void );
+
+public:
+	int length, malloc_size;
+	double *items;
+
+public:
+	double operator [] ( int _index );
+
+	void free   ( void );
+	void clear  ( void );
+	int  resize ( int _size );
+
+protected:
+	//
 };
 
 /*
