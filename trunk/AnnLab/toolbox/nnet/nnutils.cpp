@@ -47,4 +47,22 @@ int trimString(const TCHAR *szString, TCHAR *szBuffer, DWORD dwBufSize)
 	return -1;
 }
 
+int calcperf2( CAnnNetwork *net, CAnnXArray *X, double *Pd, double *Tl, double *Ai, int Q, int TS )
+{
+	int nRetCode = ERR_NN_NONE;
+	int retval = 0;
+
+	ASSERT(net != NULL && X != NULL);
+	if (net == NULL || X == NULL)
+		return ERR_NN_INVALID_PARAM;
+
+	TCHAR szBuffer[512];
+	TCHAR szText[512];
+	_tcscpy_s(szText, _countof(szText), _T(" "));
+	nRetCode = trimString(szText, szBuffer, _countof(szBuffer));
+	TRACE(_T("calcperf2(\"%s\") = %s. (nRetcode = %d)\n"), szText, szBuffer, nRetCode);
+
+	return nRetCode;
+}
+
 _MATLAB_END

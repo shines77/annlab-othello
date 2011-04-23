@@ -13,7 +13,7 @@ public:
 
 public:
 	// gets
-	INLINE TCHAR * Name( void ) const {
+	INLINE TCHAR * name( void ) const {
 		return (TCHAR *)m_szName;
 	};
 

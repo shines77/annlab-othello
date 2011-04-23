@@ -310,6 +310,21 @@ int train( CAnnNetwork *net,
 %
 ******************************************************************************/
 
+/******************************************
+trainV = 
+	name:		'Training'
+	TS:			1
+	Q:			19032
+	X:			{[128x19032 double]}
+	T:			{[1x19032 double]}
+	indices:	[1x19032 double]
+	Xi:			{1x0 cell}
+	Pd:			{3x1 cell}
+	Tl:			{3x1 cell}
+	Ai:			{3x0 cell}
+	Y:			{[]  []  []}
+******************************************/
+
 int traincgf( CAnnNetwork *net,
 			 CxTrainRecord *tr,
 			 CxMatrixList *trainV,
@@ -317,10 +332,34 @@ int traincgf( CAnnNetwork *net,
 			 CxMatrixList *testV )
 {
 	int nRetCode = ERR_NN_NONE;
+	int epoch, epochs;
+	int Q, TS;
+	int retval;
+
+	CAnnXArray X;
 
 	ASSERT(net != NULL && trainV != NULL);
 	if (net == NULL || trainV == NULL)
 		return ERR_NN_INVALID_PARAM;
+
+	Q  = trainV->Q;
+	TS = trainV->TS;
+
+	epochs = net->trainParam.epochs;
+
+	// Train
+	for (epoch = 0; epoch < epoch; epoch++) {
+		// Performance, Gradient and Search Direction
+		if (epoch == 0) {
+			// First Iteration
+
+			// Initial performance
+			retval = calcperf2(net, &X, trainV->Pd, trainV->Tl, trainV->Ai, Q, TS);
+		}
+		else {
+			//
+		}
+	}
 
 	TCHAR szBuffer[512];
 	TCHAR szText[512];
