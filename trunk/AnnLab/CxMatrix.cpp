@@ -1592,7 +1592,7 @@ CxMatrixs * CxMatrixs::clone( const CxMatrixs *srcMartixs )
 
 CxMatrixList::CxMatrixList( void )
 {
-	I       = 0;
+	N       = 0;
 	TS      = 0;
 	Q       = 0;
 

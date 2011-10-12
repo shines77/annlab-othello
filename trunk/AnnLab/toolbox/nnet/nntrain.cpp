@@ -318,11 +318,33 @@ trainV =
 	X:			{[128x19032 double]}
 	T:			{[1x19032 double]}
 	indices:	[1x19032 double]
-	Xi:			{1x0 cell}
+	Ai:			{3x0 cell}
 	Pd:			{3x1 cell}
 	Tl:			{3x1 cell}
-	Ai:			{3x0 cell}
+	Xi:			{1x0 cell}
 	Y:			{[]  []  []}
+
+	%    Each argument TRAINV, VALV and TESTV is a structure of these fields:
+	%      X  - NxTS cell array of inputs for N inputs and TS timesteps.
+	%           X{i,ts} is an RixQ matrix for ith input and ts timestep.
+	%      Xi - NxNid cell array of input delay states for N inputs and Nid delays.
+	%           Xi{i,j} is an RixQ matrix for ith input and jth state.
+	%      Pd - NxSxNid cell array of delayed input states.
+	%      T  - NoxTS cell array of targets for No outputs and TS timesteps.
+	%           T{i,ts} is an SixQ matrix for the ith output and ts timestep.
+	%      Tl - NlxTS cell array of targets for Nl layers and TS timesteps.
+	%           Tl{i,ts} is an SixQ matrix for the ith layer and ts timestep.
+	%      Ai - NlxTS cell array of layer delays states for Nl layers, TS timesteps.
+	%           Ai{i,j} is an SixQ matrix of delayed outputs for layer i, delay j.
+
+	%	    Q   - Concurrent size.
+	%	    TS  - Time steps.
+	%	    X   - Network weight and bias values in a single vector.
+	%	    Ai  - Initial layer delay conditions.
+	%	    Pd  - Delayed inputs.
+	%	    Tl  - Layer targets.
+	%       Xi  - NxNid cell array of input delay states for N inputs and Nid delays.
+	%             Xi{i,j} is an RixQ matrix for ith input and jth state.
 ******************************************/
 
 int traincgf( CAnnNetwork *net,
@@ -337,6 +359,8 @@ int traincgf( CAnnNetwork *net,
 	int retval;
 
 	CAnnXArray X;
+	double perf, El, Ac, N, LWZ, IWZ, BZ;
+	perf = El = Ac = N = LWZ = IWZ = BZ = 0.0;
 
 	ASSERT(net != NULL && trainV != NULL);
 	if (net == NULL || trainV == NULL)
@@ -354,7 +378,8 @@ int traincgf( CAnnNetwork *net,
 			// First Iteration
 
 			// Initial performance
-			retval = calcperf2(net, &X, trainV->Pd, trainV->Tl, trainV->Ai, Q, TS);
+			retval = calcperf2(net, &X, trainV->Pd, trainV->Tl, trainV->Ai, Q, TS,
+								&perf, &El, &Ac, &N, &LWZ, &IWZ, &BZ);
 		}
 		else {
 			//
