@@ -8,7 +8,7 @@
 
 using namespace std;
 
-#define MAT_NAN_ITEM         (-99.99)
+#define MAT_NAN_ITEM         (-128.0)
 
 #define MET_ADDR_ALIGN_SIZE  (64UL)
 #define MET_ADDR_ALIGN_MASK  (MET_ADDR_ALIGN_SIZE - 1)
@@ -60,7 +60,7 @@ protected:
 	BOOL initVector( const TCHAR *szName, int _size, int _initMode = INIT_MODE_NONE,
 		int _initFcn = MAT_INIT_NONE );
 	BOOL initData( int _size, int _initFcn = MAT_INIT_NONE );
-	
+
 private:
 	double *m_pOrigData;
 	double *m_pData;
@@ -261,7 +261,7 @@ public:
 	virtual ~CxMatrixList( void );
 
 public:
-	int I, TS, Q;
+	int N, TS, Q;
 	double *X, *T, *indices;
 	double *Xi, *Pd, *Tl, *Ai;
 	double *Y;
