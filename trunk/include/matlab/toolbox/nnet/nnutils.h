@@ -6,6 +6,8 @@
 #include "../../../annlab/AnnNetwork.h"
 #include "../../../annlab/AnnMatrix.h"
 
+using namespace annlab;
+
 namespace matlab {
 
 int trimString( const TCHAR *szString, TCHAR *szBuffer, DWORD dwBufSize );

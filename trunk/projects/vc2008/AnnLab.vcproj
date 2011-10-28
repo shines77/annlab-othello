@@ -509,6 +509,10 @@
 				Filter="h;hpp;hxx;hm;inl;inc;xsd"
 				>
 				<File
+					RelativePath="..\..\include\annlab\ann_config.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\annlab\ann_stddef.h"
 					>
 				</File>
@@ -537,6 +541,14 @@
 					>
 					<File
 						RelativePath="..\..\include\annlab\vs\stdint.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="internal"
+					>
+					<File
+						RelativePath="..\..\include\annlab\internal\_ann_windef.h"
 						>
 					</File>
 				</Filter>

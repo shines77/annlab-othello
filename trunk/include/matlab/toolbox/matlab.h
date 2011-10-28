@@ -2,8 +2,8 @@
 #ifndef _MATLAB_H_
 #define _MATLAB_H_
 
-#define __MY_ASSERT(text, ...)
-#define __MY_TRACE(text, ...)
+#define __MY_ASSERT(expression, ...)
+#define __MY_TRACE(expression, ...)
 
 #include "nnerror.h"
 

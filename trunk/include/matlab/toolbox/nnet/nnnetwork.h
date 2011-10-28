@@ -6,6 +6,8 @@
 #include "../../../annlab/AnnNetwork.h"
 #include "../../../annlab/AnnMatrix.h"
 
+using namespace annlab;
+
 namespace matlab {
 
 int parseNetLayers( CAnnNetwork *net,

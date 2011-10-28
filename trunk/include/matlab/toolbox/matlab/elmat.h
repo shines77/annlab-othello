@@ -5,6 +5,8 @@
 #include "../matlab.h"
 #include "../../../annlab/AnnMatrix.h"
 
+using namespace annlab;
+
 namespace matlab {
 
 CAnnMatrix zeros  ( int _rows, int _cols );

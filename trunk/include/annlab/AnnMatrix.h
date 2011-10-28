@@ -14,6 +14,8 @@ using namespace std;
 #define MET_ADDR_ALIGN_MASK  (MET_ADDR_ALIGN_SIZE - 1)
 #define MET_ADDR_ALIGN(x)    (((DWORD)(x) + MET_ADDR_ALIGN_MASK) & (~MET_ADDR_ALIGN_MASK))
 
+namespace annlab {
+
 enum enumMatrixInit {
 	MAT_INIT_NONE,
 	MAT_INIT_ZEROS,
@@ -299,3 +301,5 @@ CxMatrix operator / ( double _value, CxMatrix & _Right );
 //*/
 
 //typedef CAnnList<CAnnMatrix> CAnnMatrixList;
+
+}  // namespace annlab
