@@ -3,11 +3,11 @@
 #define _ELMAT_H_
 
 #include "../matlab.h"
-#include "../../../annlab/CxMatrix.h"
+#include "../../../annlab/AnnMatrix.h"
 
 namespace matlab {
 
-CAnnMatrix& zeros  ( int _rows, int _cols );
+CAnnMatrix zeros  ( int _rows, int _cols );
 CAnnMatrix ones   ( int _rows, int _cols );
 CAnnMatrix eyes   ( int _rows, int _cols );
 CAnnMatrix rands  ( int _rows, int _cols );

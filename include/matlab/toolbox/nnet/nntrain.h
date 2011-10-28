@@ -4,7 +4,7 @@
 
 #include "../matlab.h"
 #include "../../../annlab/AnnNetwork.h"
-#include "../../../annlab/CxMatrix.h"
+#include "../../../annlab/AnnMatrix.h"
 
 namespace matlab {
 

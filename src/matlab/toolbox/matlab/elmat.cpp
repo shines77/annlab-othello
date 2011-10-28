@@ -5,9 +5,9 @@
 namespace matlab {
 
 // 重置大小并初始化为全0矩阵
-CAnnMatrix& zeros( int _rows, int _cols )
+CAnnMatrix zeros( int _rows, int _cols )
 {
-	CAnnMatrix& _result(_rows, _cols, MAT_INIT_ZEROS);
+	CAnnMatrix _result(_rows, _cols, MAT_INIT_ZEROS);
 	return _result;
 }
 

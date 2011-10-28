@@ -1,8 +1,8 @@
 #pragma once
 
-#include "AnnGlobal.h"
-#include "CxBaseObject.h"
-#include "CxList.h"
+#include "ann_stddef.h"
+#include "AnnObject.h"
+#include "AnnList.h"
 #include <list>
 #include <vector>
 

@@ -1,6 +1,6 @@
 
 #include "../../include/gui/stdafx.h"
-#include "../../include/annlab/AnnGlobal.h"
+#include "../../include/annlab/ann_stddef.h"
 #include "../../include/annlab/AnnNetwork.h"
 #include "../../include/matlab/toolbox/matlab/elmat.h"
 #include "../../include/matlab/toolbox/nnet/nnnetwork.h"
