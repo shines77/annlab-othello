@@ -395,4 +395,4 @@ int traincgf( CAnnNetwork *net,
 	return nRetCode;
 }
 
-_MATLAB_END
+_MATLAB_END  // namespace matlab
