@@ -88,13 +88,13 @@ int CAnnLabDlg::BpNetwork_Test()
 	catch (...) {
 		::ShowMessage( GetSafeHwnd(), _T("Error: indexLayer"), indexLayer );
 	}
-	net.setName( _T("BP Network") );
+	net.set_name( _T("BP Network") );
 
-	CxMatrix trainPx, trainTx;
+	CAnnMatrix trainPx, trainTx;
 	trainPx.rands(64, 64);
 	trainTx.rands(64, 1);
 
-	CxMatrix temp, rands;
+	CAnnMatrix temp, rands;
 	temp = matlab::ones(16, 16);
 	rands = matlab::rands2(16, 16);
 	temp = 1.0 - rands;
@@ -103,7 +103,7 @@ int CAnnLabDlg::BpNetwork_Test()
 	temp /= 3.0;
 	temp = 3.0 / rands;
 
-	CxMatrix inputMinMax;
+	CAnnMatrix inputMinMax;
 	inputMinMax.createEx( _T("inputMinMax"), 64, 2, MAT_INIT_ONES );
 
 	pNetwork = net.newff( &inputMinMax, _T("64, 65, 65, 33, 1"), _T("tansig, tansig, tansig, purelin"), _T("traincgf") );
@@ -115,14 +115,14 @@ int CAnnLabDlg::BpNetwork_Test()
 	net.trainParam.show = TRUE;
 	net.trainParam.epochs = 2000;
 
-	CxMatrixList trainP, trainT;
+	CAnnMatrixList trainP, trainT;
 	trainP.size();
 
-	CxTrainRecord tr;
+	CAnnTrainRecord tr;
 	pNetwork = net.train( &trainP, &trainT, &tr );
 	nRetCode = matlab::train( &net, NULL, &trainP, &trainT, NULL );
 
-	CxMatrix m(3, 4), n;
+	CAnnMatrix m(3, 4), n;
 	//double data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
 	double data[] = {1, 5, 9, 2, 6, 10, 3, 7, 11, 4, 8, 12};
 	m.setData(data, 3, 4);

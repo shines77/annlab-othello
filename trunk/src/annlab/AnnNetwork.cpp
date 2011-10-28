@@ -38,7 +38,7 @@ INLINE void setFcnName( TCHAR *szDstFuncName, int nNameSize, const TCHAR *szFcnN
 // CxTrainParam
 //////////////////////////////////////////////////////////////////
 
-CxTrainParam::CxTrainParam( void )
+CAnnTrainParam::CAnnTrainParam( void )
 {
 	show            = true;		// 显示训练过程
 	showWindow      = true;		// 显示训练窗口
@@ -70,11 +70,11 @@ CxTrainParam::CxTrainParam( void )
 	_tcscpy_s(szSearchFcn, _countof(szSearchFcn), _T(""));
 }
 
-CxTrainParam::~CxTrainParam( void )
+CAnnTrainParam::~CAnnTrainParam( void )
 {
 }
 
-void CxTrainParam::setSearchFcn( const TCHAR *szFcnName )
+void CAnnTrainParam::setSearchFcn( const TCHAR *szFcnName )
 {
 	setFcnName(szSearchFcn, _countof(szSearchFcn), szFcnName);
 }
@@ -83,12 +83,12 @@ void CxTrainParam::setSearchFcn( const TCHAR *szFcnName )
 // CxTrainRecord
 //////////////////////////////////////////////////////////////////
 
-CxTrainRecord::CxTrainRecord( void )
+CAnnTrainRecord::CAnnTrainRecord( void )
 {
 	epochs = 0;
 }
 
-CxTrainRecord::~CxTrainRecord( void )
+CAnnTrainRecord::~CAnnTrainRecord( void )
 {
 }
 
@@ -96,22 +96,22 @@ CxTrainRecord::~CxTrainRecord( void )
 // CxNetInOutputs
 //////////////////////////////////////////////////////////////////
 
-CxNetInOutputs::CxNetInOutputs( void )
+CAnnNetInOutputs::CAnnNetInOutputs( void )
 {
 
 }
 
-CxNetInOutputs::CxNetInOutputs( const TCHAR *szName )
+CAnnNetInOutputs::CAnnNetInOutputs( const TCHAR *szName )
 {
 
 }
 
-CxNetInOutputs::~CxNetInOutputs( void )
+CAnnNetInOutputs::~CAnnNetInOutputs( void )
 {
 
 }
 
-void CxNetInOutputs::clear( void )
+void CAnnNetInOutputs::clear( void )
 {
 
 }
@@ -120,17 +120,17 @@ void CxNetInOutputs::clear( void )
 // CxNetInputs
 //////////////////////////////////////////////////////////////////
 
-CxNetInputs::CxNetInputs( void )
+CAnnNetInputs::CAnnNetInputs( void )
 {
 
 }
 
-CxNetInputs::CxNetInputs( const TCHAR *szName )
+CAnnNetInputs::CAnnNetInputs( const TCHAR *szName )
 {
 
 }
 
-CxNetInputs::~CxNetInputs( void )
+CAnnNetInputs::~CAnnNetInputs( void )
 {
 
 }
@@ -139,17 +139,17 @@ CxNetInputs::~CxNetInputs( void )
 // CxNetOutputs
 //////////////////////////////////////////////////////////////////
 
-CxNetOutputs::CxNetOutputs( void )
+CAnnNetOutputs::CAnnNetOutputs( void )
 {
 
 }
 
-CxNetOutputs::CxNetOutputs( const TCHAR *szName )
+CAnnNetOutputs::CAnnNetOutputs( const TCHAR *szName )
 {
 
 }
 
-CxNetOutputs::~CxNetOutputs( void )
+CAnnNetOutputs::~CAnnNetOutputs( void )
 {
 
 }
@@ -159,31 +159,31 @@ CxNetOutputs::~CxNetOutputs( void )
 // CxNetLayer
 //////////////////////////////////////////////////////////////////
 
-CxNetLayer::CxNetLayer( void )
+CAnnNetLayer::CAnnNetLayer( void )
 {
 	initNetLayer(0, 0);
 }
 
-CxNetLayer::CxNetLayer( int _numNeurons )
+CAnnNetLayer::CAnnNetLayer( int _numNeurons )
 {
 	initNetLayer(0, _numNeurons);
 }
 
-CxNetLayer::CxNetLayer( int _prevNeurons, int _numNeurons )
+CAnnNetLayer::CAnnNetLayer( int _prevNeurons, int _numNeurons )
 {
 	initNetLayer(_prevNeurons, _numNeurons);
 }
 
-CxNetLayer::CxNetLayer( int _type, int _prevNeurons, int _numNeurons )
+CAnnNetLayer::CAnnNetLayer( int _type, int _prevNeurons, int _numNeurons )
 {
 	initNetLayer(-1, _type, _prevNeurons, _numNeurons);
 }
 
-CxNetLayer::CxNetLayer( const CxNetLayer & srcNetLayer )
+CAnnNetLayer::CAnnNetLayer( const CAnnNetLayer & srcNetLayer )
 {
 	int _index, _type;
 	int _prevNeurons, _numNeurons;
-	CxNetLayer *_prevLayer, *_nextLayer;
+	CAnnNetLayer *_prevLayer, *_nextLayer;
 
 	_index       = srcNetLayer.index;
 	_type        = srcNetLayer.type;
@@ -200,15 +200,15 @@ CxNetLayer::CxNetLayer( const CxNetLayer & srcNetLayer )
 	setTransferFcn(srcNetLayer.transferFcn());
 }
 
-CxNetLayer::~CxNetLayer( void )
+CAnnNetLayer::~CAnnNetLayer( void )
 {
 }
 
-bool CxNetLayer::initNetLayer( int _index, int _type,
+bool CAnnNetLayer::initNetLayer( int _index, int _type,
 							  int _prevNeurons,
 							  int _numNeurons,
-							  CxNetLayer *_prevLayer, /*= NULL */
-							  CxNetLayer *_nextLayer  /*= NULL */ )
+							  CAnnNetLayer *_prevLayer, /*= NULL */
+							  CAnnNetLayer *_nextLayer  /*= NULL */ )
 {
 	index       = _index;
 	type        = _type;
@@ -228,17 +228,17 @@ bool CxNetLayer::initNetLayer( int _index, int _type,
 	return TRUE;
 }
 
-bool CxNetLayer::initNetLayer( int _prevNeurons, int _numNeurons )
+bool CAnnNetLayer::initNetLayer( int _prevNeurons, int _numNeurons )
 {
 	return initNetLayer(-1, LAYER_TYPE_NONE, _prevNeurons, _numNeurons);
 }
 
-void CxNetLayer::setInitFcn( const TCHAR *szFcnName )
+void CAnnNetLayer::setInitFcn( const TCHAR *szFcnName )
 {
 	setFcnName(m_szInitFcn, _countof(m_szInitFcn), szFcnName);
 }
 
-void CxNetLayer::setTransferFcn( const TCHAR *szFcnName )
+void CAnnNetLayer::setTransferFcn( const TCHAR *szFcnName )
 {
 	setFcnName(m_szTransferFcn, _countof(m_szTransferFcn), szFcnName);
 }
@@ -247,17 +247,17 @@ void CxNetLayer::setTransferFcn( const TCHAR *szFcnName )
 // CxNetLayers
 //////////////////////////////////////////////////////////////////
 
-CxNetLayers::CxNetLayers( void )
+CAnnNetLayers::CAnnNetLayers( void )
 {
 	commonConstructor(0);
 }
 
-CxNetLayers::CxNetLayers( int _numLayers )
+CAnnNetLayers::CAnnNetLayers( int _numLayers )
 {
 	commonConstructor(_numLayers);
 }
 
-CxNetLayers::CxNetLayers( const TCHAR *szSizesOfLayers )
+CAnnNetLayers::CAnnNetLayers( const TCHAR *szSizesOfLayers )
 {
 	commonConstructor(0);
 
@@ -272,12 +272,12 @@ CxNetLayers::CxNetLayers( const TCHAR *szSizesOfLayers )
 	}
 }
 
-CxNetLayers::~CxNetLayers( void )
+CAnnNetLayers::~CAnnNetLayers( void )
 {
 	freeLayers();
 }
 
-INLINE void CxNetLayers::commonConstructor( int _numLayers )
+INLINE void CAnnNetLayers::commonConstructor( int _numLayers )
 {
 	numLayers    = 0;
 	m_firstLayer = NULL;
@@ -286,7 +286,7 @@ INLINE void CxNetLayers::commonConstructor( int _numLayers )
 	initLayers(_numLayers);
 }
 
-int CxNetLayers::initLayers( int _numLayers )
+int CAnnNetLayers::initLayers( int _numLayers )
 {
 	int retNumLayers = 0;
 	if (_numLayers > 0)
@@ -295,7 +295,7 @@ int CxNetLayers::initLayers( int _numLayers )
 
 		numLayers = _numLayers;
 		for (int i=0; i<numLayers; i++) {
-			CxNetLayer *pNetLayer = new CxNetLayer();
+			CAnnNetLayer *pNetLayer = new CAnnNetLayer();
 			if (pNetLayer != NULL) {
 				if (append(pNetLayer))
 					retNumLayers++;
@@ -305,12 +305,12 @@ int CxNetLayers::initLayers( int _numLayers )
 	return retNumLayers;
 }
 
-void CxNetLayers::freeLayers( void )
+void CAnnNetLayers::freeLayers( void )
 {
 	clear();
 }
 
-int CxNetLayers::parseNetLayers( const TCHAR *szSizesOfLayers,
+int CAnnNetLayers::parseNetLayers( const TCHAR *szSizesOfLayers,
 								int _inNumLayers, /*= 0 */
 								const TCHAR *szDelim /*= NULL */ )
 {
@@ -371,33 +371,33 @@ int CxNetLayers::parseNetLayers( const TCHAR *szSizesOfLayers,
 	return _indexLayer;
 }
 
-int CxNetLayers::setNumLayers( int _numLayers )
+int CAnnNetLayers::setNumLayers( int _numLayers )
 {
 	return initLayers(_numLayers);
 }
 
-CxNetLayer & CxNetLayers::operator [] ( int _index ) const
+CAnnNetLayer & CAnnNetLayers::operator [] ( int _index ) const
 {
-	CxNetLayer &_layer = (CxNetLayer &)layer(_index);
+	CAnnNetLayer &_layer = (CAnnNetLayer &)layer(_index);
 	return _layer;
 }
 
-CxNetLayer & CxNetLayers::operator () ( int _index ) const
+CAnnNetLayer & CAnnNetLayers::operator () ( int _index ) const
 {
-	CxNetLayer &_layer = (CxNetLayer &)layer(_index);
+	CAnnNetLayer &_layer = (CAnnNetLayer &)layer(_index);
 	return _layer;
 }
 
-CxNetLayer & CxNetLayers::layer( int _index ) const
+CAnnNetLayer & CAnnNetLayers::layer( int _index ) const
 {
 	ASSERT(_index >= 0 && _index < numLayers);
 	if (_index >= 0 && _index < numLayers) {
-		CxNetLayer *nextLayer;
-		CxNetLayer *curLayer = m_firstLayer;
+		CAnnNetLayer *nextLayer;
+		CAnnNetLayer *curLayer = m_firstLayer;
 		int _nowIndex = 0;
 		while (curLayer != NULL) {
 			if (_nowIndex == _index)
-				return (CxNetLayer &)*curLayer;
+				return (CAnnNetLayer &)*curLayer;
 			_nowIndex++;
 			if (_nowIndex > _index)
 				break;
@@ -411,20 +411,20 @@ CxNetLayer & CxNetLayers::layer( int _index ) const
 	throw _T("CxNetLayers::layer(index): index overflow!");
 	//RaiseException( EXCEPTION_ACCESS_VIOLATION, 0, 0, 0 );
 	// Create temp 1 layer
-	CxNetLayer *pNetLayers = new CxNetLayer();
+	CAnnNetLayer *pNetLayers = new CAnnNetLayer();
 	if (pNetLayers != NULL) {
 		pNetLayers->index = -1;
-		return (CxNetLayer &)(*pNetLayers);
+		return (CAnnNetLayer &)(*pNetLayers);
 	}
 	throw _T("CxNetLayers::layer(index): temp layer create failure!");
 	//RaiseException( EXCEPTION_INVALID_HANDLE, 0, 0, 0 );
-	return *(new CxNetLayer());
+	return *(new CAnnNetLayer());
 }
 
-CxNetLayer * CxNetLayers::getLayer( int _index ) const
+CAnnNetLayer * CAnnNetLayers::getLayer( int _index ) const
 {
-	CxNetLayer *nextLayer;
-	CxNetLayer *curLayer = m_firstLayer;
+	CAnnNetLayer *nextLayer;
+	CAnnNetLayer *curLayer = m_firstLayer;
 	int _nowIndex = 0;
 
 	ASSERT(_index >= 0 && _index < numLayers);
@@ -433,7 +433,7 @@ CxNetLayer * CxNetLayers::getLayer( int _index ) const
 
 	while (curLayer != NULL) {
 		if (_nowIndex == _index)
-			return (CxNetLayer *)curLayer;
+			return (CAnnNetLayer *)curLayer;
 
 		_nowIndex++;
 		if (_nowIndex > _index)
@@ -447,12 +447,12 @@ CxNetLayer * CxNetLayers::getLayer( int _index ) const
 	return NULL;
 }
 
-int CxNetLayers::clear( void )
+int CAnnNetLayers::clear( void )
 {
 	int oldLayers = numLayers;
 
-	CxNetLayer *nextLayer;
-	CxNetLayer *curLayer = m_firstLayer;
+	CAnnNetLayer *nextLayer;
+	CAnnNetLayer *curLayer = m_firstLayer;
 	int _numLayers = 0;
 
 	while (curLayer != NULL && _numLayers < numLayers) {
@@ -474,10 +474,10 @@ int CxNetLayers::clear( void )
 	return oldLayers;
 }
 
-int CxNetLayers::size( void ) const
+int CAnnNetLayers::size( void ) const
 {
-	CxNetLayer *nextLayer;
-	CxNetLayer *curLayer = m_firstLayer;
+	CAnnNetLayer *nextLayer;
+	CAnnNetLayer *curLayer = m_firstLayer;
 	int _numLayers = 0;
 
 	while (curLayer != NULL) {
@@ -493,16 +493,16 @@ int CxNetLayers::size( void ) const
 	return _numLayers;
 }
 
-bool CxNetLayers::empty( void ) const
+bool CAnnNetLayers::empty( void ) const
 {
 	int _numLayers = size();
 	return (_numLayers <= 0);
 }
 
-int CxNetLayers::pop_front( void )
+int CAnnNetLayers::pop_front( void )
 {
-	CxNetLayer *nextLayer;
-	CxNetLayer *curLayer = m_firstLayer;
+	CAnnNetLayer *nextLayer;
+	CAnnNetLayer *curLayer = m_firstLayer;
 	if (curLayer != NULL) {
 		nextLayer = curLayer->nextLayer;
 		delete curLayer;
@@ -515,10 +515,10 @@ int CxNetLayers::pop_front( void )
 	return -1;
 }
 
-int CxNetLayers::pop_back( void )
+int CAnnNetLayers::pop_back( void )
 {
-	CxNetLayer *prevLayer;
-	CxNetLayer *curLayer = m_lastLayer;
+	CAnnNetLayer *prevLayer;
+	CAnnNetLayer *curLayer = m_lastLayer;
 	if (curLayer != NULL) {
 		prevLayer = curLayer->prevLayer;
 		delete curLayer;
@@ -531,7 +531,7 @@ int CxNetLayers::pop_back( void )
 	return -1;
 }
 
-int CxNetLayers::push_front( CxNetLayer *pNetLayer )
+int CAnnNetLayers::push_front( CAnnNetLayer *pNetLayer )
 {
 	if (pNetLayer != NULL) {
 		pNetLayer->index = numLayers;
@@ -552,7 +552,7 @@ int CxNetLayers::push_front( CxNetLayer *pNetLayer )
 	return -1;
 }
 
-int CxNetLayers::push_back( CxNetLayer *pNetLayer )
+int CAnnNetLayers::push_back( CAnnNetLayer *pNetLayer )
 {
 	if (pNetLayer != NULL) {
 		pNetLayer->index = numLayers;
@@ -573,15 +573,15 @@ int CxNetLayers::push_back( CxNetLayer *pNetLayer )
 	return -1;
 }
 
-int CxNetLayers::append( CxNetLayer *pNetLayer )
+int CAnnNetLayers::append( CAnnNetLayer *pNetLayer )
 {
 	return push_back(pNetLayer);
 }
 
-int CxNetLayers::append( int _prevNeurons, int _numNeurons )
+int CAnnNetLayers::append( int _prevNeurons, int _numNeurons )
 {
 	if (_numNeurons > 0) {
-		CxNetLayer *pNetLayer = new CxNetLayer(_prevNeurons, _numNeurons);
+		CAnnNetLayer *pNetLayer = new CAnnNetLayer(_prevNeurons, _numNeurons);
 		if (pNetLayer != NULL) {
 			pNetLayer->index       = numLayers;
 			pNetLayer->numNeurons  = _numNeurons;
@@ -592,11 +592,11 @@ int CxNetLayers::append( int _prevNeurons, int _numNeurons )
 	return -1;
 }
 
-int CxNetLayers::append( int _numNeurons )
+int CAnnNetLayers::append( int _numNeurons )
 {
 	int _prevNeurons = 0;
 	if (numLayers > 0) {
-		CxNetLayer *pNetLayer = getLayer(numLayers - 1);
+		CAnnNetLayer *pNetLayer = getLayer(numLayers - 1);
 		if (pNetLayer != NULL) {
 			_prevNeurons = pNetLayer->numNeurons;
 			if (_prevNeurons < 0)
@@ -606,17 +606,17 @@ int CxNetLayers::append( int _numNeurons )
 	return append(_prevNeurons, _numNeurons);
 }
 
-int CxNetLayers::insert( int _index, CxNetLayer *pNetLayer )
+int CAnnNetLayers::insert( int _index, CAnnNetLayer *pNetLayer )
 {
 	return 0;
 }
 
-int CxNetLayers::remove( int _index )
+int CAnnNetLayers::remove( int _index )
 {
 	return 0;
 }
 
-bool CxNetLayers::modify( int _index, int _numNeuron )
+bool CAnnNetLayers::modify( int _index, int _numNeuron )
 {
 	return FALSE;
 }
@@ -648,7 +648,7 @@ void CAnnNetwork::freeNetwork( void )
 bool CAnnNetwork::commonConstructor( const TCHAR *szName,
 									const TCHAR *szSizesOfLayers,
 									const TCHAR *szTransFcnOfLayers,
-									const CxMatrix *inputMinMax,
+									const CAnnMatrix *inputMinMax,
 									const TCHAR *szTrainFcn /*= NULL */ )
 {
 	if (szName != NULL)
@@ -682,7 +682,7 @@ bool CAnnNetwork::commonConstructor( const TCHAR *szName,
 
 bool CAnnNetwork::commonConstructor( const TCHAR *szSizesOfLayers,
 									const TCHAR *szTransFcnOfLayers,
-									const CxMatrix *inputMinMax, /*= NULL */
+									const CAnnMatrix *inputMinMax, /*= NULL */
 									const TCHAR *szTrainFcn /*= NULL */)
 {
 	return commonConstructor(_T(""), szSizesOfLayers, szTransFcnOfLayers, inputMinMax, szTrainFcn);
@@ -691,7 +691,7 @@ bool CAnnNetwork::commonConstructor( const TCHAR *szSizesOfLayers,
 bool CAnnNetwork::createEx( const TCHAR *szName,
 						   const TCHAR *szSizesOfLayers,
 						   const TCHAR *szTransFcnOfLayers,
-						   const CxMatrix *inputMinMax,
+						   const CAnnMatrix *inputMinMax,
 						   const TCHAR *szTrainFcn /*= NULL */ )
 {
 	bool bResult;
@@ -701,7 +701,7 @@ bool CAnnNetwork::createEx( const TCHAR *szName,
 
 bool CAnnNetwork::create( const TCHAR *szSizesOfLayers,
 						 const TCHAR *szTransFcnOfLayers,
-						 const CxMatrix *inputMinMax, /*= NULL */
+						 const CAnnMatrix *inputMinMax, /*= NULL */
 						 const TCHAR *szTrainFcn /*= NULL */ )
 {
 	bool bResult;
@@ -787,12 +787,12 @@ int CAnnNetwork::appendNetLayer( int _prevNeurons, int _numNeurons )
 						IW.resize(_prevNeurons, _numNeurons);
 					}
 					else {
-						CxMatrix *layerWeight = new CxMatrix(_prevNeurons, _numNeurons);
+						CAnnMatrix *layerWeight = new CAnnMatrix(_prevNeurons, _numNeurons);
 						if (layerWeight != NULL) {
 							LW.push_back(*layerWeight);
 							delete layerWeight;
 						}
-						CxMatrix *biase = new CxMatrix(_numNeurons, 1);
+						CAnnMatrix *biase = new CAnnMatrix(_numNeurons, 1);
 						if (biase != NULL) {
 							b.push_back(*biase);
 							delete biase;
@@ -864,7 +864,7 @@ int CAnnNetwork::trimString(const TCHAR *szString, TCHAR *szBuffer, DWORD dwBufS
 }
 
 int CAnnNetwork::parseNetLayers( const TCHAR *szSizesOfLayers,
-								CxNetLayers *pNetLayers,
+								CAnnNetLayers *pNetLayers,
 								int _inNumLayers, /*= 0 */
 								const TCHAR *szDelim /*= NULL */ )
 {
@@ -930,7 +930,7 @@ int CAnnNetwork::parseNetLayers( const TCHAR *szSizesOfLayers,
 }
 
 int CAnnNetwork::parseTransFcns( const TCHAR *szTransFcnOfLayers,
-								CxNetLayers *pNetLayers,
+								CAnnNetLayers *pNetLayers,
 								const TCHAR *szDelim /*= NULL */ )
 {
 	TCHAR *pszOffset, *pszEndOf, *pszDest, *pszDelim;
@@ -979,7 +979,7 @@ int CAnnNetwork::parseTransFcns( const TCHAR *szTransFcnOfLayers,
 	return _indexFcns;
 }
 
-CAnnNetwork * CAnnNetwork::newff( const CxMatrix *_inputMinMax, const TCHAR *szSizesOfLayers,
+CAnnNetwork * CAnnNetwork::newff( const CAnnMatrix *_inputMinMax, const TCHAR *szSizesOfLayers,
 								 const TCHAR *szTransFcnOfLayers, const TCHAR *szTrainFcn,
 								 bool bInitWeightsNow /*= FALSE */ )
 {
@@ -1016,11 +1016,11 @@ CAnnNetwork * CAnnNetwork::init( void )
 {
 	CAnnNetwork *pNetwork = NULL;
 	int _numInputs, _numNeurons;
-	CxMatrix _inputRange, _activeRange;
+	CAnnMatrix _inputRange, _activeRange;
 	int _rows, _cols;
 
 	for (int _index=1; _index<=numLayers; _index++) {
-		CxNetLayer *pNetLayer = layers.getLayer(_index);
+		CAnnNetLayer *pNetLayer = layers.getLayer(_index);
 		if (pNetLayer != NULL) {
 			_numInputs  = pNetLayer->prevNeurons;
 			_numNeurons = pNetLayer->numNeurons;
@@ -1054,7 +1054,7 @@ CAnnNetwork * CAnnNetwork::init( void )
 					IW.rands(_rows, _cols);
 				}
 				else {
-					CxMatrix *pMatrix = LW[_index - 2];
+					CAnnMatrix *pMatrix = LW[_index - 2];
 					if (pMatrix != NULL) {
 						_rows = pMatrix->rows;
 						_cols = pMatrix->cols;
@@ -1068,8 +1068,8 @@ CAnnNetwork * CAnnNetwork::init( void )
 	return pNetwork;
 }
 
-CAnnNetwork * CAnnNetwork::train( const CxMatrixList *trainP, const CxMatrixList *trainT,
-								 CxTrainRecord *tr )
+CAnnNetwork * CAnnNetwork::train( const CAnnMatrixList *trainP, const CAnnMatrixList *trainT,
+								 CAnnTrainRecord *tr )
 {
 	CAnnNetwork *pNetwork = NULL;
 	pNetwork = this;
@@ -1122,15 +1122,15 @@ CAnnNetwork * CAnnNetwork::train( const CxMatrixList *trainP, const CxMatrixList
 
 *****************************************************************/
 
-bool CAnnNetwork::initnw( CxMatrix *pMatrix, int _index, int _numInputs, int _numNeurons,
-						   CxMatrix *pInputRange, CxMatrix *pActiveRange )
+bool CAnnNetwork::initnw( CAnnMatrix *pMatrix, int _index, int _numInputs, int _numNeurons,
+						   CAnnMatrix *pInputRange, CAnnMatrix *pActiveRange )
 {
 	TCHAR szText[512];
 	// Assume inputs and net inputs range in [-1 1].
 
 	// Weights
 	double wMag;
-	CxMatrix wDir, _weights, _biases;
+	CAnnMatrix wDir, _weights, _biases;
 	// wMag = 0.7*s^(1/r);
 	wMag = 0.7 * pow((double)_numNeurons, 1.0/(double)_numInputs);
 	// wDir = randnr(s,r);
@@ -1168,7 +1168,7 @@ bool CAnnNetwork::initnw( CxMatrix *pMatrix, int _index, int _numInputs, int _nu
 	x = 2.0 / (maxInput - minInput);
 	y = 1.0 - maxInput * x;
 
-	CxMatrix mx, my, mxp;
+	CAnnMatrix mx, my, mxp;
 	mx = x * ones(_numInputs, 1);
 	my = y * ones(_numInputs, 1);
 
@@ -1187,8 +1187,8 @@ bool CAnnNetwork::initnw( CxMatrix *pMatrix, int _index, int _numInputs, int _nu
 	return TRUE;
 }
 
-bool CAnnNetwork::initwb( CxMatrix *pMatrix, int _index, int _numInputs, int _numNeurons,
-						 CxMatrix *pInputRange, CxMatrix *pActiveRange )
+bool CAnnNetwork::initwb( CAnnMatrix *pMatrix, int _index, int _numInputs, int _numNeurons,
+						 CAnnMatrix *pInputRange, CAnnMatrix *pActiveRange )
 {
 	return TRUE;
 }

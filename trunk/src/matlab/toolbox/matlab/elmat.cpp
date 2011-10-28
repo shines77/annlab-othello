@@ -5,42 +5,42 @@
 namespace matlab {
 
 // 重置大小并初始化为全0矩阵
-CxMatrix zeros( int _rows, int _cols )
+CAnnMatrix& zeros( int _rows, int _cols )
 {
-	CxMatrix _result(_rows, _cols, MAT_INIT_ZEROS);
+	CAnnMatrix& _result(_rows, _cols, MAT_INIT_ZEROS);
 	return _result;
 }
 
 // 重置大小并初始化为全1矩阵
-CxMatrix ones( int _rows, int _cols )
+CAnnMatrix ones( int _rows, int _cols )
 {
-	CxMatrix _result(_rows, _cols, MAT_INIT_ONES);
+	CAnnMatrix _result(_rows, _cols, MAT_INIT_ONES);
 	return _result;
 }
 
-CxMatrix eyes( int _rows, int _cols )
+CAnnMatrix eyes( int _rows, int _cols )
 {
-	CxMatrix _result(_rows, _cols, MAT_INIT_EYES);
+	CAnnMatrix _result(_rows, _cols, MAT_INIT_EYES);
 	return _result;
 }
 
 // 重置大小并初始化为[-1,1]随机数矩阵
-CxMatrix rands( int _rows, int _cols )
+CAnnMatrix rands( int _rows, int _cols )
 {
-	CxMatrix _result(_rows, _cols, MAT_INIT_RANDS);
+	CAnnMatrix _result(_rows, _cols, MAT_INIT_RANDS);
 	return _result;
 }
 
 // 重置大小并初始化为[0,1]随机数矩阵
-CxMatrix rands2( int _rows, int _cols )
+CAnnMatrix rands2( int _rows, int _cols )
 {
-	CxMatrix _result(_rows, _cols, MAT_INIT_RANDS2);
+	CAnnMatrix _result(_rows, _cols, MAT_INIT_RANDS2);
 	return _result;
 }
 
-CxMatrix transpose( CxMatrix &m )
+CAnnMatrix transpose( CAnnMatrix &m )
 {
-	CxMatrix _Result(m.cols, m.rows);
+	CAnnMatrix _Result(m.cols, m.rows);
 	for (int i=0; i<_Result.cols; i++) {
 		for (int j=0; j<_Result.rows; j++) {
 			_Result.setElement(j, i, m.getElement(i, j));
@@ -49,9 +49,9 @@ CxMatrix transpose( CxMatrix &m )
 	return _Result;
 }
 
-CxMatrix expand_row( CxMatrix &m, int _rows )
+CAnnMatrix expand_row( CAnnMatrix &m, int _rows )
 {
-	CxMatrix _Result(_rows, m.cols);
+	CAnnMatrix _Result(_rows, m.cols);
 	for (int i=0; i<_Result.rows; i++) {
 		for (int j=0; j<_Result.cols; j++) {
 			_Result.setElement(i, j, m.getElement(0, j));
@@ -60,9 +60,9 @@ CxMatrix expand_row( CxMatrix &m, int _rows )
 	return _Result;
 }
 
-CxMatrix expand_col( CxMatrix &m, int _cols )
+CAnnMatrix expand_col( CAnnMatrix &m, int _cols )
 {
-	CxMatrix _Result(m.rows, _cols);
+	CAnnMatrix _Result(m.rows, _cols);
 	for (int i=0; i<_Result.cols; i++) {
 		for (int j=0; j<_Result.rows; j++) {
 			_Result.setElement(j, i, m.getElement(j, 0));
@@ -71,9 +71,9 @@ CxMatrix expand_col( CxMatrix &m, int _cols )
 	return _Result;
 }
 
-CxMatrix diag( CxMatrix &m )
+CAnnMatrix diag( CAnnMatrix &m )
 {
-	CxMatrix _Result;
+	CAnnMatrix _Result;
 	int _size = MIN(m.rows, m.cols);
 	_size = MAX(_size, 0);
 	__MY_ASSERT(_size > 0);
@@ -87,9 +87,9 @@ CxMatrix diag( CxMatrix &m )
 	return _Result;
 }
 
-CxMatrix abs( CxMatrix &m )
+CAnnMatrix abs( CAnnMatrix &m )
 {
-	CxMatrix _Result(m);
+	CAnnMatrix _Result(m);
 	int _index = 0;
 	for (int i=0; i<_Result.rows; i++) {
 		for (int j=0; j<_Result.cols; j++) {
@@ -100,9 +100,9 @@ CxMatrix abs( CxMatrix &m )
 	return _Result;
 }
 
-CxMatrix sqrt( CxMatrix &m )
+CAnnMatrix sqrt( CAnnMatrix &m )
 {
-	CxMatrix _Result(m);
+	CAnnMatrix _Result(m);
 	int _index = 0;
 	for (int i=0; i<_Result.rows; i++) {
 		for (int j=0; j<_Result.cols; j++) {
@@ -123,10 +123,10 @@ CxMatrix sqrt( CxMatrix &m )
  **            12    15    18 
  ****************************************************************************/
 
-CxMatrix sum( CxMatrix &m )
+CAnnMatrix sum( CAnnMatrix &m )
 {
 	int _cols = m.cols;
-	CxMatrix _Result(1, _cols);
+	CAnnMatrix _Result(1, _cols);
 	for (int i=0; i<m.cols; i++) {
 		double _sum = 0.0;
 		for (int j=0; j<m.rows; j++)
@@ -136,10 +136,10 @@ CxMatrix sum( CxMatrix &m )
 	return _Result;
 }
 
-CxMatrix sumsqrt( CxMatrix &m )
+CAnnMatrix sumsqrt( CAnnMatrix &m )
 {
 	int _cols = m.cols;
-	CxMatrix _Result(1, _cols);
+	CAnnMatrix _Result(1, _cols);
 	for (int i=0; i<m.cols; i++) {
 		double _sum = 0.0;
 		for (int j=0; j<m.rows; j++)
@@ -149,10 +149,10 @@ CxMatrix sumsqrt( CxMatrix &m )
 	return _Result;
 }
 
-CxMatrix sign( CxMatrix &m )
+CAnnMatrix sign( CAnnMatrix &m )
 {
 	double _sign;
-	CxMatrix _Result(m);
+	CAnnMatrix _Result(m);
 	for (int i=0; i<m.cols; i++) {
 		for (int j=0; j<m.rows; j++) {
 			double _val = m.getElement(j, i);
@@ -198,10 +198,10 @@ CxMatrix sign( CxMatrix &m )
 	end
 **********************************************************************/
 
-CxMatrix norm( CxMatrix &m )
+CAnnMatrix norm( CAnnMatrix &m )
 {
 	int mr, mc;
-	CxMatrix n;
+	CAnnMatrix n;
 	mr = m.rows;
 	mc = m.cols;
 	/* n = sqrt(sum(diag(m'*m))); <== 'fro'参数 */
@@ -241,10 +241,10 @@ CxMatrix norm( CxMatrix &m )
 	end
 **********************************************************************/
 
-CxMatrix normr( CxMatrix &m )
+CAnnMatrix normr( CAnnMatrix &m )
 {
 	int mr, mc;
-	CxMatrix n;
+	CAnnMatrix n;
 	mr = m.rows;
 	mc = m.cols;
 	if (mc == 1) {
@@ -285,9 +285,9 @@ CxMatrix normr( CxMatrix &m )
 
 *******************************************************************/
 
-CxMatrix linspace(double d1, double d2, int n)
+CAnnMatrix linspace(double d1, double d2, int n)
 {
-	CxMatrix _Result;
+	CAnnMatrix _Result;
 	if (n > 1) {
 		_Result.resize(1, n);
 		for (int i=0; i<n; i++) {
@@ -301,14 +301,14 @@ CxMatrix linspace(double d1, double d2, int n)
 	return _Result;
 }
 
-CxMatrix randnr( int _rows, int _cols )
+CAnnMatrix randnr( int _rows, int _cols )
 {
-	CxMatrix _Result;
+	CAnnMatrix _Result;
 	_Result = normr(rands(_rows, _cols));
 	return _Result;
 }
 
-double dotprod( const CxVector &x, const CxVector &y )
+double dotprod( const CAnnVector &x, const CAnnVector &y )
 {
 	//  Check for compatible dimensions:
 	if (x.size() != y.size()) {
@@ -323,9 +323,9 @@ double dotprod( const CxVector &x, const CxVector &y )
 	return prods;
 }
 
-CxMatrix dotprod( const CxMatrix &x, const CxMatrix &y )
+CAnnMatrix dotprod( const CAnnMatrix &x, const CAnnMatrix &y )
 {
-	CxMatrix _Result;
+	CAnnMatrix _Result;
 
 	// Check for compatible dimensions:
 	__MY_ASSERT(x.size() == y.size());
@@ -364,9 +364,9 @@ CxMatrix dotprod( const CxMatrix &x, const CxMatrix &y )
 	return _Result;
 }
 
-CxMatrix dotdiv( const CxMatrix &x, const CxMatrix &y )
+CAnnMatrix dotdiv( const CAnnMatrix &x, const CAnnMatrix &y )
 {
-	CxMatrix _Result;
+	CAnnMatrix _Result;
 
 	// Check for compatible dimensions:
 	__MY_ASSERT(x.size() == y.size());

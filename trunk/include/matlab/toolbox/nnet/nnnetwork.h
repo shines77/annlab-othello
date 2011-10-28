@@ -10,17 +10,17 @@ namespace matlab {
 
 int parseNetLayers( CAnnNetwork *net,
 				   const TCHAR *szSizesOfLayers,
-				   CxNetLayers *pNetLayers,
+				   CAnnNetLayers *pNetLayers,
 				   int _inNumLayers = 0,
 				   const TCHAR *szDelim = NULL );
 
 int parseTransFcns( CAnnNetwork *net,
 				   const TCHAR *szTransFcnOfLayers,
-				   CxNetLayers *pNetLayers,
+				   CAnnNetLayers *pNetLayers,
 				   const TCHAR *szDelim = NULL );
 
 int newff( CAnnNetwork *net,
-		  const CxMatrix *_inputMinMax,
+		  const CAnnMatrix *_inputMinMax,
 		  const TCHAR *szSizesOfLayers,
 		  const TCHAR *szTransFcnOfLayers,
 		  const TCHAR *szTrainFcn,

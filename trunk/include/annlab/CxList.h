@@ -1,5 +1,5 @@
 // CxList standard header
-#pragma once
+
 #ifndef _CXLIST_H_
 #define _CXLIST_H_
 
@@ -19,21 +19,21 @@ _STD_BEGIN
 // TEMPLATE CLASS CxList
 template<class _Ty,
 class _Ax = allocator<_Ty> >
-class CxList
-	: public list<_Ty, _Ax>, public CxBaseObject
+class CAnnList
+	: public list<_Ty, _Ax>, public CAnnObject
 {
 	// bidirectional linked list
 public:
-	typedef CxList<_Ty, _Ax> _Myt;
+	typedef CAnnList<_Ty, _Ax> _Myt;
 	typedef list<_Ty, _Ax> _Mybase;
 	typedef typename _Mybase::_Alty _Alloc;
 };
 
-class CxListEx
+class CAnnListEx
 {
 public:
-	CxListEx(void);
-	virtual ~CxListEx(void);
+	CAnnListEx(void);
+	virtual ~CAnnListEx(void);
 };
 
 _STD_END

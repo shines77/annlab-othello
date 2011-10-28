@@ -11,12 +11,12 @@ namespace matlab {
 int init  ( CAnnNetwork *net );
 
 int initnw( CAnnNetwork *net,
-			CxMatrix *matrix, int _index, int _numInputs, int _numNeurons,
-			CxMatrix *inputRange, CxMatrix *activeRange );
+			CAnnMatrix *matrix, int _index, int _numInputs, int _numNeurons,
+			CAnnMatrix *inputRange, CAnnMatrix *activeRange );
 
 int initwb( CAnnNetwork *net,
-			CxMatrix *matrix, int _index, int _numInputs, int _numNeurons,
-			CxMatrix *inputRange, CxMatrix *activeRange );
+			CAnnMatrix *matrix, int _index, int _numInputs, int _numNeurons,
+			CAnnMatrix *inputRange, CAnnMatrix *activeRange );
 
 }  // namespace matlab
 

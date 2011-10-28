@@ -13,11 +13,11 @@ int init( CAnnNetwork *net )
 		return ERR_NN_INVALID_PARAM;
 
 	int _numInputs, _numNeurons;
-	CxMatrix _inputRange, _activeRange;
+	CAnnMatrix _inputRange, _activeRange;
 	int _rows, _cols;
 
 	for (int _index=1; _index<=net->numLayers; _index++) {
-		CxNetLayer *pNetLayer = net->layers.getLayer(_index);
+		CAnnNetLayer *pNetLayer = net->layers.getLayer(_index);
 		if (pNetLayer != NULL) {
 			_numInputs  = pNetLayer->prevNeurons;
 			_numNeurons = pNetLayer->numNeurons;
@@ -51,7 +51,7 @@ int init( CAnnNetwork *net )
 					net->IW.rands(_rows, _cols);
 				}
 				else {
-					CxMatrix *pMatrix = net->LW[_index - 2];
+					CAnnMatrix *pMatrix = net->LW[_index - 2];
 					if (pMatrix != NULL) {
 						_rows = pMatrix->rows;
 						_cols = pMatrix->cols;
@@ -111,8 +111,8 @@ int init( CAnnNetwork *net )
 *****************************************************************/
 
 int initnw( CAnnNetwork *net,
-			CxMatrix *matrix, int _index, int _numInputs, int _numNeurons,
-			CxMatrix *inputRange, CxMatrix *activeRange )
+			CAnnMatrix *matrix, int _index, int _numInputs, int _numNeurons,
+			CAnnMatrix *inputRange, CAnnMatrix *activeRange )
 {
 	int nRetCode = ERR_NN_NONE;
 
@@ -124,7 +124,7 @@ int initnw( CAnnNetwork *net,
 
 	// Weights
 	double wMag;
-	CxMatrix wDir, _weights, _biases;
+	CAnnMatrix wDir, _weights, _biases;
 	// wMag = 0.7*s^(1/r);
 	wMag = 0.7 * ::pow((double)_numNeurons, 1.0/(double)_numInputs);
 	// wDir = randnr(s,r);
@@ -162,7 +162,7 @@ int initnw( CAnnNetwork *net,
 	x = 2.0 / (maxInput - minInput);
 	y = 1.0 - maxInput * x;
 
-	CxMatrix mx, my, mxp;
+	CAnnMatrix mx, my, mxp;
 	mx = x * ones(_numInputs, 1);
 	my = y * ones(_numInputs, 1);
 
@@ -184,8 +184,8 @@ int initnw( CAnnNetwork *net,
 }
 
 int initwb( CAnnNetwork *annNetwork,
-			CxMatrix *matrix, int _index, int _numInputs, int _numNeurons,
-			CxMatrix *inputRange, CxMatrix *activeRange )
+			CAnnMatrix *matrix, int _index, int _numInputs, int _numNeurons,
+			CAnnMatrix *inputRange, CAnnMatrix *activeRange )
 {
 	int nRetCode = ERR_NN_NONE;
 
