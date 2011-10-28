@@ -67,6 +67,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="$(SolutionDir)..\..\bin\ia32\vc9\debug\$(ProjectName).exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -147,6 +148,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="$(SolutionDir)..\..\bin\ia32\vc9\release\$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -194,22 +196,14 @@
 				Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 				>
 				<File
-					RelativePath=".\AnnLab.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\AnnLabDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stdafx.cpp"
+					RelativePath="..\..\src\gui\AnnLab.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="1"
+							UsePrecompiledHeader="0"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -217,7 +211,50 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="1"
+							UsePrecompiledHeader="0"
+							PrecompiledHeaderThrough="$(SolutionDir)..\..\include\gui\stdAfx.h"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\src\gui\AnnLabDlg.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+							PrecompiledHeaderThrough="$(SolutionDir)..\..\include\gui\stdAfx.h"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\src\gui\stdafx.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+							PrecompiledHeaderThrough="$(SolutionDir)..\..\include\gui\stdAfx.h"
 						/>
 					</FileConfiguration>
 				</File>
@@ -227,16 +264,67 @@
 				Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 				>
 				<File
-					RelativePath=".\CxList.cpp"
+					RelativePath="..\..\src\annlab\AnnNetwork.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+							PrecompiledHeaderThrough="$(SolutionDir)..\..\include\gui\stdAfx.h"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\CxMatrix.cpp"
+					RelativePath="..\..\src\annlab\CxList.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+							PrecompiledHeaderThrough="$(SolutionDir)..\..\include\gui\stdAfx.h"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\targetver.h"
+					RelativePath="..\..\src\annlab\CxMatrix.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+							PrecompiledHeaderThrough="$(SolutionDir)..\..\include\gui\stdAfx.h"
+						/>
+					</FileConfiguration>
 				</File>
 			</Filter>
 			<Filter
@@ -248,28 +336,108 @@
 					Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 					>
 					<File
-						RelativePath=".\toolbox\nnerror.cpp"
+						RelativePath="..\..\src\matlab\toolbox\nnerror.cpp"
 						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<Filter
 						Name="nnet"
 						Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 						>
 						<File
-							RelativePath=".\toolbox\nnet\nninit.cpp"
+							RelativePath="..\..\src\matlab\toolbox\nnet\nninit.cpp"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									UsePrecompiledHeader="0"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									UsePrecompiledHeader="0"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
-							RelativePath=".\toolbox\nnet\nnnetwork.cpp"
+							RelativePath="..\..\src\matlab\toolbox\nnet\nnnetwork.cpp"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									UsePrecompiledHeader="0"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									UsePrecompiledHeader="0"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
-							RelativePath=".\toolbox\nnet\nntrain.cpp"
+							RelativePath="..\..\src\matlab\toolbox\nnet\nntrain.cpp"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									UsePrecompiledHeader="0"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									UsePrecompiledHeader="0"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
-							RelativePath=".\toolbox\nnet\nnutils.cpp"
+							RelativePath="..\..\src\matlab\toolbox\nnet\nnutils.cpp"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									UsePrecompiledHeader="0"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									UsePrecompiledHeader="0"
+								/>
+							</FileConfiguration>
 						</File>
 					</Filter>
 					<Filter
@@ -277,8 +445,24 @@
 						Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 						>
 						<File
-							RelativePath=".\toolbox\matlab\elmat.cpp"
+							RelativePath="..\..\src\matlab\toolbox\matlab\elmat.cpp"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									UsePrecompiledHeader="0"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									UsePrecompiledHeader="0"
+								/>
+							</FileConfiguration>
 						</File>
 					</Filter>
 				</Filter>
@@ -293,11 +477,11 @@
 				Name="gutils"
 				>
 				<File
-					RelativePath=".\gsl.h"
+					RelativePath="..\..\include\gutils\gsl.h"
 					>
 				</File>
 				<File
-					RelativePath=".\gyvals.h"
+					RelativePath="..\..\include\gutils\gyvals.h"
 					>
 				</File>
 			</Filter>
@@ -306,19 +490,19 @@
 				Filter="h;hpp;hxx;hm;inl;inc;xsd"
 				>
 				<File
-					RelativePath=".\AnnLab.h"
+					RelativePath="..\..\include\gui\AnnLab.h"
 					>
 				</File>
 				<File
-					RelativePath=".\AnnLabDlg.h"
+					RelativePath="..\..\include\gui\AnnLabDlg.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Resource.h"
+					RelativePath="..\..\include\gui\stdafx.h"
 					>
 				</File>
 				<File
-					RelativePath=".\stdafx.h"
+					RelativePath="..\..\include\gui\targetver.h"
 					>
 				</File>
 			</Filter>
@@ -327,27 +511,27 @@
 				Filter="h;hpp;hxx;hm;inl;inc;xsd"
 				>
 				<File
-					RelativePath=".\AnnGlobal.h"
+					RelativePath="..\..\include\annlab\AnnGlobal.h"
 					>
 				</File>
 				<File
-					RelativePath=".\AnnNetwork.cpp"
+					RelativePath="..\..\include\annlab\AnnNetwork.h"
 					>
 				</File>
 				<File
-					RelativePath=".\AnnNetwork.h"
+					RelativePath="..\..\include\annlab\CxBaseObject.h"
 					>
 				</File>
 				<File
-					RelativePath=".\CxBaseObject.h"
+					RelativePath="..\..\include\annlab\CxList.h"
 					>
 				</File>
 				<File
-					RelativePath=".\CxList.h"
+					RelativePath="..\..\include\annlab\CxMatrix.h"
 					>
 				</File>
 				<File
-					RelativePath=".\CxMatrix.h"
+					RelativePath="..\..\include\annlab\stdint.h"
 					>
 				</File>
 			</Filter>
@@ -360,11 +544,11 @@
 					Filter="h;hpp;hxx;hm;inl;inc;xsd"
 					>
 					<File
-						RelativePath=".\toolbox\nnerror.h"
+						RelativePath="..\..\include\matlab\toolbox\matlab.h"
 						>
 					</File>
 					<File
-						RelativePath=".\toolbox\nnet.h"
+						RelativePath="..\..\include\matlab\toolbox\nnerror.h"
 						>
 					</File>
 					<Filter
@@ -372,19 +556,19 @@
 						Filter="h;hpp;hxx;hm;inl;inc;xsd"
 						>
 						<File
-							RelativePath=".\toolbox\nnet\nninit.h"
+							RelativePath="..\..\include\matlab\toolbox\nnet\nninit.h"
 							>
 						</File>
 						<File
-							RelativePath=".\toolbox\nnet\nnnetwork.h"
+							RelativePath="..\..\include\matlab\toolbox\nnet\nnnetwork.h"
 							>
 						</File>
 						<File
-							RelativePath=".\toolbox\nnet\nntrain.h"
+							RelativePath="..\..\include\matlab\toolbox\nnet\nntrain.h"
 							>
 						</File>
 						<File
-							RelativePath=".\toolbox\nnet\nnutils.h"
+							RelativePath="..\..\include\matlab\toolbox\nnet\nnutils.h"
 							>
 						</File>
 					</Filter>
@@ -393,7 +577,7 @@
 						Filter="h;hpp;hxx;hm;inl;inc;xsd"
 						>
 						<File
-							RelativePath=".\toolbox\matlab\elmat.h"
+							RelativePath="..\..\include\matlab\toolbox\matlab\elmat.h"
 							>
 						</File>
 					</Filter>
@@ -409,15 +593,19 @@
 				Name="gui"
 				>
 				<File
-					RelativePath=".\res\AnnLab.ico"
+					RelativePath="..\..\res\gui\AnnLab.ico"
 					>
 				</File>
 				<File
-					RelativePath=".\AnnLab.rc"
+					RelativePath="..\..\res\gui\AnnLab.rc"
 					>
 				</File>
 				<File
-					RelativePath=".\res\AnnLab.rc2"
+					RelativePath="..\..\res\gui\AnnLab.rc2"
+					>
+				</File>
+				<File
+					RelativePath="..\..\res\gui\Resource.h"
 					>
 				</File>
 			</Filter>
@@ -431,7 +619,7 @@
 			</Filter>
 		</Filter>
 		<File
-			RelativePath=".\ReadMe.txt"
+			RelativePath="..\..\include\gui\ReadMe.txt"
 			>
 		</File>
 	</Files>
