@@ -1,11 +1,11 @@
 
-#ifndef _ANN_GLOBAL_H_
-#define _ANN_GLOBAL_H_
+#ifndef _ANN_STDDEF_H_
+#define _ANN_STDDEF_H_
 
 #include <stdlib.h>
 #include <tchar.h>
 #include <stddef.h>
-#include "stdint.h"
+#include "./vs/stdint.h"
 
 #define INLINE inline
 
@@ -18,4 +18,4 @@
 
 INLINE void setFcnName( TCHAR *szDstFuncName, int nNameSize, const TCHAR *szFcnName );
 
-#endif  // _ANN_GLOBAL_H_
+#endif  // _ANN_STDDEF_H_

@@ -1,6 +1,6 @@
 
 #include "../../include/gui/stdafx.h"
-#include "../../include/annlab/CxMatrix.h"
+#include "../../include/annlab/AnnMatrix.h"
 #include <assert.h>
 #include <math.h>
 

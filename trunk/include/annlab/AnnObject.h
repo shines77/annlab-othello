@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../include/annlab/AnnGlobal.h"
+#include "../../include/annlab/ann_stddef.h"
 
 #define OBJ_NAME_LEN      64
 

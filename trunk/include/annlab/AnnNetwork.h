@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../include/annlab/AnnGlobal.h"
-#include "../../include/annlab/CxBaseObject.h"
-#include "../../include/annlab/CxMatrix.h"
+#include "../../include/annlab/ann_stddef.h"
+#include "../../include/annlab/AnnObject.h"
+#include "../../include/annlab/AnnMatrix.h"
 #include <windows.h>
 
 enum enumNetLayerType {

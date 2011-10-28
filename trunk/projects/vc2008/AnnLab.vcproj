@@ -264,49 +264,47 @@
 				Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 				>
 				<File
+					RelativePath="..\..\src\annlab\AnnList.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\src\annlab\AnnMatrix.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath="..\..\src\annlab\AnnNetwork.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-							PrecompiledHeaderThrough="$(SolutionDir)..\..\include\gui\stdAfx.h"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\src\annlab\CxList.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-							PrecompiledHeaderThrough="$(SolutionDir)..\..\include\gui\stdAfx.h"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\src\annlab\CxMatrix.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -511,7 +509,15 @@
 				Filter="h;hpp;hxx;hm;inl;inc;xsd"
 				>
 				<File
-					RelativePath="..\..\include\annlab\AnnGlobal.h"
+					RelativePath="..\..\include\annlab\ann_stddef.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\annlab\AnnList.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\annlab\AnnMatrix.h"
 					>
 				</File>
 				<File
@@ -519,21 +525,21 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\annlab\CxBaseObject.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\annlab\CxList.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\annlab\CxMatrix.h"
+					RelativePath="..\..\include\annlab\AnnObject.h"
 					>
 				</File>
 				<File
 					RelativePath="..\..\include\annlab\stdint.h"
 					>
 				</File>
+				<Filter
+					Name="vs"
+					>
+					<File
+						RelativePath="..\..\include\annlab\vs\stdint.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="matlab"

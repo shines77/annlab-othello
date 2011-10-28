@@ -1,11 +1,11 @@
-// CxList standard header
+// CAnnList standard header
 
-#ifndef _CXLIST_H_
-#define _CXLIST_H_
+#ifndef _ANNLIST_H_
+#define _ANNLIST_H_
 
 #ifndef RC_INVOKED
 //#include <xutility>
-#include "CxBaseObject.h"
+#include "AnnObject.h"
 #include <list>
 
 using namespace std;
@@ -44,4 +44,4 @@ _STD_END
 
 #endif /* RC_INVOKED */
 
-#endif  /* _CXLIST_H_ */
+#endif  /* _ANNLIST_H_ */
