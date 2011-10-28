@@ -7,6 +7,8 @@
 /* whether use optimization of matrix operations */
 #define MATRIX_FAST_MODE       1
 
+namespace annlab {
+
 //////////////////////////////////////////////////////////////////
 // CxVector
 //////////////////////////////////////////////////////////////////
@@ -1672,3 +1674,5 @@ int CAnnXArray::resize( int _size )
 {
 	return 0;
 }
+
+}  // namespace annlab

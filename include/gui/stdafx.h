@@ -35,6 +35,9 @@
 #include "../../include/matlab/toolbox/matlab.h"
 using namespace matlab;
 
+#include "../../include/annlab/ann_stddef.h"
+using namespace annlab;
+
 #include "../../include/gutils/gsl.h"
 
 using namespace gsl;

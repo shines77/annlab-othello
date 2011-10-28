@@ -5,6 +5,8 @@
 #include "../../include/annlab/AnnMatrix.h"
 #include <windows.h>
 
+namespace annlab {
+
 enum enumNetLayerType {
 	LAYER_TYPE_NONE,
 	LAYER_TYPE_INPUT,
@@ -301,3 +303,5 @@ private:
 	TCHAR   m_szPerformFcn[FCN_NAME_LEN];
 	TCHAR   m_szTrainFcn[FCN_NAME_LEN];
 };
+
+}  // namespace annlab

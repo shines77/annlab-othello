@@ -4,6 +4,8 @@
 
 #define OBJ_NAME_LEN      64
 
+namespace annlab {
+
 class CAnnObject
 {
 public:
@@ -28,3 +30,5 @@ public:
 			_tcscpy_s(m_szName, _countof(m_szName), _T(""));
 	}
 };
+
+}  // namespace annlab

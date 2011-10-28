@@ -22,6 +22,8 @@ using namespace matlab;
 #define NNET_PERFORMFCN_DEFAULT    _T("mse")
 #define NNET_TRAINFCN_DEFAULT      _T("traingd")
 
+namespace annlab {
+
 INLINE void setFcnName( TCHAR *szDstFuncName, int nNameSize, const TCHAR *szFcnName )
 {
 	if (szDstFuncName != NULL) {
@@ -1192,3 +1194,5 @@ bool CAnnNetwork::initwb( CAnnMatrix *pMatrix, int _index, int _numInputs, int _
 {
 	return TRUE;
 }
+
+}  // namespace annlab
