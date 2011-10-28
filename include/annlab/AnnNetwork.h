@@ -16,11 +16,11 @@ enum enumNetLayerType {
 class CxCell {};
 class CxCells { int m, n; };
 
-class CxTrainParam
+class CAnnTrainParam
 {
 public:
-	CxTrainParam( void );
-	virtual ~CxTrainParam( void );
+	CAnnTrainParam( void );
+	virtual ~CAnnTrainParam( void );
 
 public:
 	// gets
@@ -53,67 +53,67 @@ private:
 	TCHAR  szSearchFcn[64];		// ËÑÑ°º¯ÊýÃû³Æ
 };
 
-class CxTrainRecord
+class CAnnTrainRecord
 {
 public:
-	CxTrainRecord( void );
-	virtual ~CxTrainRecord( void );
+	CAnnTrainRecord( void );
+	virtual ~CAnnTrainRecord( void );
 public:
 	int epochs;
 };
 
-class CxNetInOutputs : public CxBaseObject
+class CAnnNetInOutputs : public CAnnObject
 {
 public:
-	CxNetInOutputs( void );
-	CxNetInOutputs( const TCHAR *szName );
-	virtual ~CxNetInOutputs( void );
+	CAnnNetInOutputs( void );
+	CAnnNetInOutputs( const TCHAR *szName );
+	virtual ~CAnnNetInOutputs( void );
 
 public:
 	void clear( void );
 };
 
-class CxNetInputs : public CxNetInOutputs
+class CAnnNetInputs : public CAnnNetInOutputs
 {
 public:
-	CxNetInputs( void );
-	CxNetInputs( const TCHAR *szName );
-	virtual ~CxNetInputs( void );
+	CAnnNetInputs( void );
+	CAnnNetInputs( const TCHAR *szName );
+	virtual ~CAnnNetInputs( void );
 
 public:
 	//
 };
 
-class CxNetOutputs : public CxNetInOutputs
+class CAnnNetOutputs : public CAnnNetInOutputs
 {
 public:
-	CxNetOutputs( void );
-	CxNetOutputs( const TCHAR *szName );
-	virtual ~CxNetOutputs( void );
+	CAnnNetOutputs( void );
+	CAnnNetOutputs( const TCHAR *szName );
+	virtual ~CAnnNetOutputs( void );
 
 public:
 	//
 };
 
-class CxNetWeights {
+class CAnnNetWeights {
 public:
 	void clear( void ) {};
 };
 
-class CxNetBiases {
+class CAnnNetBiases {
 public:
 	void clear( void ) {};
 };
 
-class CxNetLayer : public CxBaseObject
+class CAnnNetLayer : public CAnnObject
 {
 public:
-	CxNetLayer( void );
-	CxNetLayer( int _numNeurons );
-	CxNetLayer( int _prevNeurons, int _numNeurons );
-	CxNetLayer( int _type, int _prevNeurons, int _numNeurons );
-	CxNetLayer( const CxNetLayer & srcNetLayer );
-	virtual ~CxNetLayer( void );
+	CAnnNetLayer( void );
+	CAnnNetLayer( int _numNeurons );
+	CAnnNetLayer( int _prevNeurons, int _numNeurons );
+	CAnnNetLayer( int _type, int _prevNeurons, int _numNeurons );
+	CAnnNetLayer( const CAnnNetLayer & srcNetLayer );
+	virtual ~CAnnNetLayer( void );
 
 public:
 	// property
@@ -122,8 +122,8 @@ public:
 	int prevNeurons;
 	int numNeurons;
 
-	CxNetLayer *prevLayer;
-	CxNetLayer *nextLayer;
+	CAnnNetLayer *prevLayer;
+	CAnnNetLayer *nextLayer;
 
 	// gets
 	INLINE TCHAR * initFcn     ( void ) const { return (TCHAR *)m_szInitFcn;     };
@@ -138,38 +138,38 @@ public:
 	// methods
 	bool initNetLayer( int _prevNeurons, int _numNeurons );
 	bool initNetLayer( int _index, int _type, int _prevNeurons, int _numNeurons,
-		CxNetLayer *_prevLayer = NULL, CxNetLayer *_nextLayer = NULL );
+		CAnnNetLayer *_prevLayer = NULL, CAnnNetLayer *_nextLayer = NULL );
 
 private:
 	TCHAR     m_szInitFcn[FCN_NAME_LEN];
 	TCHAR m_szTransferFcn[FCN_NAME_LEN];
 };
 
-class CxNetLayers : public CxBaseObject
+class CAnnNetLayers : public CAnnObject
 { 
 public:
-	CxNetLayers( void );
-	CxNetLayers( int _numLayers );
-	CxNetLayers( const TCHAR *szSizesOfLayers );
-	virtual ~CxNetLayers( void );
+	CAnnNetLayers( void );
+	CAnnNetLayers( int _numLayers );
+	CAnnNetLayers( const TCHAR *szSizesOfLayers );
+	virtual ~CAnnNetLayers( void );
 
 public:
 	// property
 	int numLayers;
 
 	// gets
-	CxNetLayer & operator [] ( int _index ) const;
-	CxNetLayer & operator () ( int _index ) const;
-	CxNetLayer & layer( int _index ) const;
-	CxNetLayer * getLayer( int _index ) const;
+	CAnnNetLayer & operator [] ( int _index ) const;
+	CAnnNetLayer & operator () ( int _index ) const;
+	CAnnNetLayer & layer( int _index ) const;
+	CAnnNetLayer * getLayer( int _index ) const;
  
 	int  size ( void ) const;
 	bool empty( void ) const;
 
-	CxNetLayer * begin( void ) const;
-	CxNetLayer * end  ( void ) const;
-	CxNetLayer & first( void ) const;
-	CxNetLayer & last ( void ) const;
+	CAnnNetLayer * begin( void ) const;
+	CAnnNetLayer * end  ( void ) const;
+	CAnnNetLayer & first( void ) const;
+	CAnnNetLayer & last ( void ) const;
 
 	// sets
 	int  setNumLayers( int _numLayers );
@@ -178,15 +178,15 @@ public:
 	int  clear ( void );
 	int  append( int _numNeurons );
 	int  append( int _prevNeurons, int _numNeurons );
-	int  append( CxNetLayer *pNetLayer );
+	int  append( CAnnNetLayer *pNetLayer );
 	int  remove( int _index );
-	int  insert( int _index, CxNetLayer *pNetLayer );
+	int  insert( int _index, CAnnNetLayer *pNetLayer );
 	bool modify( int _index, int _numNeuron );
 
 	int  pop_front ( void );
 	int  pop_back  ( void );
-	int  push_front( CxNetLayer *pNetLayer );
-	int  push_back ( CxNetLayer *pNetLayer );
+	int  push_front( CAnnNetLayer *pNetLayer );
+	int  push_back ( CAnnNetLayer *pNetLayer );
 
 protected:
 	INLINE void commonConstructor( int _numLayers );
@@ -197,11 +197,11 @@ protected:
 		const TCHAR *szDelim = NULL );
 
 private:
-	CxNetLayer* m_firstLayer;
-	CxNetLayer* m_lastLayer;
+	CAnnNetLayer* m_firstLayer;
+	CAnnNetLayer* m_lastLayer;
 };
 
-class CAnnNetwork : public CxBaseObject
+class CAnnNetwork : public CAnnObject
 {
 public:
 	CAnnNetwork( void );
@@ -215,23 +215,23 @@ public:
 	int numOutputs;
 	int numCounter;
 
-	CxMatrix input;
-	CxMatrix output;
-	CxMatrix inputRange;
+	CAnnMatrix input;
+	CAnnMatrix output;
+	CAnnMatrix inputRange;
 
-	CxNetInputs  inputs;
-	CxNetLayers  layers;
-	CxNetOutputs outputs;
+	CAnnNetInputs  inputs;
+	CAnnNetLayers  layers;
+	CAnnNetOutputs outputs;
 
-	CxMatrix     IW;
-	CxMatrixList LW;
-	CxMatrixList b;
+	CAnnMatrix     IW;
+	CAnnMatrixList LW;
+	CAnnMatrixList b;
 
-	CxNetWeights inputWeights;
-	CxNetWeights layerWeights;
-	CxNetBiases  biases;
+	CAnnNetWeights inputWeights;
+	CAnnNetWeights layerWeights;
+	CAnnNetBiases  biases;
 
-	CxTrainParam trainParam;
+	CAnnTrainParam trainParam;
 
 	// gets
 	INLINE TCHAR * adaptFcn( void ) const    { return (TCHAR *)m_szAdaptFcn;    };
@@ -255,14 +255,14 @@ public:
 
 	// methods
 	bool create( const TCHAR *szSizesOfLayers, const TCHAR *szTransFcnOfLayers,
-		const CxMatrix *inputMinMax = NULL, const TCHAR *szTrainFcn = NULL );
+		const CAnnMatrix *inputMinMax = NULL, const TCHAR *szTrainFcn = NULL );
 	bool createEx( const TCHAR *szName, const TCHAR *szSizesOfLayers,
-		const TCHAR *szTransFcnOfLayers, const CxMatrix *inputMinMax,
+		const TCHAR *szTransFcnOfLayers, const CAnnMatrix *inputMinMax,
 		const TCHAR *szTrainFcn = NULL );
 
-	int parseNetLayers( const TCHAR *szSizesOfLayers, CxNetLayers *pNetLayers,
+	int parseNetLayers( const TCHAR *szSizesOfLayers, CAnnNetLayers *pNetLayers,
 		int _inNumLayers = 0, const TCHAR *szDelim = NULL );
-	int parseTransFcns( const TCHAR *szTransFcnOfLayers, CxNetLayers *pNetLayers,
+	int parseTransFcns( const TCHAR *szTransFcnOfLayers, CAnnNetLayers *pNetLayers,
 		const TCHAR *szDelim = NULL );
 
 	int  clearNetLayers( void );
@@ -271,24 +271,24 @@ public:
 	bool removeNetLayer( int _index );
 	bool modifyNetLayer( int _index, int _numNeurons );
 
-	CAnnNetwork * newff( const CxMatrix *inputMinMax, const TCHAR *szSizesOfLayers,
+	CAnnNetwork * newff( const CAnnMatrix *inputMinMax, const TCHAR *szSizesOfLayers,
 		const TCHAR *szTransFcnOfLayers, const TCHAR *szTrainFcn,
 		bool bInitWeightsNow = FALSE );
 
 	CAnnNetwork * init( void );
-	CAnnNetwork * train( const CxMatrixList *trainP, const CxMatrixList *trainT,
-		CxTrainRecord *tr );
+	CAnnNetwork * train( const CAnnMatrixList *trainP, const CAnnMatrixList *trainT,
+		CAnnTrainRecord *tr );
 
-	bool initnw( CxMatrix *pMatrix, int _index, int _numInputs, int _numNeurons,
-		CxMatrix *pInputRange, CxMatrix *pActiveRange );
-	bool initwb( CxMatrix *pMatrix, int _index, int _numInputs, int _numNeurons,
-		CxMatrix *pInputRange, CxMatrix *pActiveRange );
+	bool initnw( CAnnMatrix *pMatrix, int _index, int _numInputs, int _numNeurons,
+		CAnnMatrix *pInputRange, CAnnMatrix *pActiveRange );
+	bool initwb( CAnnMatrix *pMatrix, int _index, int _numInputs, int _numNeurons,
+		CAnnMatrix *pInputRange, CAnnMatrix *pActiveRange );
 
 protected:
 	bool commonConstructor( const TCHAR *szSizesOfLayers, const TCHAR *szTransFcnOfLayers,
-		const CxMatrix *inputMinMax = NULL, const TCHAR *szTrainFcn = NULL );
+		const CAnnMatrix *inputMinMax = NULL, const TCHAR *szTrainFcn = NULL );
 	bool commonConstructor( const TCHAR *szName, const TCHAR *szSizesOfLayers,
-		const TCHAR *szTransFcnOfLayers, const CxMatrix *inputMinMax,
+		const TCHAR *szTransFcnOfLayers, const CAnnMatrix *inputMinMax,
 		const TCHAR *szTrainFcn = NULL );
 	void freeNetwork( void );
 

@@ -33,13 +33,13 @@ enum enumMatInitMode {
 
 #define MAT_INIT_DEFAULT    MAT_INIT_NONE
 
-class CxVector : public CxBaseObject
+class CAnnVector : public CAnnObject
 {
 public:
-	CxVector( void );
-	CxVector( int _size );
-	CxVector( CxVector & srcVerctor );
-	virtual ~CxVector( void );
+	CAnnVector( void );
+	CAnnVector( int _size );
+	CAnnVector( CAnnVector & srcVerctor );
+	virtual ~CAnnVector( void );
 
 public:
 	// property
@@ -53,7 +53,7 @@ public:
 	//sets
 
 	// methos
-	CxVector *copy( const CxVector *srcVector );
+	CAnnVector *copy( const CAnnVector *srcVector );
 
 protected:
 	void freeVector( void );
@@ -66,11 +66,11 @@ private:
 	double *m_pData;
 };
 
-class CxVectors : public CxBaseObject
+class CAnnVectors : public CAnnObject
 {
 public:
-	CxVectors( void );
-	virtual ~CxVectors( void );
+	CAnnVectors( void );
+	virtual ~CAnnVectors( void );
 
 public:
 	// property
@@ -85,21 +85,21 @@ protected:
 	void freeVector( void );
 };
 
-class CxMatrix : public CxBaseObject
+class CAnnMatrix : public CAnnObject
 {
 public:
-	CxMatrix( void );
-	CxMatrix( int _size );
-	CxMatrix( int _rows, int _cols, int _initFcn = MAT_INIT_NONE );
-	CxMatrix( const TCHAR *szName, int _rows, int _cols, int _initFcn = MAT_INIT_NONE );
-	CxMatrix( const CxMatrix & scrMatrix );								// 拷贝构造函数
-	CxMatrix( const CxMatrix & scrMatrix, bool bCopyData );
-	virtual ~CxMatrix( void );
+	CAnnMatrix( void );
+	explicit CAnnMatrix( int _size );
+	CAnnMatrix( int _rows, int _cols, int _initFcn = MAT_INIT_NONE );
+	CAnnMatrix( const TCHAR *szName, int _rows, int _cols, int _initFcn = MAT_INIT_NONE );
+	CAnnMatrix( const CAnnMatrix & scrMatrix );								// 拷贝构造函数
+	CAnnMatrix( const CAnnMatrix & scrMatrix, bool bCopyData );
+	virtual ~CAnnMatrix( void );
 
 public:
 	// gets
 	int    size        ( int n = 0 ) const;
-	bool   sameSize    ( const CxMatrix *target, int n = 0 );
+	bool   sameSize    ( const CAnnMatrix *target, int n = 0 );
 	double getElement  ( int _index ) const;						// 获取指定元素的值
 	double getElement  ( int _row, int _col ) const;				// 获取指定元素的值
 
@@ -109,26 +109,26 @@ public:
 	int    getColVector( int _col, double* pVector ) const;
 
 	// 获取矩阵的指定行矩阵
-	int    getRowVector( int _row, CxMatrix* pMatrix ) const;
+	int    getRowVector( int _row, CAnnMatrix* pMatrix ) const;
 	// 获取矩阵的指定列矩阵
-	int    getColVector( int _col, CxMatrix* pMatrix ) const;
+	int    getColVector( int _col, CAnnMatrix* pMatrix ) const;
 
 	// 把第x行至第y行的数据转换成为新的矩阵
-	int    getRowVector( int _rowStart, int _rowEnd, CxMatrix* pMatrix ) const;
+	int    getRowVector( int _rowStart, int _rowEnd, CAnnMatrix* pMatrix ) const;
 	// 把第x列至第y列的数据转换成为新的矩阵
-	int    getColVector( int _colStart, int _colEnd, CxMatrix* pMatrix ) const;
+	int    getColVector( int _colStart, int _colEnd, CAnnMatrix* pMatrix ) const;
 
 	/* 把第x行至第y行的第m列至第n列的数据转换成为新的矩阵 */
 	int    getPartOfMatrix( int _rowStart, int _rowEnd,
-							int _colStart, int _colEnd, CxMatrix* pMatrix ) const;
+							int _colStart, int _colEnd, CAnnMatrix* pMatrix ) const;
 
 	// 获取矩阵的指定行矩阵
-	CxMatrix getRowVector( int _row ) const;
+	CAnnMatrix getRowVector( int _row ) const;
 	// 获取矩阵的指定列矩阵
-	CxMatrix getColVector( int _col ) const;
+	CAnnMatrix getColVector( int _col ) const;
 
-	double *getData    ( void ) const { return m_pData;     };		// 获得数据指针
-	double *getOrigData( void ) const { return m_pOrigData; };		// 获得原始数据指针
+	double *get_data     ( void ) const { return m_pData;     };	// 获得数据指针
+	double *get_orig_data( void ) const { return m_pOrigData; };	// 获得原始数据指针
 
 	// sets
 	bool   setElement  ( int _row, int _col, double _value );		// 设置指定元素的值
@@ -142,37 +142,37 @@ public:
 	int malloc_size;
 
 	// operator(重载运算符)
-	double      operator () ( int _index );
-	double      operator () ( int _row, int _col );
-	double      operator [] ( int _index );
+	double        operator () ( int _index );
+	double        operator () ( int _row, int _col );
+	double        operator [] ( int _index );
 
-	CxMatrix &  operator =  ( CxMatrix & _Right );
-	CxMatrix &  operator =  ( int _Right        );
-	CxMatrix &  operator =  ( double _Right     );
-	bool        operator == ( CxMatrix & _Right );
-	bool        operator != ( CxMatrix & _Right );
-	CxMatrix    operator +  ( double _value     );
-	CxMatrix    operator +  ( CxMatrix & _Right );
-	CxMatrix &  operator += ( double _value     );
-	CxMatrix &  operator += ( CxMatrix & _Right );
-	CxMatrix    operator -  ( double _value     );
-	CxMatrix    operator -  ( CxMatrix & _Right );
-	CxMatrix &  operator -= ( double _value     );
-	CxMatrix &  operator -= ( CxMatrix & _Right );
-	CxMatrix    operator *  ( double _value     );
-	CxMatrix    operator *  ( CxMatrix & _Right );
-	CxMatrix &  operator *= ( double _value     );
-	CxMatrix &  operator *= ( CxMatrix & _Right );
-	CxMatrix    operator /  ( double _value     );
-	CxMatrix    operator /  ( CxMatrix &_Right  );
-	CxMatrix &  operator /= ( double _value     );
-	CxMatrix    operator ^  ( double _value     );
-	CxMatrix &  operator ^= ( double _value     );
+	CAnnMatrix &  operator =  ( CAnnMatrix & _Right );
+	CAnnMatrix &  operator =  ( int _Right        );
+	CAnnMatrix &  operator =  ( double _Right     );
+	bool          operator == ( CAnnMatrix & _Right );
+	bool          operator != ( CAnnMatrix & _Right );
+	CAnnMatrix    operator +  ( double _value     );
+	CAnnMatrix    operator +  ( CAnnMatrix & _Right );
+	CAnnMatrix &  operator += ( double _value     );
+	CAnnMatrix &  operator += ( CAnnMatrix & _Right );
+	CAnnMatrix    operator -  ( double _value     );
+	CAnnMatrix    operator -  ( CAnnMatrix & _Right );
+	CAnnMatrix &  operator -= ( double _value     );
+	CAnnMatrix &  operator -= ( CAnnMatrix & _Right );
+	CAnnMatrix    operator *  ( double _value     );
+	CAnnMatrix    operator *  ( CAnnMatrix & _Right );
+	CAnnMatrix &  operator *= ( double _value     );
+	CAnnMatrix &  operator *= ( CAnnMatrix & _Right );
+	CAnnMatrix    operator /  ( double _value     );
+	CAnnMatrix    operator /  ( CAnnMatrix &_Right );
+	CAnnMatrix &  operator /= ( double _value     );
+	CAnnMatrix    operator ^  ( double _value     );
+	CAnnMatrix &  operator ^= ( double _value     );
 
-	friend CxMatrix operator + ( double _value, CxMatrix & _Right );
-	friend CxMatrix operator - ( double _value, CxMatrix & _Right );
-	friend CxMatrix operator * ( double _value, CxMatrix & _Right );
-	friend CxMatrix operator / ( double _value, CxMatrix & _Right );
+	friend CAnnMatrix operator + ( double _value, CAnnMatrix & _Right );
+	friend CAnnMatrix operator - ( double _value, CAnnMatrix & _Right );
+	friend CAnnMatrix operator * ( double _value, CAnnMatrix & _Right );
+	friend CAnnMatrix operator / ( double _value, CAnnMatrix & _Right );
 
 	// methods
 	void freeMatrix( void );
@@ -182,12 +182,12 @@ public:
 	bool copyData  ( double *pNewData, int _rows, int _cols, double _fillVal = 0.0,
 		int _initFcn = MAT_INIT_DEFAULT );
 
-	bool Create  ( int _rows, int _cols, double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
+	bool create  ( int _rows, int _cols, double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
 	bool createEx( const TCHAR *szName, int _rows, int _cols, double _fillVal = 0.0,
 		int _initFcn = MAT_INIT_DEFAULT );
 
-	CxMatrix * copy ( const CxMatrix *srcMartix );
-	CxMatrix * clone( const CxMatrix *srcMartix );
+	CAnnMatrix * copy ( const CAnnMatrix *srcMartix );
+	CAnnMatrix * clone( const CAnnMatrix *srcMartix );
 
 	void clear( void );
 	int  resize( int _rows, int _cols, double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
@@ -198,35 +198,35 @@ public:
 	void display( const TCHAR *szName );
 
 	// 矩阵的转置
-	CxMatrix & transpose( void );
+	CAnnMatrix & transpose( void );
 
 	int zeros  ( int _rows, int _cols );
 	int ones   ( int _rows, int _cols );
 	int rands  ( int _rows, int _cols );
 	int rands2 ( int _rows, int _cols );
 
-	CxMatrix _zeros  ( int _rows, int _cols ) const;
-	CxMatrix _ones   ( int _rows, int _cols ) const;
-	CxMatrix _rands  ( int _rows, int _cols ) const;
-	CxMatrix _rands2 ( int _rows, int _cols ) const;
+	CAnnMatrix _zeros  ( int _rows, int _cols ) const;
+	CAnnMatrix _ones   ( int _rows, int _cols ) const;
+	CAnnMatrix _rands  ( int _rows, int _cols ) const;
+	CAnnMatrix _rands2 ( int _rows, int _cols ) const;
 
 private:
 	double *m_pOrigData;
 	double *m_pData;
 };
 
-class CxMatrixs : public CxBaseObject
+class CAnnMatrixs : public CAnnObject
 {
 public:
-	CxMatrixs( void );
-	CxMatrixs( int _numMatrixs );
-	CxMatrixs( const TCHAR *szName, int _numMatrixs );
-	virtual ~CxMatrixs( void );
+	CAnnMatrixs( void );
+	CAnnMatrixs( int _numMatrixs );
+	CAnnMatrixs( const TCHAR *szName, int _numMatrixs );
+	virtual ~CAnnMatrixs( void );
 
 public:
 	// gets
-	const CxMatrix & operator [] ( int _index ) const;
-	CxMatrix & matrixs( int _index ) const;
+	const CAnnMatrix & operator [] ( int _index ) const;
+	CAnnMatrix & matrixs( int _index ) const;
 
 	// sets
 	bool setMatrixs( int _numMatrixs );
@@ -240,25 +240,25 @@ public:
 
 	bool create( const TCHAR *szName, int _numMatrixs );
 
-	CxMatrixs * copy ( const CxMatrixs *srcMartixs );
-	CxMatrixs * clone( const CxMatrixs *srcMartixs );
+	CAnnMatrixs * copy ( const CAnnMatrixs *srcMartixs );
+	CAnnMatrixs * clone( const CAnnMatrixs *srcMartixs );
 
 private:
-	CxMatrix *pMatrixs;
+	CAnnMatrix *pMatrixs;
 };
 
-class CxMatrixVector : public vector<CxMatrix>, public CxBaseObject
+class CAnnMatrixVector : public vector<CAnnMatrix>, public CAnnObject
 {
 public:
-	CxMatrixVector( void );
-	virtual ~CxMatrixVector( void );
+	CAnnMatrixVector( void );
+	virtual ~CAnnMatrixVector( void );
 };
 
-class CxMatrixList : public list<CxMatrix>, public CxBaseObject
+class CAnnMatrixList : public list<CAnnMatrix>, public CAnnObject
 {
 public:
-	CxMatrixList( void );
-	virtual ~CxMatrixList( void );
+	CAnnMatrixList( void );
+	virtual ~CAnnMatrixList( void );
 
 public:
 	int N, TS, Q;
@@ -267,10 +267,10 @@ public:
 	double *Y;
 
 public:
-	CxMatrix * operator [] ( int _index );
+	CAnnMatrix * operator [] ( int _index );
 };
 
-class CAnnXArray : public CxBaseObject
+class CAnnXArray : public CAnnObject
 {
 public:
 	CAnnXArray( void );
@@ -298,4 +298,4 @@ CxMatrix operator * ( double _value, CxMatrix & _Right );
 CxMatrix operator / ( double _value, CxMatrix & _Right );
 //*/
 
-//typedef CxList<CxMatrix> CxMatrixList;
+//typedef CAnnList<CAnnMatrix> CAnnMatrixList;

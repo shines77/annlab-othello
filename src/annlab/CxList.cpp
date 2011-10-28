@@ -4,11 +4,11 @@
 
 _STD_BEGIN
 
-CxListEx::CxListEx(void)
+CAnnListEx::CAnnListEx(void)
 {
 }
 
-CxListEx::~CxListEx(void)
+CAnnListEx::~CAnnListEx(void)
 {
 }
 

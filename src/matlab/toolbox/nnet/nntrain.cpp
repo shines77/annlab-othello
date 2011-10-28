@@ -134,10 +134,10 @@ namespace matlab {
 ******************************************************************************/
 
 int train( CAnnNetwork *net,
-		  CxTrainRecord *tr,
-		  CxMatrixList *trainP,
-		  CxMatrixList *trainT,
-		  CxTrainParam *tainParam )
+		  CAnnTrainRecord *tr,
+		  CAnnMatrixList *trainP,
+		  CAnnMatrixList *trainT,
+		  CAnnTrainParam *tainParam )
 {
 	int nRetCode = ERR_NN_NONE;
 
@@ -345,10 +345,10 @@ trainV =
 ******************************************/
 
 int traincgf( CAnnNetwork *net,
-			 CxTrainRecord *tr,
-			 CxMatrixList *trainV,
-			 CxMatrixList *valV,
-			 CxMatrixList *testV )
+			 CAnnTrainRecord *tr,
+			 CAnnMatrixList *trainV,
+			 CAnnMatrixList *valV,
+			 CAnnMatrixList *testV )
 {
 	int nRetCode = ERR_NN_NONE;
 	int epoch, epochs;

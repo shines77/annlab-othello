@@ -9,16 +9,16 @@
 namespace matlab {
 
 int train( CAnnNetwork *net,
-		  CxTrainRecord *tr,
-		  CxMatrixList *trainP,
-		  CxMatrixList *trainT,
-		  CxTrainParam *tainParam );
+		  CAnnTrainRecord *tr,
+		  CAnnMatrixList *trainP,
+		  CAnnMatrixList *trainT,
+		  CAnnTrainParam *tainParam );
 
 int traincgf( CAnnNetwork *net,
-		  CxTrainRecord *tr,
-		  CxMatrixList *trainV,
-		  CxMatrixList *valV,
-		  CxMatrixList *testV );
+		  CAnnTrainRecord *tr,
+		  CAnnMatrixList *trainV,
+		  CAnnMatrixList *valV,
+		  CAnnMatrixList *testV );
 
 }  // namespace matlab
 

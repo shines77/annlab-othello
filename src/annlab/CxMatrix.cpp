@@ -11,32 +11,32 @@
 // CxVector
 //////////////////////////////////////////////////////////////////
 
-CxVector::CxVector( void )
+CAnnVector::CAnnVector( void )
 {
 	initVector(NULL, 0, INIT_MODE_FIRST);
 }
 
-CxVector::CxVector( int _size )
+CAnnVector::CAnnVector( int _size )
 {
 	initVector(NULL, _size, INIT_MODE_FIRST);
 }
 
-CxVector::CxVector( CxVector & srcVerctor )
+CAnnVector::CAnnVector( CAnnVector & srcVerctor )
 {
 	int _size = srcVerctor.size();
 
 	initVector(srcVerctor.name(), _size, INIT_MODE_FIRST);
 
-	CxVector *pVector = copy( &srcVerctor );
+	CAnnVector *pVector = copy( &srcVerctor );
 	ASSERT(pVector != NULL);
 }
 
-CxVector::~CxVector( void )
+CAnnVector::~CAnnVector( void )
 {
 	freeVector();
 }
 
-void CxVector::freeVector( void )
+void CAnnVector::freeVector( void )
 {
 	if (m_pOrigData != NULL) {
 		delete[] m_pOrigData;
@@ -47,7 +47,7 @@ void CxVector::freeVector( void )
 	mem_alloc = 0;
 }
 
-bool CxVector::initVector( const TCHAR *szName, int _size,
+bool CAnnVector::initVector( const TCHAR *szName, int _size,
 						  int _initMode, /*= INIT_MODE_NONE */
 						  int _initFcn   /*= MAT_INIT_NONE */ )
 {
@@ -87,7 +87,7 @@ bool CxVector::initVector( const TCHAR *szName, int _size,
 	return bResult;
 }
 
-bool CxVector::initData(int _size, int _initFcn /*= MAT_INIT_NONE */ )
+bool CAnnVector::initData(int _size, int _initFcn /*= MAT_INIT_NONE */ )
 {
 	ASSERT(m_pData != NULL);
 	if (m_pData == NULL)
@@ -135,14 +135,14 @@ bool CxVector::initData(int _size, int _initFcn /*= MAT_INIT_NONE */ )
 	return TRUE;
 }
 
-double CxVector::operator []( int _index ) const
+double CAnnVector::operator []( int _index ) const
 {
 	double _value = 0.0;
 
 	return _value;
 }
 
-CxVector * CxVector::copy( const CxVector *srcVector )
+CAnnVector * CAnnVector::copy( const CAnnVector *srcVector )
 {
 	if (srcVector != NULL) {
 		//
@@ -154,17 +154,17 @@ CxVector * CxVector::copy( const CxVector *srcVector )
 // CxVectors
 //////////////////////////////////////////////////////////////////
 
-CxVectors::CxVectors( void )
+CAnnVectors::CAnnVectors( void )
 {
 	length = 0;
 }
 
-CxVectors::~CxVectors( void )
+CAnnVectors::~CAnnVectors( void )
 {
 	freeVector();
 }
 
-void CxVectors::freeVector( void )
+void CAnnVectors::freeVector( void )
 {
 	length = 0;
 }
@@ -173,28 +173,28 @@ void CxVectors::freeVector( void )
 // CxMatrix
 //////////////////////////////////////////////////////////////////
 
-CxMatrix::CxMatrix( void )
+CAnnMatrix::CAnnMatrix( void )
 {
 	initMatrix(NULL, 0, 0, INIT_MODE_FIRST);
 }
 
-CxMatrix::CxMatrix( int _size )
+CAnnMatrix::CAnnMatrix( int _size )
 {
 	initMatrix(NULL, _size, _size, INIT_MODE_FIRST);
 }
 
-CxMatrix::CxMatrix( int _rows, int _cols, int _initFcn /*= MAT_INIT_NONE */ )
+CAnnMatrix::CAnnMatrix( int _rows, int _cols, int _initFcn /*= MAT_INIT_NONE */ )
 {
 	initMatrix(NULL, _rows, _cols, INIT_MODE_FIRST, 0.0, _initFcn);
 }
 
-CxMatrix::CxMatrix( const TCHAR *szName, int _rows, int _cols,
+CAnnMatrix::CAnnMatrix( const TCHAR *szName, int _rows, int _cols,
 				   int _initFcn /*= MAT_INIT_NONE */ )
 {
 	initMatrix(szName, _rows, _cols, INIT_MODE_FIRST, 0.0, _initFcn);
 }
 
-CxMatrix::CxMatrix( const CxMatrix & scrMatrix )
+CAnnMatrix::CAnnMatrix( const CAnnMatrix & scrMatrix )
 {
 	int _rows, _cols;
 	_rows = scrMatrix.rows;
@@ -202,11 +202,11 @@ CxMatrix::CxMatrix( const CxMatrix & scrMatrix )
 
 	initMatrix(NULL, _rows, _cols, INIT_MODE_FIRST);
 
-	CxMatrix *pMatrix = copy( &scrMatrix );
+	CAnnMatrix *pMatrix = copy( &scrMatrix );
 	ASSERT(pMatrix != NULL);
 }
 
-CxMatrix::CxMatrix( const CxMatrix & scrMatrix, bool bCopyData )
+CAnnMatrix::CAnnMatrix( const CAnnMatrix & scrMatrix, bool bCopyData )
 {
 	int _rows, _cols;
 	_rows = scrMatrix.rows;
@@ -215,17 +215,17 @@ CxMatrix::CxMatrix( const CxMatrix & scrMatrix, bool bCopyData )
 	initMatrix(NULL, _rows, _cols, INIT_MODE_FIRST);
 
 	if (bCopyData) {
-		CxMatrix *pMatrix = copy( &scrMatrix );
+		CAnnMatrix *pMatrix = copy( &scrMatrix );
 		ASSERT(pMatrix != NULL);
 	}
 }
 
-CxMatrix::~CxMatrix( void )
+CAnnMatrix::~CAnnMatrix( void )
 {
 	freeMatrix();
 }
 
-void CxMatrix::freeMatrix( void )
+void CAnnMatrix::freeMatrix( void )
 {
 	if (m_pOrigData != NULL) {
 		delete[] m_pOrigData;
@@ -237,7 +237,7 @@ void CxMatrix::freeMatrix( void )
 	malloc_size = 0;
 }
 
-bool CxMatrix::initMatrix( const TCHAR *szName, int _rows, int _cols,
+bool CAnnMatrix::initMatrix( const TCHAR *szName, int _rows, int _cols,
 						  int _initMode, /*= INIT_MODE_NONE */
 						  double _fillVal,  /*= 0.0 */
 						  int _initFcn   /*= MAT_INIT_NONE */ )
@@ -311,20 +311,20 @@ bool CxMatrix::initMatrix( const TCHAR *szName, int _rows, int _cols,
 	return bResult;
 }
 
-bool CxMatrix::Create( int _rows, int _cols, double _fillVal, /*= 0 */
+bool CAnnMatrix::create( int _rows, int _cols, double _fillVal, /*= 0 */
 					  int _initFcn /*= MAT_INIT_NONE */ )
 {
 	return initMatrix(_T(""), _rows, _cols, FALSE, _fillVal, _initFcn);
 }
 
-bool CxMatrix::createEx( const TCHAR *szName, int _rows, int _cols,
+bool CAnnMatrix::createEx( const TCHAR *szName, int _rows, int _cols,
 						double _fillVal, /*= 0 */
 						int _initFcn /*= MAT_INIT_NONE */ )
 {
 	return initMatrix(szName, _rows, _cols, FALSE, _fillVal, _initFcn);
 }
 
-bool CxMatrix::initData( int _rows, int _cols, double _fillVal, /*= 0.0 */
+bool CAnnMatrix::initData( int _rows, int _cols, double _fillVal, /*= 0.0 */
 						int _initFcn /*= MAT_INIT_NONE */ )
 {
 	ASSERT(m_pData != NULL);
@@ -382,7 +382,7 @@ bool CxMatrix::initData( int _rows, int _cols, double _fillVal, /*= 0.0 */
 	return TRUE;
 }
 
-bool CxMatrix::copyData( double *pNewData, int _rows, int _cols,
+bool CAnnMatrix::copyData( double *pNewData, int _rows, int _cols,
 						double _fillVal, /*= 0.0*/
 						int _initFcn /*= MAT_INIT_DEFAULT */ )
 {
@@ -462,7 +462,7 @@ bool CxMatrix::copyData( double *pNewData, int _rows, int _cols,
 	return TRUE;
 }
 
-int CxMatrix::size( int n ) const
+int CAnnMatrix::size( int n ) const
 {
 	int _size = 0;
 	if (n == 1)
@@ -474,7 +474,7 @@ int CxMatrix::size( int n ) const
 	return _size;
 }
 
-bool CxMatrix::empty( void ) const
+bool CAnnMatrix::empty( void ) const
 {
 	return (size() == 0);
 }
@@ -489,7 +489,7 @@ bool CxMatrix::empty( void ) const
 //
 //////////////////////////////////////////////////////////////////////
 
-bool CxMatrix::sameSize( const CxMatrix *target, int n /*= 0 */ )
+bool CAnnMatrix::sameSize( const CAnnMatrix *target, int n /*= 0 */ )
 {
 	if (target != NULL) {
 		if (n == 1)
@@ -502,12 +502,12 @@ bool CxMatrix::sameSize( const CxMatrix *target, int n /*= 0 */ )
 	return FALSE;
 }
 
-void CxMatrix::clear( void )
+void CAnnMatrix::clear( void )
 {
 	freeMatrix();
 }
 
-int CxMatrix::resize( int _rows, int _cols, double _fillVal /*= 0.0 */, int _initFcn /*= 0 */ )
+int CAnnMatrix::resize( int _rows, int _cols, double _fillVal /*= 0.0 */, int _initFcn /*= 0 */ )
 {
 	int _length = -1;
 	if (_rows <= 0 || _cols <= 0) {
@@ -531,9 +531,9 @@ int CxMatrix::resize( int _rows, int _cols, double _fillVal /*= 0.0 */, int _ini
 	return _length;
 }
 
-CxMatrix * CxMatrix::copy( const CxMatrix *srcMartix )
+CAnnMatrix * CAnnMatrix::copy( const CAnnMatrix *srcMartix )
 {
-	CxMatrix *pMartix = NULL;
+	CAnnMatrix *pMartix = NULL;
 	int _rows, _cols;
 
 	if (srcMartix == this)
@@ -545,8 +545,8 @@ CxMatrix * CxMatrix::copy( const CxMatrix *srcMartix )
 		if (_rows >= 0 && _cols >= 0) {
 			int _length = resize(_rows, _cols);
 			if (_length == (_rows * _cols) && _length >= 0) {
-				double *dstDataPtr = getData();
-				double *srcDataPtr = srcMartix->getData();
+				double *dstDataPtr = get_data();
+				double *srcDataPtr = srcMartix->get_data();
 				if (dstDataPtr != NULL && srcDataPtr != NULL) {
 					int _newLength = rows * cols;
 #if 1
@@ -575,12 +575,12 @@ CxMatrix * CxMatrix::copy( const CxMatrix *srcMartix )
 	return pMartix;
 }
 
-CxMatrix * CxMatrix::clone( const CxMatrix *srcMartix )
+CAnnMatrix * CAnnMatrix::clone( const CAnnMatrix *srcMartix )
 {
 	return copy(srcMartix);
 }
 
-double CxMatrix::getElement( int _index ) const
+double CAnnMatrix::getElement( int _index ) const
 {
 	if (m_pData != NULL) {
 		int _length = rows * cols;
@@ -591,7 +591,7 @@ double CxMatrix::getElement( int _index ) const
 	return MAT_NAN_ITEM;
 }
 
-double CxMatrix::getElement( int _row, int _col ) const
+double CAnnMatrix::getElement( int _row, int _col ) const
 {
 	int _index;
 	if (_row >= 0 && _row < rows && _col >= 0 && _col < cols) {
@@ -601,7 +601,7 @@ double CxMatrix::getElement( int _row, int _col ) const
 	return MAT_NAN_ITEM;
 }
 
-bool CxMatrix::setElement( int _index, double _value )
+bool CAnnMatrix::setElement( int _index, double _value )
 {
 	if (m_pData != NULL) {
 		int _length = rows * cols;
@@ -613,7 +613,7 @@ bool CxMatrix::setElement( int _index, double _value )
 	return FALSE;
 }
 
-bool CxMatrix::setElement( int _row, int _col, double _value )
+bool CAnnMatrix::setElement( int _row, int _col, double _value )
 {
 	int _index;
 	if (_row >= 0 && _row < rows && _col >= 0 && _col < cols) {
@@ -623,7 +623,7 @@ bool CxMatrix::setElement( int _row, int _col, double _value )
 	return FALSE;
 }
 
-double * CxMatrix::setData( double *pBuffer, int _length )
+double * CAnnMatrix::setData( double *pBuffer, int _length )
 {
 	if (pBuffer != NULL) {
 		int _length = rows * cols;
@@ -637,7 +637,7 @@ double * CxMatrix::setData( double *pBuffer, int _length )
 	return NULL;
 }
 
-double * CxMatrix::setData( double *pBuffer, int _rows, int _cols )
+double * CAnnMatrix::setData( double *pBuffer, int _rows, int _cols )
 {
 	if (_rows >= 0 && _rows <= rows && _cols >= 0 && _cols <= cols) {
 		return setData(pBuffer, _rows * _cols);
@@ -645,22 +645,22 @@ double * CxMatrix::setData( double *pBuffer, int _rows, int _cols )
 	return NULL;
 }
 
-double CxMatrix::operator[]( int _index )
+double CAnnMatrix::operator[]( int _index )
 {
 	return getElement(_index);
 }
 
-double CxMatrix::operator()( int _index )
+double CAnnMatrix::operator()( int _index )
 {
 	return getElement(_index);
 }
 
-double CxMatrix::operator()( int _row, int _col )
+double CAnnMatrix::operator()( int _row, int _col )
 {
 	return getElement(_row, _col);
 }
 
-CxMatrix & CxMatrix::operator = ( int _Right )
+CAnnMatrix & CAnnMatrix::operator = ( int _Right )
 {
 	// resize to one item matrix
 	resize(1, 1);
@@ -671,7 +671,7 @@ CxMatrix & CxMatrix::operator = ( int _Right )
 	return *this;
 }
 
-CxMatrix & CxMatrix::operator = ( double _Right )
+CAnnMatrix & CAnnMatrix::operator = ( double _Right )
 {
 	// resize to one item matrix
 	resize(1, 1);
@@ -682,10 +682,10 @@ CxMatrix & CxMatrix::operator = ( double _Right )
 	return *this;
 }
 
-CxMatrix & CxMatrix::operator = ( CxMatrix & _Right )
+CAnnMatrix & CAnnMatrix::operator = ( CAnnMatrix & _Right )
 {
 	if (&_Right != this) {
-		CxMatrix *dstMatrix = copy(&_Right);
+		CAnnMatrix *dstMatrix = copy(&_Right);
 		ASSERT(dstMatrix != NULL);
 	}
 
@@ -693,7 +693,7 @@ CxMatrix & CxMatrix::operator = ( CxMatrix & _Right )
 	return *this;
 }
 
-bool CxMatrix::operator == ( CxMatrix & _Right )
+bool CAnnMatrix::operator == ( CAnnMatrix & _Right )
 {
 	// Check whether it is its own matrix
 	if (this == &_Right)
@@ -708,8 +708,8 @@ bool CxMatrix::operator == ( CxMatrix & _Right )
 #if MATRIX_FAST_MODE
 	int _length   = size();
 	int _lenRight = _Right.size();
-	double *pData      = getData();
-	double *pDataRight = _Right.getData();
+	double *pData      = get_data();
+	double *pDataRight = _Right.get_data();
 
 	ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
 	if (pData != NULL && pDataRight != NULL) {
@@ -736,20 +736,20 @@ bool CxMatrix::operator == ( CxMatrix & _Right )
 	return (bFindDiff == FALSE);
 }
 
-bool CxMatrix::operator != ( CxMatrix & _Right )
+bool CAnnMatrix::operator != ( CAnnMatrix & _Right )
 {
 	return !(*this == _Right);
 }
 
-CxMatrix CxMatrix::operator + ( double _value )
+CAnnMatrix CAnnMatrix::operator + ( double _value )
 {
 	// Matrix addition
 #if MATRIX_FAST_MODE
 	// Copy the current matrix
-	CxMatrix _Result((CxMatrix &)*this);		// Copy constructor
+	CAnnMatrix _Result((CAnnMatrix &)*this);		// Copy constructor
 
 	int _length   = _Result.size();
-	double *pData = _Result.getData();
+	double *pData = _Result.get_data();
 
 	ASSERT(pData != NULL);
 	if (pData != NULL) {
@@ -760,7 +760,7 @@ CxMatrix CxMatrix::operator + ( double _value )
 	}
 #else
 	// Create the result matrix
-	CxMatrix _Result(rows, cols);
+	CAnnMatrix _Result(rows, cols);
 
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
@@ -771,15 +771,15 @@ CxMatrix CxMatrix::operator + ( double _value )
 	return _Result;
 }
 
-CxMatrix operator + ( double _value, CxMatrix & _Right )
+CAnnMatrix operator + ( double _value, CAnnMatrix & _Right )
 {
 	// Matrix addition
 #if MATRIX_FAST_MODE
 	// Copy the target matrix
-	CxMatrix _Result((CxMatrix &)_Right);		// Copy constructor
+	CAnnMatrix _Result((CAnnMatrix &)_Right);		// Copy constructor
 
 	int _length   = _Result.size();
-	double *pData = _Result.getData();
+	double *pData = _Result.get_data();
 
 	ASSERT(pData != NULL);
 	if (pData != NULL) {
@@ -790,7 +790,7 @@ CxMatrix operator + ( double _value, CxMatrix & _Right )
 	}
 #else
 	// Create the result matrix
-	CxMatrix _Result(_Right.rows, _Right.cols);
+	CAnnMatrix _Result(_Right.rows, _Right.cols);
 
 	for (int i=0; i<_Right.rows; ++i) {
 		for (int j=0; j<_Right.cols; ++j)
@@ -801,10 +801,10 @@ CxMatrix operator + ( double _value, CxMatrix & _Right )
 	return _Result;
 }
 
-CxMatrix CxMatrix::operator + ( CxMatrix & _Right )
+CAnnMatrix CAnnMatrix::operator + ( CAnnMatrix & _Right )
 {
 	// Copy the current matrix
-	CxMatrix _Result((CxMatrix &)*this);		// Copy constructor
+	CAnnMatrix _Result((CAnnMatrix &)*this);		// Copy constructor
 	if (_Right.empty())
 		return _Result;
 
@@ -822,8 +822,8 @@ CxMatrix CxMatrix::operator + ( CxMatrix & _Right )
 #if MATRIX_FAST_MODE
 	int _length   = _Result.size();
 	int _lenRight = _Right.size();
-	double *pData      = _Result.getData();
-	double *pDataRight = _Right.getData();
+	double *pData      = _Result.get_data();
+	double *pDataRight = _Right.get_data();
 
 	ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
 	if (pData != NULL && pDataRight != NULL && _length == _lenRight) {
@@ -843,12 +843,12 @@ CxMatrix CxMatrix::operator + ( CxMatrix & _Right )
 	return _Result;
 }
 
-CxMatrix & CxMatrix::operator += ( double _value )
+CAnnMatrix & CAnnMatrix::operator += ( double _value )
 {
 	// Matrix addition
 #if MATRIX_FAST_MODE
 	int _length   = size();
-	double *pData = getData();
+	double *pData = get_data();
 
 	ASSERT(pData != NULL);
 	if (pData != NULL) {
@@ -867,7 +867,7 @@ CxMatrix & CxMatrix::operator += ( double _value )
 	return *this;
 }
 
-CxMatrix & CxMatrix::operator += ( CxMatrix & _Right )
+CAnnMatrix & CAnnMatrix::operator += ( CAnnMatrix & _Right )
 {
 	if (_Right.empty())
 		return *this;
@@ -885,8 +885,8 @@ CxMatrix & CxMatrix::operator += ( CxMatrix & _Right )
 #if MATRIX_FAST_MODE
 	int _length   = size();
 	int _lenRight = _Right.size();
-	double *pData      = getData();
-	double *pDataRight = _Right.getData();
+	double *pData      = get_data();
+	double *pDataRight = _Right.get_data();
 
 	ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
 	if (pData != NULL && pDataRight != NULL && _length == _lenRight) {
@@ -906,15 +906,15 @@ CxMatrix & CxMatrix::operator += ( CxMatrix & _Right )
 	return *this;
 }
 
-CxMatrix CxMatrix::operator - ( double _value )
+CAnnMatrix CAnnMatrix::operator - ( double _value )
 {
 	// Matrix subtraction
 #if MATRIX_FAST_MODE
 	// Copy the current matrix
-	CxMatrix _Result((CxMatrix &)*this);		// Copy constructor
+	CAnnMatrix _Result((CAnnMatrix &)*this);		// Copy constructor
 
 	int _length   = _Result.size();
-	double *pData = _Result.getData();
+	double *pData = _Result.get_data();
 
 	ASSERT(pData != NULL);
 	if (pData != NULL) {
@@ -925,7 +925,7 @@ CxMatrix CxMatrix::operator - ( double _value )
 	}
 #else
 	// Create the result matrix
-	CxMatrix _Result(rows, cols);
+	CAnnMatrix _Result(rows, cols);
 
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
@@ -936,15 +936,15 @@ CxMatrix CxMatrix::operator - ( double _value )
 	return _Result;
 }
 
-CxMatrix operator - ( double _value, CxMatrix & _Right )
+CAnnMatrix operator - ( double _value, CAnnMatrix & _Right )
 {
 	// Matrix subtraction
 #if MATRIX_FAST_MODE
 	// Copy the current matrix
-	CxMatrix _Result((CxMatrix &)_Right);		// Copy constructor
+	CAnnMatrix _Result((CAnnMatrix &)_Right);		// Copy constructor
 
 	int _length   = _Result.size();
-	double *pData = _Result.getData();
+	double *pData = _Result.get_data();
 
 	ASSERT(pData != NULL);
 	if (pData != NULL) {
@@ -955,7 +955,7 @@ CxMatrix operator - ( double _value, CxMatrix & _Right )
 	}
 #else
 	// Create the result matrix
-	CxMatrix _Result(_Right.rows, _Right.cols);
+	CAnnMatrix _Result(_Right.rows, _Right.cols);
 
 	for (int i=0; i<_Right.rows; ++i) {
 		for (int j=0; j<_Right.cols; ++j)
@@ -966,10 +966,10 @@ CxMatrix operator - ( double _value, CxMatrix & _Right )
 	return _Result;
 }
 
-CxMatrix CxMatrix::operator - ( CxMatrix & _Right )
+CAnnMatrix CAnnMatrix::operator - ( CAnnMatrix & _Right )
 {
 	// Copy the current matrix
-	CxMatrix _Result((CxMatrix &)*this);		// Copy constructor
+	CAnnMatrix _Result((CAnnMatrix &)*this);		// Copy constructor
 	if (_Right.empty())
 		return _Result;
 
@@ -987,8 +987,8 @@ CxMatrix CxMatrix::operator - ( CxMatrix & _Right )
 #if MATRIX_FAST_MODE
 	int _length   = _Result.size();
 	int _lenRight = _Right.size();
-	double *pData      = _Result.getData();
-	double *pDataRight = _Right.getData();
+	double *pData      = _Result.get_data();
+	double *pDataRight = _Right.get_data();
 
 	ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
 	if (pData != NULL && pDataRight != NULL && _length == _lenRight) {
@@ -1008,12 +1008,12 @@ CxMatrix CxMatrix::operator - ( CxMatrix & _Right )
 	return _Result;
 }
 
-CxMatrix & CxMatrix::operator -= ( double _value )
+CAnnMatrix & CAnnMatrix::operator -= ( double _value )
 {
 	// Matrix subtraction
 #if MATRIX_FAST_MODE
 	int _length   = size();
-	double *pData = getData();
+	double *pData = get_data();
 
 	ASSERT(pData != NULL);
 	if (pData != NULL) {
@@ -1032,7 +1032,7 @@ CxMatrix & CxMatrix::operator -= ( double _value )
 	return *this;
 }
 
-CxMatrix & CxMatrix::operator -= ( CxMatrix & _Right )
+CAnnMatrix & CAnnMatrix::operator -= ( CAnnMatrix & _Right )
 {
 	if (_Right.empty())
 		return *this;
@@ -1050,8 +1050,8 @@ CxMatrix & CxMatrix::operator -= ( CxMatrix & _Right )
 #if MATRIX_FAST_MODE
 	int _length   = size();
 	int _lenRight = _Right.size();
-	double *pData      = getData();
-	double *pDataRight = _Right.getData();
+	double *pData      = get_data();
+	double *pDataRight = _Right.get_data();
 
 	ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
 	if (pData != NULL && pDataRight != NULL && _length == _lenRight) {
@@ -1071,15 +1071,15 @@ CxMatrix & CxMatrix::operator -= ( CxMatrix & _Right )
 	return *this;
 }
 
-CxMatrix CxMatrix::operator * ( double _value )
+CAnnMatrix CAnnMatrix::operator * ( double _value )
 {
 	// Matrix multiplication
 #if MATRIX_FAST_MODE
 	// Copy the current matrix
-	CxMatrix _Result((CxMatrix &)*this);		// copy ourselves
+	CAnnMatrix _Result((CAnnMatrix &)*this);		// copy ourselves
 
 	int _length   = _Result.size();
-	double *pData = _Result.getData();
+	double *pData = _Result.get_data();
 
 	ASSERT(pData != NULL);
 	if (pData != NULL) {
@@ -1090,7 +1090,7 @@ CxMatrix CxMatrix::operator * ( double _value )
 	}
 #else
 	// Create the result matrix
-	CxMatrix _Result(rows, cols);
+	CAnnMatrix _Result(rows, cols);
 
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
@@ -1101,15 +1101,15 @@ CxMatrix CxMatrix::operator * ( double _value )
 	return _Result;
 }
 
-CxMatrix operator * ( double _value, CxMatrix & _Right )
+CAnnMatrix operator * ( double _value, CAnnMatrix & _Right )
 {
 	// Matrix multiplication
 #if MATRIX_FAST_MODE
 	// Copy the current matrix
-	CxMatrix _Result((CxMatrix &)_Right);		// Copy constructor
+	CAnnMatrix _Result((CAnnMatrix &)_Right);		// Copy constructor
 
 	int _length   = _Result.size();
-	double *pData = _Result.getData();
+	double *pData = _Result.get_data();
 
 	ASSERT(pData != NULL);
 	if (pData != NULL) {
@@ -1120,7 +1120,7 @@ CxMatrix operator * ( double _value, CxMatrix & _Right )
 	}
 #else
 	// Create the result matrix
-	CxMatrix _Result(_Right.rows, _Right.cols);
+	CAnnMatrix _Result(_Right.rows, _Right.cols);
 
 	for (int i=0; i<_Right.rows; ++i) {
 		for (int j=0; j<_Right.cols; ++j)
@@ -1131,7 +1131,7 @@ CxMatrix operator * ( double _value, CxMatrix & _Right )
 	return _Result;
 }
 
-CxMatrix CxMatrix::operator * ( CxMatrix & _Right )
+CAnnMatrix CAnnMatrix::operator * ( CAnnMatrix & _Right )
 {
 	// 首先检查乘矩阵的行数和被乘矩阵的列数是否相同
 	ASSERT(cols == _Right.rows);
@@ -1145,7 +1145,7 @@ CxMatrix CxMatrix::operator * ( CxMatrix & _Right )
 	_oldCols = cols;
 
 	// 创建目标乘积矩阵
-	CxMatrix _Result(_newRows, _newCols);
+	CAnnMatrix _Result(_newRows, _newCols);
 
 	// Matrix multiplication，即
 	//
@@ -1166,7 +1166,7 @@ CxMatrix CxMatrix::operator * ( CxMatrix & _Right )
 	return _Result;
 }
 
-CxMatrix & CxMatrix::operator *= ( double _value )
+CAnnMatrix & CAnnMatrix::operator *= ( double _value )
 {
 	// Matrix multiplication
 	for (int i=0; i<rows; ++i) {
@@ -1177,13 +1177,13 @@ CxMatrix & CxMatrix::operator *= ( double _value )
 	return *this;
 }
 
-CxMatrix & CxMatrix::operator *= ( CxMatrix & _Right )
+CAnnMatrix & CAnnMatrix::operator *= ( CAnnMatrix & _Right )
 {
 	// 首先检查乘矩阵的行数和被乘矩阵的列数是否相同
 	ASSERT(cols == _Right.rows);
 
 	// Copy the current matrix
-	CxMatrix _Left((CxMatrix &)*this);
+	CAnnMatrix _Left((CAnnMatrix &)*this);
 
 	int _newRows, _newCols, _oldCols;
 	_newRows = rows;
@@ -1212,10 +1212,10 @@ CxMatrix & CxMatrix::operator *= ( CxMatrix & _Right )
 	return *this;
 }
 
-CxMatrix CxMatrix::operator ^ ( double _value )
+CAnnMatrix CAnnMatrix::operator ^ ( double _value )
 {
 	// Copy the current matrix
-	CxMatrix _Result((CxMatrix &)*this);		// copy ourselves
+	CAnnMatrix _Result((CAnnMatrix &)*this);		// copy ourselves
 
 	double _base, _power;
 	// 进行乘方
@@ -1230,7 +1230,7 @@ CxMatrix CxMatrix::operator ^ ( double _value )
 	return _Result;
 }
 
-CxMatrix & CxMatrix::operator ^= ( double _value )
+CAnnMatrix & CAnnMatrix::operator ^= ( double _value )
 {
 	double _base, _power;
 	// 进行乘方
@@ -1245,15 +1245,15 @@ CxMatrix & CxMatrix::operator ^= ( double _value )
 	return *this;
 }
 
-CxMatrix CxMatrix::operator / ( double _value )
+CAnnMatrix CAnnMatrix::operator / ( double _value )
 {
 	// Matrix division: dotdiv
 #if MATRIX_FAST_MODE
 	// Copy the current matrix
-	CxMatrix _Result((CxMatrix &)*this);		// copy ourselves
+	CAnnMatrix _Result((CAnnMatrix &)*this);		// copy ourselves
 
 	int _length   = _Result.size();
-	double *pData = _Result.getData();
+	double *pData = _Result.get_data();
 
 	ASSERT(pData != NULL);
 	if (pData != NULL) {
@@ -1264,7 +1264,7 @@ CxMatrix CxMatrix::operator / ( double _value )
 	}
 #else
 	// Create the result matrix
-	CxMatrix _Result(rows, cols);
+	CAnnMatrix _Result(rows, cols);
 
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
@@ -1275,10 +1275,10 @@ CxMatrix CxMatrix::operator / ( double _value )
 	return _Result;
 }
 
-CxMatrix CxMatrix::operator / ( CxMatrix &_Right )
+CAnnMatrix CAnnMatrix::operator / ( CAnnMatrix &_Right )
 {
 	// Copy the current matrix
-	CxMatrix _Result((CxMatrix &)*this);		// copy ourselves
+	CAnnMatrix _Result((CAnnMatrix &)*this);		// copy ourselves
 
 	// Check whether it is its own matrix
 	ASSERT(rows == _Right.rows && cols == _Right.cols);
@@ -1294,8 +1294,8 @@ CxMatrix CxMatrix::operator / ( CxMatrix &_Right )
 #if MATRIX_FAST_MODE
 	int _length   = _Result.size();
 	int _lenRight = _Right.size();
-	double *pData = _Result.getData();
-	double *pDataRight = _Right.getData();
+	double *pData = _Result.get_data();
+	double *pDataRight = _Right.get_data();
 
 	ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
 	if (pData != NULL && pDataRight != NULL && _length == _lenRight) {
@@ -1315,15 +1315,15 @@ CxMatrix CxMatrix::operator / ( CxMatrix &_Right )
 	return _Result;
 }
 
-CxMatrix operator / ( double _value, CxMatrix & _Right )
+CAnnMatrix operator / ( double _value, CAnnMatrix & _Right )
 {
 	// Copy the current matrix
-	CxMatrix _Result((CxMatrix &)_Right);		// Copy constructor
+	CAnnMatrix _Result((CAnnMatrix &)_Right);		// Copy constructor
 
 	// Matrix division
 #if MATRIX_FAST_MODE
 	int _length   = _Result.size();
-	double *pData = _Result.getData();
+	double *pData = _Result.get_data();
 
 	ASSERT(pData != NULL);
 	if (pData != NULL) {
@@ -1342,7 +1342,7 @@ CxMatrix operator / ( double _value, CxMatrix & _Right )
 	return _Result;
 }
 
-CxMatrix & CxMatrix::operator /= ( double _value )
+CAnnMatrix & CAnnMatrix::operator /= ( double _value )
 {
 	// Matrix division: dotdiv
 	for (int i=0; i<rows; ++i) {
@@ -1353,7 +1353,7 @@ CxMatrix & CxMatrix::operator /= ( double _value )
 	return *this;
 }
 
-bool CxMatrix::makeUnitMatrix( int _size )
+bool CAnnMatrix::makeUnitMatrix( int _size )
 {
 	int _sizeNew = resize(_size, _size);
 	if (_sizeNew >= 0) {
@@ -1368,10 +1368,10 @@ bool CxMatrix::makeUnitMatrix( int _size )
 	return FALSE;
 }
 
-CxMatrix & CxMatrix::transpose( void )
+CAnnMatrix & CAnnMatrix::transpose( void )
 {
 	// Copy the current matrix
-	CxMatrix _Trans((CxMatrix &)*this);		// copy ourselves
+	CAnnMatrix _Trans((CAnnMatrix &)*this);		// copy ourselves
 
 	// 转置各元素
 	for (int i=0; i<rows; ++i) {
@@ -1382,34 +1382,34 @@ CxMatrix & CxMatrix::transpose( void )
 	return *this;
 }
 
-int CxMatrix::zeros( int _rows, int _cols )
+int CAnnMatrix::zeros( int _rows, int _cols )
 {
 	// 重置大小并初始化为全0矩阵
 	return resize(_rows, _cols, MAT_INIT_ZEROS);
 }
 
-int CxMatrix::ones( int _rows, int _cols )
+int CAnnMatrix::ones( int _rows, int _cols )
 {
 	// 重置大小并初始化为全1矩阵
 	return resize(_rows, _cols, MAT_INIT_ONES);
 }
 
-int CxMatrix::rands( int _rows, int _cols )
+int CAnnMatrix::rands( int _rows, int _cols )
 {
 	// 重置大小并初始化为[-1,1]随机数矩阵
 	return resize(_rows, _cols, MAT_INIT_RANDS);
 }
 
-int CxMatrix::rands2( int _rows, int _cols )
+int CAnnMatrix::rands2( int _rows, int _cols )
 {
 	// 重置大小并初始化为[0,1]随机数矩阵
 	return resize(_rows, _cols, MAT_INIT_RANDS2);
 }
 
-CxMatrix CxMatrix::_zeros( int _rows, int _cols ) const
+CAnnMatrix CAnnMatrix::_zeros( int _rows, int _cols ) const
 {
 	// Copy the current matrix
-	CxMatrix _zeros0(_rows, _cols);
+	CAnnMatrix _zeros0(_rows, _cols);
 
 	// 所有元素置0
 	for (int i=0; i<_rows; ++i) {
@@ -1420,10 +1420,10 @@ CxMatrix CxMatrix::_zeros( int _rows, int _cols ) const
 	return _zeros0;
 }
 
-CxMatrix CxMatrix::_ones( int _rows, int _cols ) const
+CAnnMatrix CAnnMatrix::_ones( int _rows, int _cols ) const
 {
 	// Copy the current matrix
-	CxMatrix _ones0(_rows, _cols);
+	CAnnMatrix _ones0(_rows, _cols);
 
 	// 所有元素置1
 	for (int i=0; i<_rows; ++i) {
@@ -1434,10 +1434,10 @@ CxMatrix CxMatrix::_ones( int _rows, int _cols ) const
 	return _ones0;
 }
 
-CxMatrix CxMatrix::_rands( int _rows, int _cols ) const
+CAnnMatrix CAnnMatrix::_rands( int _rows, int _cols ) const
 {
 	// Copy the current matrix
-	CxMatrix _rands(_rows, _cols);
+	CAnnMatrix _rands(_rows, _cols);
 
 	// 所有元素置[-1,1]的随机数
 	double _dblRand;
@@ -1451,10 +1451,10 @@ CxMatrix CxMatrix::_rands( int _rows, int _cols ) const
 	return _rands;
 }
 
-CxMatrix CxMatrix::_rands2( int _rows, int _cols ) const
+CAnnMatrix CAnnMatrix::_rands2( int _rows, int _cols ) const
 {
 	// Copy the current matrix
-	CxMatrix _rands(_rows, _cols);
+	CAnnMatrix _rands(_rows, _cols);
 
 	// 所有元素置[-1,1]的随机数
 	double _dblRand;
@@ -1469,9 +1469,9 @@ CxMatrix CxMatrix::_rands2( int _rows, int _cols ) const
 }
 
 // 获取矩阵的指定行矩阵, _row下标从0开始
-CxMatrix CxMatrix::getRowVector( int _row ) const
+CAnnMatrix CAnnMatrix::getRowVector( int _row ) const
 {
-	CxMatrix _Result;
+	CAnnMatrix _Result;
 	if (_row >= 0 && _row < rows) {
 		_Result.resize(1, cols);
 		for (int i= 0; i<cols; i++)
@@ -1481,9 +1481,9 @@ CxMatrix CxMatrix::getRowVector( int _row ) const
 }
 
 // 获取矩阵的指定列矩阵, _col下标从0开始
-CxMatrix CxMatrix::getColVector( int _col ) const
+CAnnMatrix CAnnMatrix::getColVector( int _col ) const
 {
-	CxMatrix _Result;
+	CAnnMatrix _Result;
 	if (_col >= 0 && _col < cols) {
 		_Result.resize(rows, 1);
 		for (int i= 0; i<rows; i++)
@@ -1492,7 +1492,7 @@ CxMatrix CxMatrix::getColVector( int _col ) const
 	return _Result;
 }
 
-void CxMatrix::display( void )
+void CAnnMatrix::display( void )
 {
 	TRACE(_T("CxMatrix: Name = [ %s ], [rows = %d, cols = %d]\n"), name(), rows, cols);
 	TRACE(_T("============================================================================================================\n\n"));
@@ -1506,7 +1506,7 @@ void CxMatrix::display( void )
 	TRACE(_T("============================================================================================================\n\n"));
 }
 
-void CxMatrix::display( const TCHAR *szName )
+void CAnnMatrix::display( const TCHAR *szName )
 {
 #if 1
 	TRACE(_T("CxMatrix: Name = [ %s ], [rows = %d, cols = %d]\n"), szName, rows, cols);
@@ -1526,7 +1526,7 @@ void CxMatrix::display( const TCHAR *szName )
 // CxMatrixs
 //////////////////////////////////////////////////////////////////
 
-CxMatrixs::CxMatrixs( void )
+CAnnMatrixs::CAnnMatrixs( void )
 {
 	_tcscpy_s(m_szName, _countof(m_szName), _T(""));
 
@@ -1534,7 +1534,7 @@ CxMatrixs::CxMatrixs( void )
 	pMatrixs = NULL;
 }
 
-CxMatrixs::CxMatrixs( int _numMatrixs )
+CAnnMatrixs::CAnnMatrixs( int _numMatrixs )
 {
 	_tcscpy_s(m_szName, _countof(m_szName), _T(""));
 
@@ -1542,7 +1542,7 @@ CxMatrixs::CxMatrixs( int _numMatrixs )
 	pMatrixs = NULL;
 }
 
-CxMatrixs::CxMatrixs( const TCHAR *szName, int _numMatrixs )
+CAnnMatrixs::CAnnMatrixs( const TCHAR *szName, int _numMatrixs )
 {
 	if (szName != NULL)
 		_tcscpy_s(m_szName, _countof(m_szName), szName);
@@ -1553,12 +1553,12 @@ CxMatrixs::CxMatrixs( const TCHAR *szName, int _numMatrixs )
 	pMatrixs = NULL;
 }
 
-CxMatrixs::~CxMatrixs( void )
+CAnnMatrixs::~CAnnMatrixs( void )
 {
 	freeMatrixs();
 }
 
-void CxMatrixs::freeMatrixs( void )
+void CAnnMatrixs::freeMatrixs( void )
 {
 	if (pMatrixs != NULL) {
 		delete[] pMatrixs;
@@ -1566,23 +1566,23 @@ void CxMatrixs::freeMatrixs( void )
 	}
 }
 
-bool CxMatrixs::create( const TCHAR *szName, int _numMatrixs )
+bool CAnnMatrixs::create( const TCHAR *szName, int _numMatrixs )
 {
 	return TRUE;
 }
 
-bool CxMatrixs::setMatrixs( int _numMatrixs )
+bool CAnnMatrixs::setMatrixs( int _numMatrixs )
 {
 	numMatrixs = _numMatrixs;
 	return TRUE;
 }
 
-CxMatrixs * CxMatrixs::copy( const CxMatrixs *srcMartixs )
+CAnnMatrixs * CAnnMatrixs::copy( const CAnnMatrixs *srcMartixs )
 {
 	return NULL;
 }
 
-CxMatrixs * CxMatrixs::clone( const CxMatrixs *srcMartixs )
+CAnnMatrixs * CAnnMatrixs::clone( const CAnnMatrixs *srcMartixs )
 {
 	return copy(srcMartixs);
 }
@@ -1591,7 +1591,7 @@ CxMatrixs * CxMatrixs::clone( const CxMatrixs *srcMartixs )
 // CxMatrixList
 //////////////////////////////////////////////////////////////////
 
-CxMatrixList::CxMatrixList( void )
+CAnnMatrixList::CAnnMatrixList( void )
 {
 	N       = 0;
 	TS      = 0;
@@ -1607,32 +1607,32 @@ CxMatrixList::CxMatrixList( void )
 	Y       = NULL;
 }
 
-CxMatrixList::~CxMatrixList( void )
+CAnnMatrixList::~CAnnMatrixList( void )
 {
 
 }
 
-CxMatrix * CxMatrixList::operator[]( int _index )
+CAnnMatrix * CAnnMatrixList::operator[]( int _index )
 {
 	if (_index < 0)
 		return NULL;
 
-	list<CxMatrix>::iterator itList;
+	list<CAnnMatrix>::iterator itList;
 	int _counter = 0;
 	for (itList = begin(); itList != end(); itList++) {
 		if (_counter == _index)
-			return (CxMatrix *)&(*itList);
+			return (CAnnMatrix *)&(*itList);
 		_counter++;
 	}
 	return NULL;
 }
 
-CxMatrixVector::CxMatrixVector( void )
+CAnnMatrixVector::CAnnMatrixVector( void )
 {
 
 }
 
-CxMatrixVector::~CxMatrixVector( void )
+CAnnMatrixVector::~CAnnMatrixVector( void )
 {
 
 }
