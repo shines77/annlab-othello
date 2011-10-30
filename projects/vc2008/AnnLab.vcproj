@@ -196,7 +196,7 @@
 				Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 				>
 				<File
-					RelativePath="..\..\src\gui\AnnLab.cpp"
+					RelativePath="..\..\src\gui\AnnLabApp.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -239,72 +239,6 @@
 				</File>
 				<File
 					RelativePath="..\..\src\gui\stdafx.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-							PrecompiledHeaderThrough="$(SolutionDir)..\..\include\gui\stdAfx.h"
-						/>
-					</FileConfiguration>
-				</File>
-			</Filter>
-			<Filter
-				Name="annlab"
-				Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-				>
-				<File
-					RelativePath="..\..\src\annlab\AnnList.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\src\annlab\AnnMatrix.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\src\annlab\AnnNetwork.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -464,6 +398,72 @@
 						</File>
 					</Filter>
 				</Filter>
+				<Filter
+					Name="sys"
+					Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
+					>
+					<File
+						RelativePath="..\..\src\matlab\sys\AnnList.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\src\matlab\sys\AnnMatrix.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\src\matlab\sys\AnnNetwork.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+								PrecompiledHeaderThrough="$(SolutionDir)..\..\include\gui\stdAfx.h"
+							/>
+						</FileConfiguration>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -488,7 +488,7 @@
 				Filter="h;hpp;hxx;hm;inl;inc;xsd"
 				>
 				<File
-					RelativePath="..\..\include\gui\AnnLab.h"
+					RelativePath="..\..\include\gui\AnnLabApp.h"
 					>
 				</File>
 				<File
@@ -505,66 +505,25 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="annlab"
-				Filter="h;hpp;hxx;hm;inl;inc;xsd"
-				>
-				<File
-					RelativePath="..\..\include\annlab\ann_config.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\annlab\ann_stddef.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\annlab\AnnList.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\annlab\AnnMatrix.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\annlab\AnnNetwork.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\annlab\AnnObject.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\annlab\stdint.h"
-					>
-				</File>
-				<Filter
-					Name="vs"
-					>
-					<File
-						RelativePath="..\..\include\annlab\vs\stdint.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="internal"
-					>
-					<File
-						RelativePath="..\..\include\annlab\internal\_ann_windef.h"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
 				Name="matlab"
 				Filter="h;hpp;hxx;hm;inl;inc;xsd"
 				>
+				<File
+					RelativePath="..\..\include\matlab\matlab_config.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\matlab\matlab_stddef.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\matlab\matlab.h"
+					>
+				</File>
 				<Filter
 					Name="toolbox"
 					Filter="h;hpp;hxx;hm;inl;inc;xsd"
 					>
-					<File
-						RelativePath="..\..\include\matlab\toolbox\matlab.h"
-						>
-					</File>
 					<File
 						RelativePath="..\..\include\matlab\toolbox\nnerror.h"
 						>
@@ -600,6 +559,43 @@
 						</File>
 					</Filter>
 				</Filter>
+				<Filter
+					Name="sys"
+					Filter="h;hpp;hxx;hm;inl;inc;xsd"
+					>
+					<File
+						RelativePath="..\..\include\matlab\sys\AnnList.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\matlab\sys\AnnMatrix.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\matlab\sys\AnnNetwork.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\matlab\sys\AnnObject.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="internal"
+					>
+					<File
+						RelativePath="..\..\include\matlab\internal\_matlab_windef.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="vs"
+					>
+					<File
+						RelativePath="..\..\include\matlab\vs\stdint.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -632,7 +628,7 @@
 				>
 			</Filter>
 			<Filter
-				Name="annlab"
+				Name="gutils"
 				>
 			</Filter>
 		</Filter>

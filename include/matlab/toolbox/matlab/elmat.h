@@ -2,10 +2,8 @@
 #ifndef _ELMAT_H_
 #define _ELMAT_H_
 
-#include "../matlab.h"
-#include "../../../annlab/AnnMatrix.h"
-
-using namespace annlab;
+#include "../../matlab.h"
+#include "../../../matlab/sys/AnnMatrix.h"
 
 namespace matlab {
 

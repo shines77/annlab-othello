@@ -3,10 +3,8 @@
 #define _NNNETWORK_H_
 
 #include "../matlab.h"
-#include "../../../annlab/AnnNetwork.h"
-#include "../../../annlab/AnnMatrix.h"
-
-using namespace annlab;
+#include "../../../matlab/sys/AnnNetwork.h"
+#include "../../../matlab/sys/AnnMatrix.h"
 
 namespace matlab {
 
