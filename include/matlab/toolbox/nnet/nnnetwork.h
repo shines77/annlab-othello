@@ -2,7 +2,7 @@
 #ifndef _NNNETWORK_H_
 #define _NNNETWORK_H_
 
-#include "../matlab.h"
+#include "../../matlab.h"
 #include "../../../matlab/sys/AnnNetwork.h"
 #include "../../../matlab/sys/AnnMatrix.h"
 
