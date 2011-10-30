@@ -26,7 +26,7 @@
     the GNU General Public License.
 */
 
-#if !defined(_MATLAB_matlab_windef_H_) || defined(_MATLAB_INTERNAL_MATLAB_WINDEF_H_)
+#if !defined(_MATLAB_matlab_windef_H_)
 #error Do not #include this internal file directly; use public MATLAB headers instead.
 #endif /* _MATLAB_matlab_windef_H_ */
 
@@ -52,15 +52,15 @@ namespace std {
 #define __MATLAB_STRING_AUX(x)		#x
 #define __MATLAB_STRING(x)			__MATLAB_STRING_AUX(x)
 
-// Default setting of TBB_USE_DEBUG
-#ifdef TBB_USE_DEBUG
-#    if TBB_USE_DEBUG 
+// Default setting of MATLAB_USE_DEBUG
+#ifdef MATLAB_USE_DEBUG
+#    if MATLAB_USE_DEBUG 
 #        if !defined(_DEBUG)
-#            pragma message(__FILE__ "(" __MATLAB_STRING(__LINE__) ") : Warning: Recommend using /MDd if compiling with TBB_USE_DEBUG!=0")
+#            pragma message(__FILE__ "(" __MATLAB_STRING(__LINE__) ") : Warning: Recommend using /MDd if compiling with MATLAB_USE_DEBUG!=0")
 #        endif
 #    else
 #        if defined(_DEBUG)
-#            pragma message(__FILE__ "(" __MATLAB_STRING(__LINE__) ") : Warning: Recommend using /MD if compiling with TBB_USE_DEBUG==0")
+#            pragma message(__FILE__ "(" __MATLAB_STRING(__LINE__) ") : Warning: Recommend using /MD if compiling with MATLAB_USE_DEBUG==0")
 #        endif
 #    endif
 #endif
