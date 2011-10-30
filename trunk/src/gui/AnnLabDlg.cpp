@@ -2,10 +2,10 @@
 //
 
 #include "../../include/gui/stdafx.h"
-#include "../../include/gui/AnnLab.h"
+#include "../../include/gui/AnnLabApp.h"
 #include "../../include/gui/AnnLabDlg.h"
-#include "../../include/annlab/AnnList.h"
-#include "../../include/annlab/AnnMatrix.h"
+#include "../../include/matlab/sys/AnnList.h"
+#include "../../include/matlab/sys/AnnMatrix.h"
 #include "../../include/matlab/toolbox/matlab/elmat.h"
 #include "../../include/matlab/toolbox/nnet/nninit.h"
 #include "../../include/matlab/toolbox/nnet/nntrain.h"
