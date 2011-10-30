@@ -343,7 +343,4 @@ typedef version_tag_v1 version_tag;
 
 #endif /* RC_INVOKED */
 
-
-INLINE void setFcnName( TCHAR *szDstFuncName, int nNameSize, const TCHAR *szFcnName );
-
 #endif  // _MATLAB_STDDEF_H_

@@ -15,8 +15,8 @@ enum enumNetLayerType {
 	LAYER_TYPE_MAX,
 };
 
-class CxCell {};
-class CxCells { int m, n; };
+class CAnnCell {};
+class CAnnCells { int m, n; };
 
 class CAnnTrainParam
 {
@@ -303,5 +303,7 @@ private:
 	TCHAR   m_szPerformFcn[FCN_NAME_LEN];
 	TCHAR   m_szTrainFcn[FCN_NAME_LEN];
 };
+
+INLINE void setFcnName( TCHAR *szDstFuncName, int nNameSize, const TCHAR *szFcnName );
 
 }  // namespace matlab
