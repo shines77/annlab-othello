@@ -627,12 +627,12 @@ bool CAnnNetLayers::modify( int _index, int _numNeuron )
 
 CAnnNetwork::CAnnNetwork( void )
 {
-	commonConstructor(_T(""), _T(""));
+	initialize(_T(""), _T(""));
 }
 
 CAnnNetwork::CAnnNetwork( const TCHAR *szName )
 {
-	commonConstructor(szName, _T(""), _T(""), NULL);
+	initialize(szName, _T(""), _T(""), NULL);
 }
 
 CAnnNetwork::~CAnnNetwork( void )
@@ -645,11 +645,11 @@ void CAnnNetwork::freeNetwork( void )
 	clearNetLayers();
 }
 
-bool CAnnNetwork::commonConstructor( const TCHAR *szName,
-									const TCHAR *szSizesOfLayers,
-									const TCHAR *szTransFcnOfLayers,
-									const CAnnMatrix *inputMinMax,
-									const TCHAR *szTrainFcn /*= NULL */ )
+bool CAnnNetwork::initialize( const TCHAR *szName,
+                             const TCHAR *szSizesOfLayers,
+                             const TCHAR *szTransFcnOfLayers,
+                             const CAnnMatrix *inputMinMax,
+                             const TCHAR *szTrainFcn /*= NULL */ )
 {
 	if (szName != NULL)
 		_tcscpy_s(m_szName, _countof(m_szName), szName);
@@ -680,32 +680,32 @@ bool CAnnNetwork::commonConstructor( const TCHAR *szName,
 	return TRUE;
 }
 
-bool CAnnNetwork::commonConstructor( const TCHAR *szSizesOfLayers,
-									const TCHAR *szTransFcnOfLayers,
-									const CAnnMatrix *inputMinMax, /*= NULL */
-									const TCHAR *szTrainFcn /*= NULL */)
+bool CAnnNetwork::initialize( const TCHAR *szSizesOfLayers,
+                             const TCHAR *szTransFcnOfLayers,
+                             const CAnnMatrix *inputMinMax, /*= NULL */
+                             const TCHAR *szTrainFcn /*= NULL */)
 {
-	return commonConstructor(_T(""), szSizesOfLayers, szTransFcnOfLayers, inputMinMax, szTrainFcn);
+	return initialize(_T(""), szSizesOfLayers, szTransFcnOfLayers, inputMinMax, szTrainFcn);
 }
 
-bool CAnnNetwork::createEx( const TCHAR *szName,
+bool CAnnNetwork::CreateEx( const TCHAR *szName,
 						   const TCHAR *szSizesOfLayers,
 						   const TCHAR *szTransFcnOfLayers,
 						   const CAnnMatrix *inputMinMax,
 						   const TCHAR *szTrainFcn /*= NULL */ )
 {
 	bool bResult;
-	bResult = commonConstructor(szName, szSizesOfLayers, szTransFcnOfLayers, inputMinMax, szTrainFcn);
+	bResult = initialize(szName, szSizesOfLayers, szTransFcnOfLayers, inputMinMax, szTrainFcn);
 	return bResult;
 }
 
-bool CAnnNetwork::create( const TCHAR *szSizesOfLayers,
+bool CAnnNetwork::Create( const TCHAR *szSizesOfLayers,
 						 const TCHAR *szTransFcnOfLayers,
 						 const CAnnMatrix *inputMinMax, /*= NULL */
 						 const TCHAR *szTrainFcn /*= NULL */ )
 {
 	bool bResult;
-	bResult = createEx(_T(""), szSizesOfLayers, szTransFcnOfLayers, inputMinMax, szTrainFcn);
+	bResult = CreateEx(_T(""), szSizesOfLayers, szTransFcnOfLayers, inputMinMax, szTrainFcn);
 	return bResult;
 }
 
@@ -1145,7 +1145,7 @@ bool CAnnNetwork::initnw( CAnnMatrix *pMatrix, int _index, int _numInputs, int _
 	}
 	else {
 		// b = wMag*linspace(-1,1,s)'.*sign(w(:,1));
-		_biases = wMag * dotprod(transpose(linspace(-1, 1, _numNeurons)), sign(_weights.getColVector(0)));
+		_biases = wMag * dotprod(transpose(linspace(-1, 1, _numNeurons)), sign(_weights.get_col_vector(0)));
 	}
 
 	// Conversions

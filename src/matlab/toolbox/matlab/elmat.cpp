@@ -43,7 +43,7 @@ CAnnMatrix transpose( CAnnMatrix &m )
 	CAnnMatrix _Result(m.cols, m.rows);
 	for (int i=0; i<_Result.cols; i++) {
 		for (int j=0; j<_Result.rows; j++) {
-			_Result.setElement(j, i, m.getElement(i, j));
+			_Result.set_element(j, i, m.get_element(i, j));
 		}
 	}
 	return _Result;
@@ -54,7 +54,7 @@ CAnnMatrix expand_row( CAnnMatrix &m, int _rows )
 	CAnnMatrix _Result(_rows, m.cols);
 	for (int i=0; i<_Result.rows; i++) {
 		for (int j=0; j<_Result.cols; j++) {
-			_Result.setElement(i, j, m.getElement(0, j));
+			_Result.set_element(i, j, m.get_element(0, j));
 		}
 	}
 	return _Result;
@@ -65,7 +65,7 @@ CAnnMatrix expand_col( CAnnMatrix &m, int _cols )
 	CAnnMatrix _Result(m.rows, _cols);
 	for (int i=0; i<_Result.cols; i++) {
 		for (int j=0; j<_Result.rows; j++) {
-			_Result.setElement(j, i, m.getElement(j, 0));
+			_Result.set_element(j, i, m.get_element(j, 0));
 		}
 	}
 	return _Result;
@@ -81,7 +81,7 @@ CAnnMatrix diag( CAnnMatrix &m )
 	if (_size > 0) {
 		_Result.resize(_size, 1, MAT_INIT_ZEROS);
 		for (int i=0; i<_size; i++) {
-			_Result.setElement(i, 0, m.getElement(i, i));
+			_Result.set_element(i, 0, m.get_element(i, i));
 		}
 	}
 	return _Result;
@@ -93,7 +93,7 @@ CAnnMatrix abs( CAnnMatrix &m )
 	int _index = 0;
 	for (int i=0; i<_Result.rows; i++) {
 		for (int j=0; j<_Result.cols; j++) {
-			_Result.setElement(_index, ::abs(m.getElement(_index)));
+			_Result.set_element(_index, ::abs(m.get_element(_index)));
 			_index++;
 		}
 	}
@@ -106,7 +106,7 @@ CAnnMatrix sqrt( CAnnMatrix &m )
 	int _index = 0;
 	for (int i=0; i<_Result.rows; i++) {
 		for (int j=0; j<_Result.cols; j++) {
-			_Result.setElement(_index, ::sqrt(m.getElement(_index)));
+			_Result.set_element(_index, ::sqrt(m.get_element(_index)));
 			_index++;
 		}
 	}
@@ -130,8 +130,8 @@ CAnnMatrix sum( CAnnMatrix &m )
 	for (int i=0; i<m.cols; i++) {
 		double _sum = 0.0;
 		for (int j=0; j<m.rows; j++)
-			_sum += m.getElement(j, i);
-		_Result.setElement(0, i, _sum);
+			_sum += m.get_element(j, i);
+		_Result.set_element(0, i, _sum);
 	}
 	return _Result;
 }
@@ -143,8 +143,8 @@ CAnnMatrix sumsqrt( CAnnMatrix &m )
 	for (int i=0; i<m.cols; i++) {
 		double _sum = 0.0;
 		for (int j=0; j<m.rows; j++)
-			_sum += m.getElement(j, i);
-		_Result.setElement(0, i, ::sqrt(_sum));
+			_sum += m.get_element(j, i);
+		_Result.set_element(0, i, ::sqrt(_sum));
 	}
 	return _Result;
 }
@@ -155,12 +155,12 @@ CAnnMatrix sign( CAnnMatrix &m )
 	CAnnMatrix _Result(m);
 	for (int i=0; i<m.cols; i++) {
 		for (int j=0; j<m.rows; j++) {
-			double _val = m.getElement(j, i);
+			double _val = m.get_element(j, i);
 			if (_val == 0.0)
 				_sign = 0.0;
 			else
 				_sign = _val / ::abs(_val);
-			_Result.setElement(j, i, _sign);
+			_Result.set_element(j, i, _sign);
 		}
 	}
 	return _Result;
@@ -291,12 +291,12 @@ CAnnMatrix linspace(double d1, double d2, int n)
 	if (n > 1) {
 		_Result.resize(1, n);
 		for (int i=0; i<n; i++) {
-			_Result.setElement(0, i, d1 + i * (d2 - d1)/( n - 1));
+			_Result.set_element(0, i, d1 + i * (d2 - d1)/( n - 1));
 		}
 	}
 	else if (n == 1) {
 		_Result.resize(1, 1);
-		_Result.setElement(0, 0, d2);
+		_Result.set_element(0, 0, d2);
 	}
 	return _Result;
 }
@@ -349,14 +349,14 @@ CAnnMatrix dotprod( const CAnnMatrix &x, const CAnnMatrix &y )
 	if (minx == 1 && miny == 1 && maxx == maxy) {
 		_Result.resize(1, maxx);
 		for (int i=0; i<maxx; i++)
-			_Result.setElement(i, x.getElement(i) * y.getElement(i));
+			_Result.set_element(i, x.get_element(i) * y.get_element(i));
 	}
 	else if (xr == yr && xc == yc) {
 		_Result.resize(xr, xc);
 		int _index = 0;
 		for (int i=0; i<xr; i++) {
 			for (int j=0; j<xc; j++) {
-				_Result.setElement(_index, x.getElement(_index) * y.getElement(_index));
+				_Result.set_element(_index, x.get_element(_index) * y.get_element(_index));
 				_index++;
 			}
 		}
@@ -390,14 +390,14 @@ CAnnMatrix dotdiv( const CAnnMatrix &x, const CAnnMatrix &y )
 	if (minx == 1 && miny == 1 && maxx == maxy) {
 		_Result.resize(1, maxx);
 		for (int i=0; i<maxx; i++)
-			_Result.setElement(i, x.getElement(i) / y.getElement(i));
+			_Result.set_element(i, x.get_element(i) / y.get_element(i));
 	}
 	else if (xr == yr && xc == yc) {
 		_Result.resize(xr, xc);
 		int _index = 0;
 		for (int i=0; i<xr; i++) {
 			for (int j=0; j<xc; j++) {
-				_Result.setElement(_index, x.getElement(_index) / y.getElement(_index));
+				_Result.set_element(_index, x.get_element(_index) / y.get_element(_index));
 				_index++;
 			}
 		}
