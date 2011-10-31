@@ -94,49 +94,49 @@ public:
 	explicit CAnnMatrix( int _size );
 	CAnnMatrix( int _rows, int _cols, int _initFcn = MAT_INIT_NONE );
 	CAnnMatrix( const TCHAR *szName, int _rows, int _cols, int _initFcn = MAT_INIT_NONE );
-	CAnnMatrix( const CAnnMatrix & scrMatrix );								// 拷贝构造函数
+	CAnnMatrix( const CAnnMatrix & scrMatrix );			            // 拷贝构造函数
 	CAnnMatrix( const CAnnMatrix & scrMatrix, bool bCopyData );
 	virtual ~CAnnMatrix( void );
 
 public:
 	// gets
 	int    size        ( int n = 0 ) const;
-	bool   sameSize    ( const CAnnMatrix *target, int n = 0 );
-	double getElement  ( int _index ) const;						// 获取指定元素的值
-	double getElement  ( int _row, int _col ) const;				// 获取指定元素的值
+	bool   is_same_size    ( const CAnnMatrix *target, int n = 0 );
+	double get_element  ( int _index ) const;						// 获取指定元素的值
+	double get_element  ( int _row, int _col ) const;				// 获取指定元素的值
 
 	// 获取矩阵的指定行矩阵
-	int    getRowVector( int _row, double* pVector ) const;
+	int    get_row_vector( int _row, double* pVector ) const;
 	// 获取矩阵的指定列矩阵
-	int    getColVector( int _col, double* pVector ) const;
+	int    get_col_vector( int _col, double* pVector ) const;
 
 	// 获取矩阵的指定行矩阵
-	int    getRowVector( int _row, CAnnMatrix* pMatrix ) const;
+	int    get_row_vector( int _row, CAnnMatrix* pMatrix ) const;
 	// 获取矩阵的指定列矩阵
-	int    getColVector( int _col, CAnnMatrix* pMatrix ) const;
+	int    get_col_vector( int _col, CAnnMatrix* pMatrix ) const;
 
 	// 把第x行至第y行的数据转换成为新的矩阵
-	int    getRowVector( int _rowStart, int _rowEnd, CAnnMatrix* pMatrix ) const;
+	int    get_row_vector( int _rowStart, int _rowEnd, CAnnMatrix* pMatrix ) const;
 	// 把第x列至第y列的数据转换成为新的矩阵
-	int    getColVector( int _colStart, int _colEnd, CAnnMatrix* pMatrix ) const;
+	int    get_col_vector( int _colStart, int _colEnd, CAnnMatrix* pMatrix ) const;
 
 	/* 把第x行至第y行的第m列至第n列的数据转换成为新的矩阵 */
-	int    getPartOfMatrix( int _rowStart, int _rowEnd,
-							int _colStart, int _colEnd, CAnnMatrix* pMatrix ) const;
+	int    get_partof_matrix( int _rowStart, int _rowEnd,
+                            int _colStart, int _colEnd, CAnnMatrix* pMatrix ) const;
 
 	// 获取矩阵的指定行矩阵
-	CAnnMatrix getRowVector( int _row ) const;
+	CAnnMatrix get_row_vector( int _row ) const;
 	// 获取矩阵的指定列矩阵
-	CAnnMatrix getColVector( int _col ) const;
+	CAnnMatrix get_col_vector( int _col ) const;
 
 	double *get_data     ( void ) const { return m_pData;     };	// 获得数据指针
 	double *get_orig_data( void ) const { return m_pOrigData; };	// 获得原始数据指针
 
 	// sets
-	bool   setElement  ( int _row, int _col, double _value );		// 设置指定元素的值
-	bool   setElement  ( int _index, double _value );				// 设置指定元素的值
-	double *setData    ( double *pBuffer, int _length );			// 从缓冲区写入数据
-	double *setData    ( double *pBuffer, int _rows, int _cols );	// 从缓冲区写入数据
+	bool   set_element  ( int _row, int _col, double _value );		// 设置指定元素的值
+	bool   set_element  ( int _index, double _value );				// 设置指定元素的值
+	double *set_data    ( double *pBuffer, int _length );			// 从缓冲区写入数据
+	double *set_data    ( double *pBuffer, int _rows, int _cols );	// 从缓冲区写入数据
 
 	// property
 	int rows, cols;
@@ -176,25 +176,28 @@ public:
 	friend CAnnMatrix operator * ( double _value, CAnnMatrix & _Right );
 	friend CAnnMatrix operator / ( double _value, CAnnMatrix & _Right );
 
+    friend ostream & operator << (ostream & ios, const CAnnMatrix & _matrix);
+    friend istream & operator >> (istream & ios, CAnnMatrix & _matrix);
+
 	// methods
-	void freeMatrix( void );
-	bool initMatrix( const TCHAR *szName, int _rows, int _cols, int _initMode = INIT_MODE_NONE,
+	void free_matrix( void );
+	bool init_matrix( const TCHAR *szName, int _rows, int _cols, int _initMode = INIT_MODE_NONE,
 		double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
-	bool initData  ( int _rows, int _cols, double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
-	bool copyData  ( double *pNewData, int _rows, int _cols, double _fillVal = 0.0,
+	bool init_data  ( int _rows, int _cols, double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
+	bool copy_data  ( double *pNewData, int _rows, int _cols, double _fillVal = 0.0,
 		int _initFcn = MAT_INIT_DEFAULT );
 
-	bool create  ( int _rows, int _cols, double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
-	bool createEx( const TCHAR *szName, int _rows, int _cols, double _fillVal = 0.0,
+	bool create   ( int _rows, int _cols, double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
+	bool create_ex( const TCHAR *szName, int _rows, int _cols, double _fillVal = 0.0,
 		int _initFcn = MAT_INIT_DEFAULT );
 
 	CAnnMatrix * copy ( const CAnnMatrix *srcMartix );
 	CAnnMatrix * clone( const CAnnMatrix *srcMartix );
 
-	void clear( void );
+	void clear ( void );
 	int  resize( int _rows, int _cols, double _fillVal = 0.0, int _initFcn = MAT_INIT_DEFAULT );
-	bool empty( void ) const;
-	bool makeUnitMatrix( int _size );
+	bool empty ( void ) const;
+	bool make_unit_matrix( int _size );
 
 	void display( void );
 	void display( const TCHAR *szName );
@@ -221,7 +224,7 @@ class CAnnMatrixs : public CAnnObject
 {
 public:
 	CAnnMatrixs( void );
-	CAnnMatrixs( int _numMatrixs );
+	explicit CAnnMatrixs( int _numMatrixs );
 	CAnnMatrixs( const TCHAR *szName, int _numMatrixs );
 	virtual ~CAnnMatrixs( void );
 
@@ -231,14 +234,14 @@ public:
 	CAnnMatrix & matrixs( int _index ) const;
 
 	// sets
-	bool setMatrixs( int _numMatrixs );
+	bool set_matrixs( int _numMatrixs );
 
 	// property
 	int numMatrixs;
 
 	// methods
-	void freeMatrixs( void );
-	bool initMatrix ( const TCHAR *szName, int _numMatrixs );
+	void free_matrixs( void );
+	bool init_matrixs( const TCHAR *szName, int _numMatrixs );
 
 	bool create( const TCHAR *szName, int _numMatrixs );
 

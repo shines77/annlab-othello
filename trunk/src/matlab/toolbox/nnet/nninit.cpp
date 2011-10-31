@@ -139,7 +139,7 @@ int initnw( CAnnNetwork *net,
 	}
 	else {
 		// b = wMag*linspace(-1,1,s)'.*sign(w(:,1));
-		_biases = wMag * dotprod(transpose(linspace(-1, 1, _numNeurons)), sign(_weights.getColVector(0)));
+		_biases = wMag * dotprod(transpose(linspace(-1, 1, _numNeurons)), sign(_weights.get_col_vector(0)));
 	}
 
 	// Conversions

@@ -104,7 +104,7 @@ int CAnnLabDlg::BpNetwork_Test()
 	temp = 3.0 / rands;
 
 	CAnnMatrix inputMinMax;
-	inputMinMax.createEx( _T("inputMinMax"), 64, 2, MAT_INIT_ONES );
+	inputMinMax.create_ex( _T("inputMinMax"), 64, 2, MAT_INIT_ONES );
 
 	pNetwork = net.newff( &inputMinMax, _T("64, 65, 65, 33, 1"), _T("tansig, tansig, tansig, purelin"), _T("traincgf") );
 	pNetwork = net.init();
@@ -122,10 +122,13 @@ int CAnnLabDlg::BpNetwork_Test()
 	pNetwork = net.train( &trainP, &trainT, &tr );
 	nRetCode = matlab::train( &net, NULL, &trainP, &trainT, NULL );
 
-	CAnnMatrix m(3, 4), n;
+	CAnnMatrix m(3, 4), m2(3, 4), m3(3, 4), n;
 	//double data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
 	double data[] = {1, 5, 9, 2, 6, 10, 3, 7, 11, 4, 8, 12};
-	m.setData(data, 3, 4);
+	m.set_data(data, 3, 4);
+    m2.set_data(data, 3, 4);
+    m3.set_data(data, 3, 4);
+    m3 = m2 = m + m2 + m3;
 	n = matlab::normr(m);
 	//n.display(_T("n = normr(m);"));
 

@@ -256,9 +256,9 @@ public:
 	void setTrainFcn    ( const TCHAR *szFcnName );
 
 	// methods
-	bool create( const TCHAR *szSizesOfLayers, const TCHAR *szTransFcnOfLayers,
+	bool Create( const TCHAR *szSizesOfLayers, const TCHAR *szTransFcnOfLayers,
 		const CAnnMatrix *inputMinMax = NULL, const TCHAR *szTrainFcn = NULL );
-	bool createEx( const TCHAR *szName, const TCHAR *szSizesOfLayers,
+	bool CreateEx( const TCHAR *szName, const TCHAR *szSizesOfLayers,
 		const TCHAR *szTransFcnOfLayers, const CAnnMatrix *inputMinMax,
 		const TCHAR *szTrainFcn = NULL );
 
@@ -287,9 +287,9 @@ public:
 		CAnnMatrix *pInputRange, CAnnMatrix *pActiveRange );
 
 protected:
-	bool commonConstructor( const TCHAR *szSizesOfLayers, const TCHAR *szTransFcnOfLayers,
+	bool initialize( const TCHAR *szSizesOfLayers, const TCHAR *szTransFcnOfLayers,
 		const CAnnMatrix *inputMinMax = NULL, const TCHAR *szTrainFcn = NULL );
-	bool commonConstructor( const TCHAR *szName, const TCHAR *szSizesOfLayers,
+	bool initialize( const TCHAR *szName, const TCHAR *szSizesOfLayers,
 		const TCHAR *szTransFcnOfLayers, const CAnnMatrix *inputMinMax,
 		const TCHAR *szTrainFcn = NULL );
 	void freeNetwork( void );

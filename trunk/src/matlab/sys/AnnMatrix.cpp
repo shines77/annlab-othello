@@ -1,6 +1,7 @@
 
 #include "../../../include/gui/stdafx.h"
 #include "../../../include/matlab/sys/AnnMatrix.h"
+#include <iostream>
 #include <assert.h>
 #include <math.h>
 
@@ -177,23 +178,23 @@ void CAnnVectors::freeVector( void )
 
 CAnnMatrix::CAnnMatrix( void )
 {
-	initMatrix(NULL, 0, 0, INIT_MODE_FIRST);
+	init_matrix(NULL, 0, 0, INIT_MODE_FIRST);
 }
 
 CAnnMatrix::CAnnMatrix( int _size )
 {
-	initMatrix(NULL, _size, _size, INIT_MODE_FIRST);
+	init_matrix(NULL, _size, _size, INIT_MODE_FIRST);
 }
 
 CAnnMatrix::CAnnMatrix( int _rows, int _cols, int _initFcn /*= MAT_INIT_NONE */ )
 {
-	initMatrix(NULL, _rows, _cols, INIT_MODE_FIRST, 0.0, _initFcn);
+	init_matrix(NULL, _rows, _cols, INIT_MODE_FIRST, 0.0, _initFcn);
 }
 
 CAnnMatrix::CAnnMatrix( const TCHAR *szName, int _rows, int _cols,
 				   int _initFcn /*= MAT_INIT_NONE */ )
 {
-	initMatrix(szName, _rows, _cols, INIT_MODE_FIRST, 0.0, _initFcn);
+	init_matrix(szName, _rows, _cols, INIT_MODE_FIRST, 0.0, _initFcn);
 }
 
 CAnnMatrix::CAnnMatrix( const CAnnMatrix & scrMatrix )
@@ -202,7 +203,7 @@ CAnnMatrix::CAnnMatrix( const CAnnMatrix & scrMatrix )
 	_rows = scrMatrix.rows;
 	_cols = scrMatrix.cols;
 
-	initMatrix(NULL, _rows, _cols, INIT_MODE_FIRST);
+	init_matrix(NULL, _rows, _cols, INIT_MODE_FIRST);
 
 	CAnnMatrix *pMatrix = copy( &scrMatrix );
 	ASSERT(pMatrix != NULL);
@@ -214,7 +215,7 @@ CAnnMatrix::CAnnMatrix( const CAnnMatrix & scrMatrix, bool bCopyData )
 	_rows = scrMatrix.rows;
 	_cols = scrMatrix.cols;
 
-	initMatrix(NULL, _rows, _cols, INIT_MODE_FIRST);
+	init_matrix(NULL, _rows, _cols, INIT_MODE_FIRST);
 
 	if (bCopyData) {
 		CAnnMatrix *pMatrix = copy( &scrMatrix );
@@ -224,10 +225,10 @@ CAnnMatrix::CAnnMatrix( const CAnnMatrix & scrMatrix, bool bCopyData )
 
 CAnnMatrix::~CAnnMatrix( void )
 {
-	freeMatrix();
+	free_matrix();
 }
 
-void CAnnMatrix::freeMatrix( void )
+void CAnnMatrix::free_matrix( void )
 {
 	if (m_pOrigData != NULL) {
 		delete[] m_pOrigData;
@@ -239,7 +240,7 @@ void CAnnMatrix::freeMatrix( void )
 	malloc_size = 0;
 }
 
-bool CAnnMatrix::initMatrix( const TCHAR *szName, int _rows, int _cols,
+bool CAnnMatrix::init_matrix( const TCHAR *szName, int _rows, int _cols,
 						  int _initMode, /*= INIT_MODE_NONE */
 						  double _fillVal,  /*= 0.0 */
 						  int _initFcn   /*= MAT_INIT_NONE */ )
@@ -275,11 +276,11 @@ bool CAnnMatrix::initMatrix( const TCHAR *szName, int _rows, int _cols,
 					m_pOrigData = pNewOrigData;
 					m_pData = pNewData;
 					// init data for matrix
-					bResult = initData(_rows, _cols, _fillVal, _initFcn);
+					bResult = init_data(_rows, _cols, _fillVal, _initFcn);
 				}
 				else {
 					// copy data from old data buffer
-					bResult = copyData(pNewData, _rows, _cols, _fillVal, _initFcn);
+					bResult = copy_data(pNewData, _rows, _cols, _fillVal, _initFcn);
 					// clear old data
 					if (m_pOrigData != NULL) {
 						delete[] m_pOrigData;
@@ -316,17 +317,17 @@ bool CAnnMatrix::initMatrix( const TCHAR *szName, int _rows, int _cols,
 bool CAnnMatrix::create( int _rows, int _cols, double _fillVal, /*= 0 */
 					  int _initFcn /*= MAT_INIT_NONE */ )
 {
-	return initMatrix(_T(""), _rows, _cols, FALSE, _fillVal, _initFcn);
+	return init_matrix(_T(""), _rows, _cols, FALSE, _fillVal, _initFcn);
 }
 
-bool CAnnMatrix::createEx( const TCHAR *szName, int _rows, int _cols,
+bool CAnnMatrix::create_ex( const TCHAR *szName, int _rows, int _cols,
 						double _fillVal, /*= 0 */
 						int _initFcn /*= MAT_INIT_NONE */ )
 {
-	return initMatrix(szName, _rows, _cols, FALSE, _fillVal, _initFcn);
+	return init_matrix(szName, _rows, _cols, FALSE, _fillVal, _initFcn);
 }
 
-bool CAnnMatrix::initData( int _rows, int _cols, double _fillVal, /*= 0.0 */
+bool CAnnMatrix::init_data( int _rows, int _cols, double _fillVal, /*= 0.0 */
 						int _initFcn /*= MAT_INIT_NONE */ )
 {
 	ASSERT(m_pData != NULL);
@@ -348,7 +349,7 @@ bool CAnnMatrix::initData( int _rows, int _cols, double _fillVal, /*= 0.0 */
 
 	ASSERT(_length >= 0);
 	if (_length == 0) {
-		freeMatrix();
+		free_matrix();
 		return TRUE;
 	}
 
@@ -384,7 +385,7 @@ bool CAnnMatrix::initData( int _rows, int _cols, double _fillVal, /*= 0.0 */
 	return TRUE;
 }
 
-bool CAnnMatrix::copyData( double *pNewData, int _rows, int _cols,
+bool CAnnMatrix::copy_data( double *pNewData, int _rows, int _cols,
 						double _fillVal, /*= 0.0*/
 						int _initFcn /*= MAT_INIT_DEFAULT */ )
 {
@@ -412,7 +413,7 @@ bool CAnnMatrix::copyData( double *pNewData, int _rows, int _cols,
 
 	ASSERT(_newLength >= 0);
 	if (_newLength == 0) {
-		freeMatrix();
+		free_matrix();
 		return TRUE;
 	}
 
@@ -491,7 +492,7 @@ bool CAnnMatrix::empty( void ) const
 //
 //////////////////////////////////////////////////////////////////////
 
-bool CAnnMatrix::sameSize( const CAnnMatrix *target, int n /*= 0 */ )
+bool CAnnMatrix::is_same_size( const CAnnMatrix *target, int n /*= 0 */ )
 {
 	if (target != NULL) {
 		if (n == 1)
@@ -506,7 +507,7 @@ bool CAnnMatrix::sameSize( const CAnnMatrix *target, int n /*= 0 */ )
 
 void CAnnMatrix::clear( void )
 {
-	freeMatrix();
+	free_matrix();
 }
 
 int CAnnMatrix::resize( int _rows, int _cols, double _fillVal /*= 0.0 */, int _initFcn /*= 0 */ )
@@ -518,13 +519,13 @@ int CAnnMatrix::resize( int _rows, int _cols, double _fillVal /*= 0.0 */, int _i
 	}
 	else {
 		if (_rows == rows && _cols == cols) {
-			if (initData(_rows, _cols, _fillVal, _initFcn)) {
+			if (init_data(_rows, _cols, _fillVal, _initFcn)) {
 				_length = rows * cols;
 				length = _length;
 			}
 		}
 		else {
-			if (initMatrix(NULL, _rows, _cols, INIT_MODE_RESIZE, _fillVal, _initFcn)) {
+			if (init_matrix(NULL, _rows, _cols, INIT_MODE_RESIZE, _fillVal, _initFcn)) {
 				_length = rows * cols;
 				length = _length;
 			}
@@ -565,7 +566,7 @@ CAnnMatrix * CAnnMatrix::copy( const CAnnMatrix *srcMartix )
 						for (int j=0; j<_rows; j++) {
 							int _index = i * _rows + j;
 							if (_index >= 0 && _index < _newLength)
-								m_pData[_index] = srcMartix->getElement(j, i);
+								m_pData[_index] = srcMartix->get_element(j, i);
 						}
 					}
 #endif
@@ -582,7 +583,7 @@ CAnnMatrix * CAnnMatrix::clone( const CAnnMatrix *srcMartix )
 	return copy(srcMartix);
 }
 
-double CAnnMatrix::getElement( int _index ) const
+double CAnnMatrix::get_element( int _index ) const
 {
 	if (m_pData != NULL) {
 		int _length = rows * cols;
@@ -593,17 +594,17 @@ double CAnnMatrix::getElement( int _index ) const
 	return MAT_NAN_ITEM;
 }
 
-double CAnnMatrix::getElement( int _row, int _col ) const
+double CAnnMatrix::get_element( int _row, int _col ) const
 {
 	int _index;
 	if (_row >= 0 && _row < rows && _col >= 0 && _col < cols) {
 		_index = _col * rows + _row;
-		return getElement(_index);
+		return get_element(_index);
 	}
 	return MAT_NAN_ITEM;
 }
 
-bool CAnnMatrix::setElement( int _index, double _value )
+bool CAnnMatrix::set_element( int _index, double _value )
 {
 	if (m_pData != NULL) {
 		int _length = rows * cols;
@@ -615,17 +616,17 @@ bool CAnnMatrix::setElement( int _index, double _value )
 	return FALSE;
 }
 
-bool CAnnMatrix::setElement( int _row, int _col, double _value )
+bool CAnnMatrix::set_element( int _row, int _col, double _value )
 {
 	int _index;
 	if (_row >= 0 && _row < rows && _col >= 0 && _col < cols) {
 		_index = _col * rows + _row;
-		return setElement(_index, _value);
+		return set_element(_index, _value);
 	}
 	return FALSE;
 }
 
-double * CAnnMatrix::setData( double *pBuffer, int _length )
+double * CAnnMatrix::set_data( double *pBuffer, int _length )
 {
 	if (pBuffer != NULL) {
 		int _length = rows * cols;
@@ -639,27 +640,27 @@ double * CAnnMatrix::setData( double *pBuffer, int _length )
 	return NULL;
 }
 
-double * CAnnMatrix::setData( double *pBuffer, int _rows, int _cols )
+double * CAnnMatrix::set_data( double *pBuffer, int _rows, int _cols )
 {
 	if (_rows >= 0 && _rows <= rows && _cols >= 0 && _cols <= cols) {
-		return setData(pBuffer, _rows * _cols);
+		return set_data(pBuffer, _rows * _cols);
 	}
 	return NULL;
 }
 
 double CAnnMatrix::operator[]( int _index )
 {
-	return getElement(_index);
+	return get_element(_index);
 }
 
 double CAnnMatrix::operator()( int _index )
 {
-	return getElement(_index);
+	return get_element(_index);
 }
 
 double CAnnMatrix::operator()( int _row, int _col )
 {
-	return getElement(_row, _col);
+	return get_element(_row, _col);
 }
 
 CAnnMatrix & CAnnMatrix::operator = ( int _Right )
@@ -667,7 +668,7 @@ CAnnMatrix & CAnnMatrix::operator = ( int _Right )
 	// resize to one item matrix
 	resize(1, 1);
 	// set the single data
-	setElement(0, 0, (double)_Right);
+	set_element(0, 0, (double)_Right);
 
 	// finally return a reference to ourselves
 	return *this;
@@ -678,7 +679,7 @@ CAnnMatrix & CAnnMatrix::operator = ( double _Right )
 	// resize to one item matrix
 	resize(1, 1);
 	// set the single data
-	setElement(0, 0, _Right);
+	set_element(0, 0, _Right);
 
 	// finally return a reference to ourselves
 	return *this;
@@ -727,7 +728,7 @@ bool CAnnMatrix::operator == ( CAnnMatrix & _Right )
 #else
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j) {
-			if (getElement(i, j) != _Right.getElement(i, j)) {
+			if (get_element(i, j) != _Right.get_element(i, j)) {
 				bFindDiff = true;
 				break;
 			}
@@ -766,7 +767,7 @@ CAnnMatrix CAnnMatrix::operator + ( double _value )
 
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			_Result.setElement(i, j, getElement(i, j) + _value);
+			_Result.set_element(i, j, get_element(i, j) + _value);
 	}
 #endif
 
@@ -796,7 +797,7 @@ CAnnMatrix operator + ( double _value, CAnnMatrix & _Right )
 
 	for (int i=0; i<_Right.rows; ++i) {
 		for (int j=0; j<_Right.cols; ++j)
-			_Result.setElement(i, j, _value + _Right.getElement(i, j));
+			_Result.set_element(i, j, _value + _Right.get_element(i, j));
 	}
 #endif
 
@@ -838,7 +839,7 @@ CAnnMatrix CAnnMatrix::operator + ( CAnnMatrix & _Right )
 #else
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			_Result.setElement(i, j, getElement(i, j) + _Right.getElement(i, j));
+			_Result.set_element(i, j, get_element(i, j) + _Right.get_element(i, j));
 	}
 #endif
 
@@ -862,7 +863,7 @@ CAnnMatrix & CAnnMatrix::operator += ( double _value )
 #else
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			setElement(i, j, getElement(i, j) + _value);
+			set_element(i, j, get_element(i, j) + _value);
 	}
 #endif
 
@@ -901,7 +902,7 @@ CAnnMatrix & CAnnMatrix::operator += ( CAnnMatrix & _Right )
 #else
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			setElement(i, j, getElement(i, j) + _Right.getElement(i, j));
+			set_element(i, j, get_element(i, j) + _Right.get_element(i, j));
 	}
 #endif
 
@@ -931,7 +932,7 @@ CAnnMatrix CAnnMatrix::operator - ( double _value )
 
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			_Result.setElement(i, j, getElement(i, j) - _value);
+			_Result.set_element(i, j, get_element(i, j) - _value);
 	}
 #endif
 
@@ -961,7 +962,7 @@ CAnnMatrix operator - ( double _value, CAnnMatrix & _Right )
 
 	for (int i=0; i<_Right.rows; ++i) {
 		for (int j=0; j<_Right.cols; ++j)
-			_Result.setElement(i, j, _value - _Right.getElement(i, j));
+			_Result.set_element(i, j, _value - _Right.get_element(i, j));
 	}
 #endif
 
@@ -1003,7 +1004,7 @@ CAnnMatrix CAnnMatrix::operator - ( CAnnMatrix & _Right )
 #else
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			_Result.setElement(i, j, getElement(i, j) - _Right.getElement(i, j));
+			_Result.set_element(i, j, get_element(i, j) - _Right.get_element(i, j));
 	}
 #endif
 
@@ -1027,7 +1028,7 @@ CAnnMatrix & CAnnMatrix::operator -= ( double _value )
 #else
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			setElement(i, j, getElement(i, j) - _value);
+			set_element(i, j, get_element(i, j) - _value);
 	}
 #endif
 
@@ -1066,7 +1067,7 @@ CAnnMatrix & CAnnMatrix::operator -= ( CAnnMatrix & _Right )
 #else
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			setElement(i, j, getElement(i, j) - _Right.getElement(i, j));
+			set_element(i, j, get_element(i, j) - _Right.get_element(i, j));
 	}
 #endif
 
@@ -1096,7 +1097,7 @@ CAnnMatrix CAnnMatrix::operator * ( double _value )
 
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			_Result.setElement(i, j, getElement(i, j) * _value) ;
+			_Result.set_element(i, j, get_element(i, j) * _value) ;
 	}
 #endif
 
@@ -1126,7 +1127,7 @@ CAnnMatrix operator * ( double _value, CAnnMatrix & _Right )
 
 	for (int i=0; i<_Right.rows; ++i) {
 		for (int j=0; j<_Right.cols; ++j)
-			_Result.setElement(i, j, _value * _Right.getElement(i, j));
+			_Result.set_element(i, j, _value * _Right.get_element(i, j));
 	}
 #endif
 
@@ -1160,8 +1161,8 @@ CAnnMatrix CAnnMatrix::operator * ( CAnnMatrix & _Right )
 		for (int j=0; j<_newCols; ++j) {
 			_value = 0.0;
 			for (int k=0; k<_oldCols; ++k)
-				_value += getElement(i, k) * _Right.getElement(k, j);
-			_Result.setElement(i, j, _value);
+				_value += get_element(i, k) * _Right.get_element(k, j);
+			_Result.set_element(i, j, _value);
 		}
 	}
 
@@ -1173,7 +1174,7 @@ CAnnMatrix & CAnnMatrix::operator *= ( double _value )
 	// Matrix multiplication
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			setElement(i, j, getElement(i, j) * _value) ;
+			set_element(i, j, get_element(i, j) * _value) ;
 	}
 
 	return *this;
@@ -1206,8 +1207,8 @@ CAnnMatrix & CAnnMatrix::operator *= ( CAnnMatrix & _Right )
 		for (int j=0; j<_newCols; ++j) {
 			_value = 0.0;
 			for (int k=0; k<_oldCols; ++k)
-				_value += _Left.getElement(i, k) * _Right.getElement(k, j);
-			setElement(i, j, _value);
+				_value += _Left.get_element(i, k) * _Right.get_element(k, j);
+			set_element(i, j, _value);
 		}
 	}
 
@@ -1223,9 +1224,9 @@ CAnnMatrix CAnnMatrix::operator ^ ( double _value )
 	// 进行乘方
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j) {
-			_base  = getElement(i, j);
+			_base  = get_element(i, j);
 			_power = pow(_base, _value);
-			_Result.setElement(i, j, _power);
+			_Result.set_element(i, j, _power);
 		}
 	}
 
@@ -1238,9 +1239,9 @@ CAnnMatrix & CAnnMatrix::operator ^= ( double _value )
 	// 进行乘方
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j) {
-			_base  = getElement(i, j);
+			_base  = get_element(i, j);
 			_power = pow(_base, _value);
-			setElement(i, j, _power);
+			set_element(i, j, _power);
 		}
 	}
 
@@ -1270,7 +1271,7 @@ CAnnMatrix CAnnMatrix::operator / ( double _value )
 
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			_Result.setElement(i, j, getElement(i, j) / _value) ;
+			_Result.set_element(i, j, get_element(i, j) / _value) ;
 	}
 #endif
 
@@ -1310,7 +1311,7 @@ CAnnMatrix CAnnMatrix::operator / ( CAnnMatrix &_Right )
 #else
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			_Result.setElement(i, j, getElement(i, j) / _Right.getElement(i, j)) ;
+			_Result.set_element(i, j, get_element(i, j) / _Right.get_element(i, j)) ;
 	}
 #endif
 
@@ -1337,7 +1338,7 @@ CAnnMatrix operator / ( double _value, CAnnMatrix & _Right )
 #else
 	for (int i=0; i<_Right.rows; ++i) {
 		for (int j=0; j<_Right.cols; ++j)
-			_Result.setElement(i, j, _value / _Right.getElement(i, j));
+			_Result.set_element(i, j, _value / _Right.get_element(i, j));
 	}
 #endif
 
@@ -1349,20 +1350,40 @@ CAnnMatrix & CAnnMatrix::operator /= ( double _value )
 	// Matrix division: dotdiv
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			setElement(i, j, getElement(i, j) / _value) ;
+			set_element(i, j, get_element(i, j) / _value) ;
 	}
 
 	return *this;
 }
 
-bool CAnnMatrix::makeUnitMatrix( int _size )
+ostream & operator << (ostream & ios, const CAnnMatrix & _matrix)
+{
+    for (int i=0; i<_matrix.size(); ++i) {
+        if (0 == (i % _matrix.cols))
+            ios << endl;
+        ios << _matrix.get_element(i) << " ";
+    }
+    return ios;
+}
+
+istream & operator >> (istream & ios, CAnnMatrix & _matrix)
+{
+    double fValue;
+    for (int i=0; i<_matrix.size(); ++i) {
+        ios >> fValue;
+        _matrix.set_element(i, fValue);
+    }
+    return ios;
+}
+
+bool CAnnMatrix::make_unit_matrix( int _size )
 {
 	int _sizeNew = resize(_size, _size);
 	if (_sizeNew >= 0) {
 		for (int i=0; i<_size; ++i) {
 			for (int j=0; j<_size; ++j) {
 				if (i == j)
-					setElement(i, j, 1.0);
+					set_element(i, j, 1.0);
 			}
 		}
 		return TRUE;
@@ -1378,7 +1399,7 @@ CAnnMatrix & CAnnMatrix::transpose( void )
 	// 转置各元素
 	for (int i=0; i<rows; ++i) {
 		for (int j=0; j<cols; ++j)
-			setElement(j, i, _Trans.getElement(i, j));
+			set_element(j, i, _Trans.get_element(i, j));
 	}
 
 	return *this;
@@ -1416,7 +1437,7 @@ CAnnMatrix CAnnMatrix::_zeros( int _rows, int _cols ) const
 	// 所有元素置0
 	for (int i=0; i<_rows; ++i) {
 		for (int j=0; j<_cols; ++j)
-			_zeros0.setElement(i, j, 0.0);
+			_zeros0.set_element(i, j, 0.0);
 	}
 
 	return _zeros0;
@@ -1430,7 +1451,7 @@ CAnnMatrix CAnnMatrix::_ones( int _rows, int _cols ) const
 	// 所有元素置1
 	for (int i=0; i<_rows; ++i) {
 		for (int j=0; j<_cols; ++j)
-			_ones0.setElement(i, j, 1.0);
+			_ones0.set_element(i, j, 1.0);
 	}
 
 	return _ones0;
@@ -1446,7 +1467,7 @@ CAnnMatrix CAnnMatrix::_rands( int _rows, int _cols ) const
 	for (int i=0; i<_rows; ++i) {
 		for (int j=0; j<_cols; ++j) {
 			_dblRand = 2.0 * (double)rand() / (double)(RAND_MAX + 1) - 1.0;
-			_rands.setElement(i, j, _dblRand);
+			_rands.set_element(i, j, _dblRand);
 		}
 	}
 
@@ -1463,7 +1484,7 @@ CAnnMatrix CAnnMatrix::_rands2( int _rows, int _cols ) const
 	for (int i=0; i<_rows; ++i) {
 		for (int j=0; j<_cols; ++j) {
 			_dblRand = (double)rand() / (double)(RAND_MAX + 1);
-			_rands.setElement(i, j, _dblRand);
+			_rands.set_element(i, j, _dblRand);
 		}
 	}
 
@@ -1471,25 +1492,25 @@ CAnnMatrix CAnnMatrix::_rands2( int _rows, int _cols ) const
 }
 
 // 获取矩阵的指定行矩阵, _row下标从0开始
-CAnnMatrix CAnnMatrix::getRowVector( int _row ) const
+CAnnMatrix CAnnMatrix::get_row_vector( int _row ) const
 {
 	CAnnMatrix _Result;
 	if (_row >= 0 && _row < rows) {
 		_Result.resize(1, cols);
 		for (int i= 0; i<cols; i++)
-			_Result.setElement(0, i, getElement(_row, i));
+			_Result.set_element(0, i, get_element(_row, i));
 	}
 	return _Result;
 }
 
 // 获取矩阵的指定列矩阵, _col下标从0开始
-CAnnMatrix CAnnMatrix::getColVector( int _col ) const
+CAnnMatrix CAnnMatrix::get_col_vector( int _col ) const
 {
 	CAnnMatrix _Result;
 	if (_col >= 0 && _col < cols) {
 		_Result.resize(rows, 1);
 		for (int i= 0; i<rows; i++)
-			_Result.setElement(i, 0, getElement(i, _col));
+			_Result.set_element(i, 0, get_element(i, _col));
 	}
 	return _Result;
 }
@@ -1501,7 +1522,7 @@ void CAnnMatrix::display( void )
 	for (int r=0; r<rows; r++) {
 		TRACE(_T("\t"));
 		for (int c=0; c<cols; c++) {
-			TRACE(_T("%0.4f  \t"), getElement(r, c));
+			TRACE(_T("%0.4f  \t"), get_element(r, c));
 		}
 		TRACE(_T("\n\n"));
 	}
@@ -1516,7 +1537,7 @@ void CAnnMatrix::display( const TCHAR *szName )
 	for (int r=0; r<rows; r++) {
 		TRACE(_T("\t"));
 		for (int c=0; c<cols; c++) {
-			TRACE(_T("%0.4f  \t"), getElement(r, c));
+			TRACE(_T("%0.4f  \t"), get_element(r, c));
 		}
 		TRACE(_T("\n\n"));
 	}
@@ -1557,10 +1578,10 @@ CAnnMatrixs::CAnnMatrixs( const TCHAR *szName, int _numMatrixs )
 
 CAnnMatrixs::~CAnnMatrixs( void )
 {
-	freeMatrixs();
+	free_matrixs();
 }
 
-void CAnnMatrixs::freeMatrixs( void )
+void CAnnMatrixs::free_matrixs( void )
 {
 	if (pMatrixs != NULL) {
 		delete[] pMatrixs;
@@ -1573,7 +1594,7 @@ bool CAnnMatrixs::create( const TCHAR *szName, int _numMatrixs )
 	return TRUE;
 }
 
-bool CAnnMatrixs::setMatrixs( int _numMatrixs )
+bool CAnnMatrixs::set_matrixs( int _numMatrixs )
 {
 	numMatrixs = _numMatrixs;
 	return TRUE;
