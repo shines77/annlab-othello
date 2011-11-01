@@ -16,19 +16,19 @@ namespace matlab {
 
 CAnnVector::CAnnVector( void )
 {
-	initVector(NULL, 0, INIT_MODE_FIRST);
+	initVector(NULL, 0, INIT_MODE_CONSTRUCTOR);
 }
 
 CAnnVector::CAnnVector( int _size )
 {
-	initVector(NULL, _size, INIT_MODE_FIRST);
+	initVector(NULL, _size, INIT_MODE_CONSTRUCTOR);
 }
 
 CAnnVector::CAnnVector( CAnnVector & srcVerctor )
 {
 	int _size = srcVerctor.size();
 
-	initVector(srcVerctor.name(), _size, INIT_MODE_FIRST);
+	initVector(srcVerctor.name(), _size, INIT_MODE_CONSTRUCTOR);
 
 	CAnnVector *pVector = copy( &srcVerctor );
 	ASSERT(pVector != NULL);
@@ -55,7 +55,7 @@ bool CAnnVector::initVector( const TCHAR *szName, int _size,
 						  int _initFcn   /*= MAT_INIT_NONE */ )
 {
 	bool bResult = false;
-	if (_initMode == INIT_MODE_FIRST) {
+	if (_initMode == INIT_MODE_CONSTRUCTOR) {
 		length      = 0;
 		mem_alloc   = 0;
 		m_pOrigData = NULL;
@@ -122,7 +122,7 @@ bool CAnnVector::initData(int _size, int _initFcn /*= MAT_INIT_NONE */ )
 			m_pData[i] = _dblRand;
 		}
 		break;
-	case MAT_INIT_RANDS2:		// all [0,1] randomize
+	case MAT_INIT_RANDS_POSITIVE:		// all [0,1] randomize
 		for (int i=0; i<_size; i++) {
 			_dblRand = (double)rand() / (double)(RAND_MAX + 1);
 			m_pData[i] = _dblRand;
@@ -178,23 +178,23 @@ void CAnnVectors::freeVector( void )
 
 CAnnMatrix::CAnnMatrix( void )
 {
-	init_matrix(NULL, 0, 0, INIT_MODE_FIRST);
+	init_matrix(NULL, 0, 0, INIT_MODE_CONSTRUCTOR);
 }
 
 CAnnMatrix::CAnnMatrix( int _size )
 {
-	init_matrix(NULL, _size, _size, INIT_MODE_FIRST);
+	init_matrix(NULL, _size, _size, INIT_MODE_CONSTRUCTOR);
 }
 
 CAnnMatrix::CAnnMatrix( int _rows, int _cols, int _initFcn /*= MAT_INIT_NONE */ )
 {
-	init_matrix(NULL, _rows, _cols, INIT_MODE_FIRST, 0.0, _initFcn);
+	init_matrix(NULL, _rows, _cols, INIT_MODE_CONSTRUCTOR, 0.0, _initFcn);
 }
 
 CAnnMatrix::CAnnMatrix( const TCHAR *szName, int _rows, int _cols,
 				   int _initFcn /*= MAT_INIT_NONE */ )
 {
-	init_matrix(szName, _rows, _cols, INIT_MODE_FIRST, 0.0, _initFcn);
+	init_matrix(szName, _rows, _cols, INIT_MODE_CONSTRUCTOR, 0.0, _initFcn);
 }
 
 CAnnMatrix::CAnnMatrix( const CAnnMatrix & scrMatrix )
@@ -203,7 +203,7 @@ CAnnMatrix::CAnnMatrix( const CAnnMatrix & scrMatrix )
 	_rows = scrMatrix.rows;
 	_cols = scrMatrix.cols;
 
-	init_matrix(NULL, _rows, _cols, INIT_MODE_FIRST);
+	init_matrix(NULL, _rows, _cols, INIT_MODE_CONSTRUCTOR);
 
 	CAnnMatrix *pMatrix = copy( &scrMatrix );
 	ASSERT(pMatrix != NULL);
@@ -215,7 +215,7 @@ CAnnMatrix::CAnnMatrix( const CAnnMatrix & scrMatrix, bool bCopyData )
 	_rows = scrMatrix.rows;
 	_cols = scrMatrix.cols;
 
-	init_matrix(NULL, _rows, _cols, INIT_MODE_FIRST);
+	init_matrix(NULL, _rows, _cols, INIT_MODE_CONSTRUCTOR);
 
 	if (bCopyData) {
 		CAnnMatrix *pMatrix = copy( &scrMatrix );
@@ -246,7 +246,10 @@ bool CAnnMatrix::init_matrix( const TCHAR *szName, int _rows, int _cols,
 						  int _initFcn   /*= MAT_INIT_NONE */ )
 {
 	bool bResult = false;
-	if (_initMode == INIT_MODE_FIRST) {
+    static const int nAdditionSize =
+        (int)ceil(double(MAT_ADDR_ALIGN_SIZE) / (double)sizeof(double));
+
+	if (_initMode == INIT_MODE_CONSTRUCTOR) {
 		rows = cols = 0;
 		length      = 0;
 		malloc_size = 0;
@@ -260,8 +263,6 @@ bool CAnnMatrix::init_matrix( const TCHAR *szName, int _rows, int _cols,
 		else
 			_tcscpy_s(m_szName, _countof(m_szName), _T(""));
 	}
-
-	const int nAdditionSize = (int)ceil(double(MAT_ADDR_ALIGN_SIZE) / (double)sizeof(double));
 
 	int _malloc_size;
 	int _length = _rows * _cols;
@@ -369,7 +370,7 @@ bool CAnnMatrix::init_data( int _rows, int _cols, double _fillVal, /*= 0.0 */
 			m_pData[i] = _dblRand;
 		}
 		break;
-	case MAT_INIT_RANDS2:		// all [0,1] randomize
+	case MAT_INIT_RANDS_POSITIVE:		// all [0,1] randomize
 		for (int i=0; i<_length; i++) {
 			_dblRand = (double)rand() / (double)(RAND_MAX + 1);
 			m_pData[i] = _dblRand;
@@ -448,7 +449,7 @@ bool CAnnMatrix::copy_data( double *pNewData, int _rows, int _cols,
 			pNewDataFill[i] = _dblRand;
 		}
 		break;
-	case MAT_INIT_RANDS2:		// all [0,1] randomize
+	case MAT_INIT_RANDS_POSITIVE:		// all [0,1] randomize
 		for (int i=0; i<_fillLength; i++) {
 			_dblRand = (double)rand() / (double)(RAND_MAX + 1);
 			pNewDataFill[i] = _dblRand;
@@ -1446,7 +1447,7 @@ int CAnnMatrix::rands( int _rows, int _cols )
 int CAnnMatrix::rands2( int _rows, int _cols )
 {
 	// 重置大小并初始化为[0,1]随机数矩阵
-	return resize(_rows, _cols, MAT_INIT_RANDS2);
+	return resize(_rows, _cols, MAT_INIT_RANDS_POSITIVE);
 }
 
 CAnnMatrix CAnnMatrix::_zeros( int _rows, int _cols ) const
