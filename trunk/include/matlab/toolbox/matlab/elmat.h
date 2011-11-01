@@ -13,22 +13,23 @@ CAnnMatrix eyes   ( int _rows, int _cols );
 CAnnMatrix rands  ( int _rows, int _cols );
 CAnnMatrix rands2 ( int _rows, int _cols );
 
-CAnnMatrix transpose  ( CAnnMatrix &m );
+CAnnMatrix  transpose ( const CAnnMatrix &mat );
+//CAnnMatrix& transpose ( const CAnnMatrix &mat );
 CAnnMatrix linspace   ( double d1, double d2, int n );
-CAnnMatrix expand_row ( CAnnMatrix &m, int _rows );
-CAnnMatrix expand_col ( CAnnMatrix &m, int _cols );
+CAnnMatrix expand_row ( CAnnMatrix &mat, int _rows );
+CAnnMatrix expand_col ( CAnnMatrix &mat, int _cols );
 
-CAnnMatrix diag ( CAnnMatrix &m );
+CAnnMatrix diag ( CAnnMatrix &mat );
 
-CAnnMatrix abs  ( CAnnMatrix &m );
-CAnnMatrix sqrt ( CAnnMatrix &m );
-CAnnMatrix sum  ( CAnnMatrix &m );
-CAnnMatrix sign ( CAnnMatrix &m );
+CAnnMatrix abs  ( CAnnMatrix &mat );
+CAnnMatrix sqrt ( CAnnMatrix &mat );
+CAnnMatrix sum  ( CAnnMatrix &mat );
+CAnnMatrix sign ( CAnnMatrix &mat );
 
-CAnnMatrix sumsqrt ( CAnnMatrix &m );
+CAnnMatrix sumsqrt ( CAnnMatrix &mat );
 
-CAnnMatrix norm  ( CAnnMatrix &m );
-CAnnMatrix normr ( CAnnMatrix &m );
+CAnnMatrix norm  ( CAnnMatrix &mat );
+CAnnMatrix normr ( CAnnMatrix &mat );
 
 CAnnMatrix randnr( int _rows, int _cols );
 

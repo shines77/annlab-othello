@@ -509,15 +509,15 @@
 				Filter="h;hpp;hxx;hm;inl;inc;xsd"
 				>
 				<File
+					RelativePath="..\..\include\matlab\matlab.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\matlab\matlab_config.h"
 					>
 				</File>
 				<File
 					RelativePath="..\..\include\matlab\matlab_stddef.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\matlab\matlab.h"
 					>
 				</File>
 				<Filter
@@ -577,6 +577,14 @@
 					</File>
 					<File
 						RelativePath="..\..\include\matlab\sys\AnnObject.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\matlab\sys\matrixt.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\matlab\sys\matrixt_impl.h"
 						>
 					</File>
 				</Filter>

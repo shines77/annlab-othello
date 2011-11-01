@@ -6,6 +6,7 @@
 #include "../../include/gui/AnnLabDlg.h"
 #include "../../include/matlab/sys/AnnList.h"
 #include "../../include/matlab/sys/AnnMatrix.h"
+#include "../../include/matlab/sys/matrixt.h"
 #include "../../include/matlab/toolbox/matlab/elmat.h"
 #include "../../include/matlab/toolbox/nnet/nninit.h"
 #include "../../include/matlab/toolbox/nnet/nntrain.h"
@@ -129,6 +130,7 @@ int CAnnLabDlg::BpNetwork_Test()
     m2.set_data(data, 3, 4);
     m3.set_data(data, 3, 4);
     m3 = m2 = m + m2 + m3;
+    m3 = m2 - m;
 	n = matlab::normr(m);
 	//n.display(_T("n = normr(m);"));
 
@@ -137,6 +139,9 @@ int CAnnLabDlg::BpNetwork_Test()
 
 	n = matlab::diag(m);
 	//n.display(_T("n = diag(m);"));
+
+    MatrixT<double> mt1;
+    mt1.size();
 	return indexLayer;
 }
 
