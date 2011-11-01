@@ -38,75 +38,124 @@ CAnnMatrix rands2( int _rows, int _cols )
 	return _result;
 }
 
-CAnnMatrix transpose( CAnnMatrix &m )
+///*
+CAnnMatrix transpose( const CAnnMatrix &mat )
 {
-	CAnnMatrix _Result(m.cols, m.rows);
-	for (int i=0; i<_Result.cols; i++) {
-		for (int j=0; j<_Result.rows; j++) {
-			_Result.set_element(j, i, m.get_element(i, j));
-		}
-	}
-	return _Result;
+    if (mat.cols == 1 || mat.rows == 1) {
+        CAnnMatrix _Result(mat);		// copy ourselves
+        _Result.cols = mat.rows;
+        _Result.rows = mat.cols;
+        return _Result;
+    }
+    else if (mat.cols == mat.rows) {
+        CAnnMatrix _Result(mat);		// copy ourselves
+	    // 转置各元素
+	    for (int i=0; i<mat.rows; ++i) {
+		    for (int j=i+1; j<mat.cols; ++j)
+			    _Result.set_element(j, i, mat.get_element(i, j));
+	    }
+        return _Result;
+    }
+    else {
+	    CAnnMatrix _Result(mat.cols, mat.rows);		// copy ourselves
+	    // 转置各元素
+	    for (int i=0; i<mat.rows; ++i) {
+		    for (int j=0; j<mat.cols; ++j)
+			    _Result.set_element(j, i, mat.get_element(i, j));
+	    }
+        return _Result;
+    }
 }
+//*/
 
-CAnnMatrix expand_row( CAnnMatrix &m, int _rows )
+/*
+CAnnMatrix& transpose( const CAnnMatrix &mat )
 {
-	CAnnMatrix _Result(_rows, m.cols);
+    if (mat.cols == 1 || mat.rows == 1) {
+        CAnnMatrix& _Result = *(CAnnMatrix *)new CAnnMatrix(mat);
+        _Result.cols = mat.rows;
+        _Result.rows = mat.cols;
+        return _Result;
+    }
+    else if (mat.cols == mat.rows) {
+        CAnnMatrix& _Result = *(CAnnMatrix *)new CAnnMatrix(mat);
+	    // 转置各元素
+	    for (int i=0; i<mat.rows; ++i) {
+		    for (int j=i+1; j<mat.cols; ++j)
+			    _Result.set_element(j, i, mat.get_element(i, j));
+	    }
+        return _Result;
+    }
+    else {
+        CAnnMatrix& _Result = *(CAnnMatrix *)new CAnnMatrix(mat.cols, mat.rows);
+	    // 转置各元素
+	    for (int i=0; i<mat.rows; ++i) {
+		    for (int j=0; j<mat.cols; ++j)
+			    _Result.set_element(j, i, mat.get_element(i, j));
+	    }
+        return _Result;
+    }
+}
+//*/
+
+CAnnMatrix expand_row( CAnnMatrix &mat, int _rows )
+{
+	CAnnMatrix _Result(_rows, mat.cols);
 	for (int i=0; i<_Result.rows; i++) {
 		for (int j=0; j<_Result.cols; j++) {
-			_Result.set_element(i, j, m.get_element(0, j));
+			_Result.set_element(i, j, mat.get_element(0, j));
 		}
 	}
 	return _Result;
 }
 
-CAnnMatrix expand_col( CAnnMatrix &m, int _cols )
+CAnnMatrix expand_col( CAnnMatrix &mat, int _cols )
 {
-	CAnnMatrix _Result(m.rows, _cols);
+	CAnnMatrix _Result(mat.rows, _cols);
 	for (int i=0; i<_Result.cols; i++) {
 		for (int j=0; j<_Result.rows; j++) {
-			_Result.set_element(j, i, m.get_element(j, 0));
+			_Result.set_element(j, i, mat.get_element(j, 0));
 		}
 	}
 	return _Result;
 }
 
-CAnnMatrix diag( CAnnMatrix &m )
+CAnnMatrix diag( CAnnMatrix &mat )
 {
 	CAnnMatrix _Result;
-	int _size = MIN(m.rows, m.cols);
+	int _size = MIN(mat.rows, mat.cols);
 	_size = MAX(_size, 0);
 	__MY_ASSERT(_size > 0);
 
 	if (_size > 0) {
 		_Result.resize(_size, 1, MAT_INIT_ZEROS);
 		for (int i=0; i<_size; i++) {
-			_Result.set_element(i, 0, m.get_element(i, i));
+			_Result.set_element(i, 0, mat.get_element(i, i));
 		}
 	}
 	return _Result;
 }
 
-CAnnMatrix abs( CAnnMatrix &m )
+CAnnMatrix abs( CAnnMatrix &mat )
 {
-	CAnnMatrix _Result(m);
+	CAnnMatrix _Result(mat);
 	int _index = 0;
 	for (int i=0; i<_Result.rows; i++) {
 		for (int j=0; j<_Result.cols; j++) {
-			_Result.set_element(_index, ::abs(m.get_element(_index)));
+			_Result.set_element(_index, ::abs(mat.get_element(_index)));
 			_index++;
 		}
 	}
 	return _Result;
 }
 
-CAnnMatrix sqrt( CAnnMatrix &m )
+CAnnMatrix sqrt( CAnnMatrix &mat )
 {
-	CAnnMatrix _Result(m);
+	CAnnMatrix _Result(mat);
 	int _index = 0;
 	for (int i=0; i<_Result.rows; i++) {
 		for (int j=0; j<_Result.cols; j++) {
-			_Result.set_element(_index, ::sqrt(m.get_element(_index)));
+			_Result.set_element(_index, ::sqrt(mat.get_element(_index)));
 			_index++;
 		}
 	}

@@ -74,10 +74,10 @@ bool CAnnVector::initVector( const TCHAR *szName, int _size,
 
 		length = _size;
 		if (length > 0) {
-			mem_alloc = length + MET_ADDR_ALIGN_SIZE;
+			mem_alloc = length + MAT_ADDR_ALIGN_SIZE;
 			m_pOrigData = new double[mem_alloc];
 			if (m_pOrigData != NULL) {
-				m_pData = (double *)MET_ADDR_ALIGN(m_pOrigData);
+				m_pData = (double *)MAT_ADDR_ALIGN(m_pOrigData);
 				// init vector data
 				bResult = initData(length, _initFcn);
 			}
@@ -261,7 +261,7 @@ bool CAnnMatrix::init_matrix( const TCHAR *szName, int _rows, int _cols,
 			_tcscpy_s(m_szName, _countof(m_szName), _T(""));
 	}
 
-	const int nAdditionSize = (int)ceil(double(MET_ADDR_ALIGN_SIZE) / (double)sizeof(double));
+	const int nAdditionSize = (int)ceil(double(MAT_ADDR_ALIGN_SIZE) / (double)sizeof(double));
 
 	int _malloc_size;
 	int _length = _rows * _cols;
@@ -270,7 +270,7 @@ bool CAnnMatrix::init_matrix( const TCHAR *szName, int _rows, int _cols,
 			_malloc_size = _length + nAdditionSize;
 			double *pNewOrigData = new double[_malloc_size];
 			if (pNewOrigData != NULL) {
-				double *pNewData = (double *)MET_ADDR_ALIGN(pNewOrigData);
+				double *pNewData = (double *)MAT_ADDR_ALIGN(pNewOrigData);
 				if (m_pOrigData == NULL) {
 					// save the new data buffer
 					m_pOrigData = pNewOrigData;
@@ -321,7 +321,7 @@ bool CAnnMatrix::create( int _rows, int _cols, double _fillVal, /*= 0 */
 }
 
 bool CAnnMatrix::create_ex( const TCHAR *szName, int _rows, int _cols,
-						double _fillVal, /*= 0 */
+						double _fillVal, /*= 0.0 */
 						int _initFcn /*= MAT_INIT_NONE */ )
 {
 	return init_matrix(szName, _rows, _cols, FALSE, _fillVal, _initFcn);
@@ -465,9 +465,9 @@ bool CAnnMatrix::copy_data( double *pNewData, int _rows, int _cols,
 	return TRUE;
 }
 
-int CAnnMatrix::size( int n ) const
+int CAnnMatrix::size( int n /*= 0 */ ) const
 {
-	int _size = 0;
+	int _size;
 	if (n == 1)
 		_size = rows;
 	else if (n == 2)
@@ -1393,14 +1393,34 @@ bool CAnnMatrix::make_unit_matrix( int _size )
 
 CAnnMatrix & CAnnMatrix::transpose( void )
 {
-	// Copy the current matrix
-	CAnnMatrix _Trans((CAnnMatrix &)*this);		// copy ourselves
+    // 对称矩阵(方块矩阵)
+    if (cols == 1 || rows == 1) {
+        int temp = rows;
+        rows = cols;
+        cols = temp;
+        return *this;
+    }
 
-	// 转置各元素
-	for (int i=0; i<rows; ++i) {
-		for (int j=0; j<cols; ++j)
-			set_element(j, i, _Trans.get_element(i, j));
-	}
+    if (cols == rows) {
+	    // 转置各元素
+	    for (int i=0; i<rows; ++i) {
+		    for (int j=i+1; j<cols; ++j)
+			    set_element(j, i, get_element(i, j));
+	    }
+    }
+    else {
+	    // Copy the current matrix
+	    CAnnMatrix _Trans((CAnnMatrix &)*this);		// copy ourselves
+
+	    // 转置各元素
+	    for (int i=0; i<rows; ++i) {
+		    for (int j=0; j<cols; ++j)
+			    set_element(j, i, _Trans.get_element(i, j));
+	    }
+        int temp = rows;
+        rows = cols;
+        cols = temp;
+    }
 
 	return *this;
 }
@@ -1517,6 +1537,7 @@ CAnnMatrix CAnnMatrix::get_col_vector( int _col ) const
 
 void CAnnMatrix::display( void )
 {
+#if defined(MATLAB_USE_DISPLAY) && (MATLAB_USE_DISPLAY)
 	TRACE(_T("CxMatrix: Name = [ %s ], [rows = %d, cols = %d]\n"), name(), rows, cols);
 	TRACE(_T("============================================================================================================\n\n"));
 	for (int r=0; r<rows; r++) {
@@ -1527,11 +1548,12 @@ void CAnnMatrix::display( void )
 		TRACE(_T("\n\n"));
 	}
 	TRACE(_T("============================================================================================================\n\n"));
+#endif
 }
 
 void CAnnMatrix::display( const TCHAR *szName )
 {
-#if 1
+#if defined(MATLAB_USE_DISPLAY) && (MATLAB_USE_DISPLAY)
 	TRACE(_T("CxMatrix: Name = [ %s ], [rows = %d, cols = %d]\n"), szName, rows, cols);
 	TRACE(_T("============================================================================================================\n\n"));
 	for (int r=0; r<rows; r++) {
