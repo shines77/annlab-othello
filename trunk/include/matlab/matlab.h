@@ -7,7 +7,6 @@
 
 #include "matlab_stddef.h"
 #include "./toolbox/nnerror.h"
-#include "./sys/matrixt.h"
 
 /* NAMESPACE */
 

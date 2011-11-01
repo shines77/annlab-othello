@@ -10,7 +10,7 @@ using namespace std;
 
 #define MAT_NAN_ITEM         (-128.0)
 
-#define MAT_ADDR_ALIGN_SIZE  (64UL)
+#define MAT_ADDR_ALIGN_SIZE  (128UL)
 #define MAT_ADDR_ALIGN_MASK  (MAT_ADDR_ALIGN_SIZE - 1)
 #define MAT_ADDR_ALIGN(x)    (((uint32_t)(x) + MAT_ADDR_ALIGN_MASK) & (~MAT_ADDR_ALIGN_MASK))
 
@@ -22,18 +22,16 @@ enum enumMatrixInit {
 	MAT_INIT_ONES,
 	MAT_INIT_EYES,
 	MAT_INIT_RANDS,
-	MAT_INIT_RANDS2,
+	MAT_INIT_RANDS_POSITIVE,
 	MAT_INIT_MAX
 };
 
 enum enumMatInitMode {
 	INIT_MODE_NONE = 0,
-	INIT_MODE_FIRST,
+	INIT_MODE_CONSTRUCTOR,
 	INIT_MODE_RESIZE,
 	INIT_MODE_MAX
 };
-
-#define MAT_INIT_DEFAULT    MAT_INIT_NONE
 
 class CAnnVector : public CAnnObject
 {
@@ -99,6 +97,8 @@ public:
 	virtual ~CAnnMatrix( void );
 
 public:
+    static const unsigned int MAT_INIT_DEFAULT = MAT_INIT_NONE;
+
 	// gets
 	int    size         ( int n = 0 ) const;
 	bool   is_same_size ( const CAnnMatrix *target, int n = 0 );

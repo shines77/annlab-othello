@@ -34,7 +34,7 @@ CAnnMatrix rands( int _rows, int _cols )
 // 重置大小并初始化为[0,1]随机数矩阵
 CAnnMatrix rands2( int _rows, int _cols )
 {
-	CAnnMatrix _result(_rows, _cols, MAT_INIT_RANDS2);
+	CAnnMatrix _result(_rows, _cols, MAT_INIT_RANDS_POSITIVE);
 	return _result;
 }
 
