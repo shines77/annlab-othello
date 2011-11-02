@@ -246,7 +246,7 @@ bool CAnnMatrix::init_matrix( const TCHAR *szName, int _rows, int _cols,
 						  int _initFcn   /*= MAT_INIT_NONE */ )
 {
 	bool bResult = false;
-    static const int nAdditionSize =
+    const int nAdditionSize =
         (int)ceil(double(MAT_ADDR_ALIGN_SIZE) / (double)sizeof(double));
 
 	if (_initMode == INIT_MODE_CONSTRUCTOR) {
