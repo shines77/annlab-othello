@@ -40,9 +40,10 @@
 #define __MATLAB_BUILD     1
 
 #ifdef _DEBUG
-#define MATLAB_USE_ASSERT  1
-#define MATLAB_USE_TRACE   1
-#define MATLAB_USE_DISPLAY 0
+#define MATLAB_USE_ASSERT       1
+#define MATLAB_USE_TRACE        1
+#define MATLAB_USE_DISPLAY      1
+#define MATLAB_USE_DISPLAY_EX   1
 #endif
 
 #define __MATLAB_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)

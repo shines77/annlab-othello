@@ -14,7 +14,8 @@ namespace matlab {
 
 template<typename T>
 MatrixT<T>::MatrixT( void ) :
-    pvData(NULL), pvOrigPtr(NULL), alloc_size(0), rows(0), cols(0), totals(0)
+    pvData(NULL), ppvRow(NULL), pvAlloc(NULL), ppvRowAlloc(NULL),
+    rows(0), cols(0), totals(0), totals_actual(0), alloc_size(0)
 {
 }
 
@@ -31,14 +32,14 @@ MatrixT<T>::MatrixT( int _rows, int _cols, int _initFcn /*= MAT_INIT_NONE */ )
 }
 
 template<typename T>
-matlab::MatrixT<T>::MatrixT( int _rows, int _cols, const value_type& _x )
+MatrixT<T>::MatrixT( int _rows, int _cols, const value_type& _x )
 {
     initialize(_rows, _cols, INIT_MODE_CONSTRUCTOR);
     set_by_scalar(_x);
 }
 
 template<typename T>
-matlab::MatrixT<T>::MatrixT( int _rows, int _cols, const value_type* _array )
+MatrixT<T>::MatrixT( int _rows, int _cols, const value_type* _array )
 {
     initialize(_rows, _cols, INIT_MODE_CONSTRUCTOR);
     copy_from_array(_array);
@@ -84,24 +85,37 @@ MatrixT<T>::~MatrixT( void )
 template<typename T>
 inline void MatrixT<T>::destroy( void )
 {
-    if (pvOrigPtr != NULL) {
-        delete[] pvOrigPtr;
-        pvOrigPtr = NULL;
+    if (pvAlloc != NULL) {
+        delete[] pvAlloc;
+        pvAlloc = NULL;
         pvData = NULL;
+        if (ppvRowAlloc != NULL) {
+            delete[] ppvRowAlloc;
+            ppvRowAlloc = NULL;
+            ppvRow = NULL;
+        }
     }
+    alloc_size = 0;
     rows = cols = 0;
     totals = 0;
-    alloc_size = 0;
+    totals_actual = 0;
 }
 
 /* Notice: use the function carefully! */
 template<typename T>
 inline void MatrixT<T>::free( void )
 {
-    if (pvOrigPtr != NULL) {
-        delete[] pvOrigPtr;
-        pvOrigPtr = NULL;
+    if (pvAlloc != NULL) {
+        delete[] pvAlloc;
+        pvAlloc = NULL;
         pvData = NULL;
+        if (ppvRowAlloc != NULL) {
+            delete[] ppvRowAlloc;
+            ppvRowAlloc = NULL;
+            ppvRow = NULL;
+        }
+        alloc_size = 0;
+        totals_actual = 0;
     }
 }
 
@@ -120,17 +134,23 @@ void MatrixT<T>::initialize_ex( const TCHAR *szName, int _rows, int _cols,
                                value_type _fillVal /*= 0.0*/,
                                int _initFcn /*= MAT_INIT_DEFAULT*/ )
 {
-    int _alloc_size;
+    size_type _alloc_size;
     int _totals;
     const int nAdditionSize =
         (int)ceil(double(MAT_ADDR_ALIGN_SIZE) / (double)sizeof(typename T));
+    const int nAdditionRowSize =
+        (int)ceil(double(MAT_ADDR_ALIGN_SIZE) / (double)sizeof(pointer));
 
     if (_initMode == INIT_MODE_CONSTRUCTOR) {
+        pvData      = NULL;
+        ppvRow      = NULL;
+        pvAlloc     = NULL;
+        ppvRowAlloc = NULL;
+        alloc_size  = 0;
+
         rows = cols = 0;
         totals      = 0;
-        alloc_size  = 0;
-        pvOrigPtr   = NULL;
-        pvData      = NULL;
+        totals_actual = 0;
     }
 
     if (_initMode != INIT_MODE_RESIZE) {
@@ -144,18 +164,30 @@ void MatrixT<T>::initialize_ex( const TCHAR *szName, int _rows, int _cols,
     _alloc_size = _totals + nAdditionSize;
 
     pointer pvNewOrigPtr = new value_type[_alloc_size];
-    if (pvNewOrigPtr != NULL) {
+    ptr_pointer ppvOrigRow = new pointer[_rows + nAdditionRowSize];
+    if (pvNewOrigPtr != NULL && ppvOrigRow != NULL) {
         pointer pvNewData = (pointer)MAT_ADDR_ALIGN(pvNewOrigPtr);
-        if (pvOrigPtr == NULL) {
+        ptr_pointer ppvNewRow = (ptr_pointer)MAT_ADDR_ALIGN(ppvOrigRow);
+        if (pvAlloc == NULL) {
             // save the new data buffer
-            pvOrigPtr = pvNewOrigPtr;
+            pvAlloc = pvNewOrigPtr;
+            ppvRowAlloc = ppvOrigRow;
             pvData = pvNewData;
+            ppvRow = ppvNewRow;
+            alloc_size = _alloc_size;
 
             // save the new sizes
             rows = _rows;
             cols = _cols;
             totals = _totals;
-            alloc_size = _alloc_size;
+            totals_actual = _totals;
+
+            // save the row pointer
+            pointer p = pvData;
+            for (int i=0; i<rows; ++i) {
+                ppvRow[i] = p;
+                p += cols;
+            }
 
             // fill data for matrix
             if (_initFcn != FILL_MODE_NONE)
@@ -166,165 +198,125 @@ void MatrixT<T>::initialize_ex( const TCHAR *szName, int _rows, int _cols,
             reserve_and_fill_data(pvNewData, _rows, _cols, _fillVal, _initFcn);
 
             // clear old data
-            if (pvOrigPtr != NULL)
-                delete[] pvOrigPtr;
+            if (pvAlloc != NULL) {
+                delete[] pvAlloc;
+                if (ppvRowAlloc = NULL)
+                    delete[] ppvRowAlloc;
+            }
 
             // save the new data buffer
-            pvOrigPtr = pvNewOrigPtr;
+            pvAlloc = pvNewOrigPtr;
+            ppvRowAlloc = ppvOrigRow;
             pvData = pvNewData;
+            ppvRow = ppvNewRow;
+            alloc_size = _alloc_size;
 
             // save the new sizes
             rows = _rows;
             cols = _cols;
             totals = _totals;
-            alloc_size = _alloc_size;
+            totals_actual = _totals;
+
+            // save the row pointer
+            pointer p = pvData;
+            for (int i=0; i<rows; ++i) {
+                ppvRow[i] = p;
+                p += cols;
+            }
         }				
     }
 }
 
 template<typename T>
-void MatrixT<T>::fill_data( int _rows, int _cols,
-                           value_type _fillVal /*= 0.0*/,
-                           int _initFcn /*= MAT_INIT_DEFAULT */ )
+void MatrixT<T>::init_martix( int _rows, int _cols,
+                             int _initMode /*= INIT_MODE_NONE*/,
+                             value_type _fillVal /*= static_cast<T>(0)*/,
+                             int _initFcn /*= MAT_INIT_DEFAULT */ )
 {
-    ASSERT(pvData != NULL);
-    ASSERT(_rows <= rows && _rows >= 0 && _cols <= cols && _cols >= 0);
+    size_type _alloc_size;
+    int _totals;
+    const int nAdditionSize =
+        (int)ceil(double(MAT_ADDR_ALIGN_SIZE) / (double)sizeof(typename T));
+    const int nAdditionRowSize =
+        (int)ceil(double(MAT_ADDR_ALIGN_SIZE) / (double)sizeof(typename pointer));
 
-    // init matrix data
-    int _totals = _rows * _cols;
-    ASSERT(_totals >= 0);
-    if (totals <= 0)
-        return;
+    if (_initMode == INIT_MODE_CONSTRUCTOR) {
+        pvData      = NULL;
+        ppvRow      = NULL;
+        pvAlloc     = NULL;
+        alloc_size  = 0;
 
-    switch (_initFcn) {
-    case FILL_MODE_ZEROS:		    // all zeros
-        for (int i=0; i<_totals; ++i)
-            pvData[i] = static_cast<T>(0);
-        break;
-    case FILL_MODE_ONES:			    // all ones
-        for (int i=0; i<_totals; ++i)
-            pvData[i] = static_cast<T>(1);
-        break;
-    case FILL_MODE_RANDS:		    // all [-1,1] randomize
-        for (int i=0; i<_totals; ++i)
-            pvData[i] = (value_type)(2.0 * (value_type)rand() / (value_type)(RAND_MAX) - 1.0);
-        break;
-    case FILL_MODE_RANDS_POSITIVE:	// all [0,1] positive randomize
-        for (int i=0; i<_totals; ++i)
-            pvData[i] = (value_type)rand() / (value_type)(RAND_MAX);
-        break;
-    case FILL_MODE_EYES:
-        // 暂未提供
-        break;
-    case FILL_MODE_NONE:
-        // do nothing
-        break;
+        rows = cols = 0;
+        totals      = 0;
+        totals_actual = 0;
+    }
+
+    _totals = _rows * _cols;
+    _alloc_size = _totals + nAdditionSize;
+
+    pointer pvNewOrigPtr = new value_type[_alloc_size];
+    ptr_pointer ppvOrigRow = new pointer[_rows + nAdditionRowSize];
+    if (pvNewOrigPtr != NULL && ppvOrigRow != NULL) {
+        pointer pvNewData = (pointer)MAT_ADDR_ALIGN(pvNewOrigPtr);
+        ptr_pointer ppvNewRow = (ptr_pointer)MAT_ADDR_ALIGN(ppvOrigRow);
+        if (pvAlloc == NULL) {
+            // save the new data buffer
+            pvAlloc = pvNewOrigPtr;
+            ppvRowAlloc = ppvOrigRow;
+            pvData = pvNewData;
+            ppvRow = ppvNewRow;
+            alloc_size = _alloc_size;
+
+            // save the new sizes
+            rows = _rows;
+            cols = _cols;
+            totals = _totals;
+            totals_actual = _totals;
+
+            // save the row pointer
+            pointer p = pvData;
+            for (int i=0; i<rows; ++i) {
+                ppvRow[i] = p;
+                p += cols;
+            }
+
+            // fill data for matrix
+            if (_initFcn != FILL_MODE_NONE)
+                fill_data(_rows, _cols, _fillVal, _initFcn);
+        }
+        else {
+            // reserve(copy) old data and fill data buffer
+            reserve_and_fill_data(pvNewData, _rows, _cols, _fillVal, _initFcn);
+
+            // clear old data
+            if (pvAlloc != NULL) {
+                delete[] pvAlloc;
+                if (ppvRowAlloc = NULL)
+                    delete[] ppvRowAlloc;
+            }
+
+            // save the new data buffer
+            pvAlloc = pvNewOrigPtr;
+            ppvRowAlloc = ppvOrigRow;
+            pvData = pvNewData;
+            ppvRow = ppvNewRow;
+            alloc_size = _alloc_size;
+
+            // save the new sizes
+            rows = _rows;
+            cols = _cols;
+            totals = _totals;
+            totals_actual = _totals;
+
+            // save the row pointer
+            pointer p = pvData;
+            for (int i=0; i<rows; ++i) {
+                ppvRow[i] = p;
+                p += cols;
+            }
+        }				
     }
 }
-
-#define MATRIX_FILL_DATA_FUNC_SIGNED(T) \
-template<> \
-void MatrixT<T>::fill_data( int _rows, int _cols, \
-                           value_type _fillVal /*= 0.0*/, \
-                           int _initFcn /*= MAT_INIT_DEFAULT */ ) \
-{ \
-    ASSERT(pvData != NULL); \
-    ASSERT(_rows <= rows && _rows >= 0 && _cols <= cols && _cols >= 0); \
-                            \
-    /* init matrix data */  \
-    int _totals = _rows * _cols; \
-    ASSERT(_totals >= 0); \
-    if (totals <= 0) \
-        return; \
-                        \
-    switch (_initFcn) { \
-    case FILL_MODE_ZEROS:		    /* all zeros */ \
-        for (int i=0; i<_totals; ++i) \
-            pvData[i] = static_cast<T>(0); \
-        break; \
-    case FILL_MODE_ONES:			    /* all ones */ \
-        for (int i=0; i<_totals; ++i) \
-            pvData[i] = static_cast<T>(1); \
-        break; \
-    case FILL_MODE_RANDS:		    /* all [-1,1] randomize */ \
-        /* whether is the signed integer type? */ \
-        if ((value_type)(0) > (value_type)(-1)) { \
-            /* signed integer */ \
-            for (int i=0; i<_totals; ++i) \
-                pvData[i] = (value_type)((rand() % 3) - 1); \
-        } \
-        else { \
-            /* unsigned integer, not allowed -1 */ \
-            for (int i=0; i<_totals; ++i) \
-                pvData[i] = (value_type)(rand() & 1); \
-        } \
-        break; \
-    case FILL_MODE_RANDS_POSITIVE:	/* all [0,1] positive randomize */ \
-        for (int i=0; i<_totals; ++i) \
-            pvData[i] = (value_type)(rand() & 1); \
-        break; \
-    case FILL_MODE_EYES: \
-        /* 暂未提供 */ \
-        break; \
-    case FILL_MODE_NONE: \
-        /* do nothing */ \
-        break; \
-    } \
-}
-
-#define MATRIX_FILL_DATA_FUNC_UNSIGNED(T) \
-template<> \
-void MatrixT<T>::fill_data( int _rows, int _cols, \
-                           value_type _fillVal /*= 0.0*/, \
-                           int _initFcn /*= MAT_INIT_DEFAULT */ ) \
-{ \
-    ASSERT(pvData != NULL); \
-    ASSERT(_rows <= rows && _rows >= 0 && _cols <= cols && _cols >= 0); \
-                            \
-    /* init matrix data */  \
-    int _totals = _rows * _cols; \
-    ASSERT(_totals >= 0); \
-    if (totals <= 0) \
-        return; \
-                        \
-    switch (_initFcn) { \
-    case FILL_MODE_ZEROS:		    /* all zeros */ \
-        for (int i=0; i<_totals; ++i) \
-            pvData[i] = static_cast<T>(0); \
-        break; \
-    case FILL_MODE_ONES:			    /* all ones */ \
-        for (int i=0; i<_totals; ++i) \
-            pvData[i] = static_cast<T>(1); \
-        break; \
-    case FILL_MODE_RANDS:		    /* all [0,1] randomize */ \
-        /* unsigned integer, not allowed -1 */ \
-        for (int i=0; i<_totals; ++i) \
-            pvData[i] = (value_type)(rand() & 1); \
-        break; \
-    case FILL_MODE_RANDS_POSITIVE:	/* all [0,1] positive randomize */ \
-        for (int i=0; i<_totals; ++i) \
-            pvData[i] = (value_type)(rand() & 1); \
-        break; \
-    case FILL_MODE_EYES: \
-        /* 暂未提供 */ \
-        break; \
-    case FILL_MODE_NONE: \
-        /* do nothing */ \
-        break; \
-    } \
-}
-
-MATRIX_FILL_DATA_FUNC_SIGNED(int64_t)
-MATRIX_FILL_DATA_FUNC_SIGNED(int32_t)
-MATRIX_FILL_DATA_FUNC_SIGNED(int16_t)
-MATRIX_FILL_DATA_FUNC_SIGNED(int8_t)
-MATRIX_FILL_DATA_FUNC_SIGNED(signed char)
-
-MATRIX_FILL_DATA_FUNC_UNSIGNED(uint64_t)
-MATRIX_FILL_DATA_FUNC_UNSIGNED(uint32_t)
-MATRIX_FILL_DATA_FUNC_UNSIGNED(uint16_t)
-MATRIX_FILL_DATA_FUNC_UNSIGNED(uint8_t)
-MATRIX_FILL_DATA_FUNC_UNSIGNED(bool)
 
 template<typename T>
 void MatrixT<T>::reserve_and_fill_data( pointer pvNewData, int _rows, int _cols,
@@ -496,7 +488,7 @@ inline int MatrixT<T>::resize( int _rows, int _cols )
     }
 
     destroy();
-    initialize(_rows, _cols, INIT_MODE_RESIZE);
+    init_martix(_rows, _cols, INIT_MODE_RESIZE);
     return totals;
 }
 
@@ -526,7 +518,7 @@ inline void MatrixT<T>::copy_from_array( const_pointer _array )
 }
 
 template<typename T>
-inline void matlab::MatrixT<T>::set_by_scalar( const_value_type _x )
+inline void MatrixT<T>::set_by_scalar( const_value_type _x )
 {
     __MY_ASSERT((_array != NULL), _T(""));
 
@@ -561,26 +553,39 @@ inline MatrixT<T>* MatrixT<T>::copy( const MatrixT<T>* src )
 }
 
 template<typename T>
-void MatrixT<T>::display( void )
+inline typename MatrixT<T>::value_type MatrixT<T>::get_element( int _index )
 {
-    display(name());
+    return pvData[_index];
 }
 
 template<typename T>
-void MatrixT<T>::display( const TCHAR *szText )
+inline typename const MatrixT<T>::value_type MatrixT<T>::get_element( int _index ) const
 {
-#if defined(MATLAB_USE_DISPLAY) && (MATLAB_USE_DISPLAY)
-	TRACE(_T("MatrixT<T>: Name = [ %s ], [rows = %d, cols = %d]\n"), szName, rows, cols);
-	TRACE(_T("============================================================================================================\n\n"));
-	for (int r=0; r<rows; r++) {
-		TRACE(_T("\t"));
-		for (int c=0; c<cols; c++) {
-			TRACE(_T("%0.4f  \t"), get_element(r, c));
-		}
-		TRACE(_T("\n\n"));
-	}
-	TRACE(_T("============================================================================================================\n\n"));
-#endif
+    return pvData[_index];
+}
+
+template<typename T>
+inline typename MatrixT<T>::value_type MatrixT<T>::get_element( int _row, int _col )
+{
+    return pvData[_col * rows + _row];
+}
+
+template<typename T>
+inline typename const MatrixT<T>::value_type MatrixT<T>::get_element( int _row, int _col ) const
+{
+    return pvData[_col * rows + _row];
+}
+
+template<typename T>
+inline void MatrixT<T>::set_element( int _index, value_type _value )
+{
+    pvData[_index] = _value;
+}
+
+template<typename T>
+inline void MatrixT<T>::set_element( int _row, int _col, value_type _value )
+{
+    pvData[_col * rows + _row] = _value;
 }
 
 template<typename T>
@@ -596,7 +601,7 @@ inline MatrixT<T>::operator const T*() const
 }
 
 template<typename T>
-MatrixT<T>& matlab::MatrixT<T>::operator = ( value_type _value )
+MatrixT<T>& MatrixT<T>::operator = ( value_type _value )
 {
     // resize to one item matrix
     resize(1, 1);
@@ -628,6 +633,42 @@ MatrixT<T>& MatrixT<T>::operator = ( MatrixT<T>& _Right )
 
     // finally return a reference to ourselves
     return *this;
+}
+
+template<typename T>
+inline typename MatrixT<T>::pointer MatrixT<T>::operator[]( int _row )
+{
+    return ppvRow[_row];
+}
+
+template<typename T>
+inline typename MatrixT<T>::const_pointer MatrixT<T>::operator[]( int _row ) const
+{
+    return ppvRow[_row];
+}
+
+template<typename T>
+inline typename MatrixT<T>::reference MatrixT<T>::operator()( int _index )
+{
+    return pvData[_index];
+}
+
+template<typename T>
+inline typename MatrixT<T>::const_reference MatrixT<T>::operator()( int _index ) const
+{
+    return pvData[_index];
+}
+
+template<typename T>
+inline typename MatrixT<T>::reference MatrixT<T>::operator()( int _row, int _col )
+{
+    return pvData[_col * rows + _row];
+}
+
+template<typename T>
+inline typename MatrixT<T>::const_reference MatrixT<T>::operator()( int _row, int _col ) const
+{
+    return pvData[_col * rows + _row];
 }
 
 template<typename T>
@@ -711,6 +752,404 @@ inline MatrixT<T> MatrixT<T>::_rands2( int _rows, int _cols ) const
 {
 
 }
+
+template<typename T>
+void MatrixT<T>::fill_data( int _rows, int _cols,
+                           value_type _fillVal /*= 0.0*/,
+                           int _initFcn /*= MAT_INIT_DEFAULT */ )
+{
+    ASSERT(pvData != NULL);
+    ASSERT(_rows <= rows && _rows >= 0 && _cols <= cols && _cols >= 0);
+
+    // init matrix data
+    int _totals = _rows * _cols;
+    ASSERT(_totals >= 0);
+    if (totals <= 0)
+        return;
+
+    switch (_initFcn) {
+    case FILL_MODE_ZEROS:		    // all zeros
+        for (int i=0; i<_totals; ++i)
+            pvData[i] = static_cast<T>(0);
+        break;
+    case FILL_MODE_ONES:			    // all ones
+        for (int i=0; i<_totals; ++i)
+            pvData[i] = static_cast<T>(1);
+        break;
+    case FILL_MODE_RANDS:		    // all [-1,1] randomize
+        for (int i=0; i<_totals; ++i)
+            pvData[i] = (value_type)(2.0 * (value_type)rand() / (value_type)(RAND_MAX) - 1.0);
+        break;
+    case FILL_MODE_RANDS_POSITIVE:	// all [0,1] positive randomize
+        for (int i=0; i<_totals; ++i)
+            pvData[i] = (value_type)rand() / (value_type)(RAND_MAX);
+        break;
+    case FILL_MODE_EYES:
+        // 暂未提供
+        break;
+    case FILL_MODE_NONE:
+        // do nothing
+        break;
+    }
+}
+
+#define MATRIXT_FILL_DATA_FUNC_SIGNED(Ty) \
+template<> \
+void MatrixT<Ty>::fill_data( int _rows, int _cols, \
+                           value_type _fillVal /*= 0.0*/, \
+                           int _initFcn /*= MAT_INIT_DEFAULT */ ) \
+{ \
+    ASSERT(pvData != NULL); \
+    ASSERT(_rows <= rows && _rows >= 0 && _cols <= cols && _cols >= 0); \
+                            \
+    /* init matrix data */  \
+    int _totals = _rows * _cols; \
+    ASSERT(_totals >= 0); \
+    if (totals <= 0) \
+        return; \
+                        \
+    switch (_initFcn) { \
+    case FILL_MODE_ZEROS:		    /* all zeros */ \
+        for (int i=0; i<_totals; ++i) \
+            pvData[i] = static_cast<Ty>(0); \
+        break; \
+    case FILL_MODE_ONES:			    /* all ones */ \
+        for (int i=0; i<_totals; ++i) \
+            pvData[i] = static_cast<Ty>(1); \
+        break; \
+    case FILL_MODE_RANDS:		    /* all [-1,1] randomize */ \
+        /* whether is the signed integer type? */ \
+        if ((value_type)(0) > (value_type)(-1)) { \
+            /* signed integer */ \
+            for (int i=0; i<_totals; ++i) \
+                pvData[i] = (value_type)((rand() % 3) - 1); \
+        } \
+        else { \
+            /* unsigned integer, not allowed -1 */ \
+            for (int i=0; i<_totals; ++i) \
+                pvData[i] = (value_type)(rand() & 1); \
+        } \
+        break; \
+    case FILL_MODE_RANDS_POSITIVE:	/* all [0,1] positive randomize */ \
+        for (int i=0; i<_totals; ++i) \
+            pvData[i] = (value_type)(rand() & 1); \
+        break; \
+    case FILL_MODE_EYES: \
+        /* 暂未提供 */ \
+        break; \
+    case FILL_MODE_NONE: \
+        /* do nothing */ \
+        break; \
+    } \
+}
+
+#define MATRIXT_FILL_DATA_FUNC_UNSIGNED(Ty) \
+template<> \
+void MatrixT<Ty>::fill_data( int _rows, int _cols, \
+                           value_type _fillVal /*= 0.0*/, \
+                           int _initFcn /*= MAT_INIT_DEFAULT */ ) \
+{ \
+    ASSERT(pvData != NULL); \
+    ASSERT(_rows <= rows && _rows >= 0 && _cols <= cols && _cols >= 0); \
+                            \
+    /* init matrix data */  \
+    int _totals = _rows * _cols; \
+    ASSERT(_totals >= 0); \
+    if (totals <= 0) \
+        return; \
+                        \
+    switch (_initFcn) { \
+    case FILL_MODE_ZEROS:		    /* all zeros */ \
+        for (int i=0; i<_totals; ++i) \
+            pvData[i] = static_cast<Ty>(0); \
+        break; \
+    case FILL_MODE_ONES:			    /* all ones */ \
+        for (int i=0; i<_totals; ++i) \
+            pvData[i] = static_cast<Ty>(1); \
+        break; \
+    case FILL_MODE_RANDS:		    /* all [0,1] randomize */ \
+        /* unsigned integer, not allowed -1 */ \
+        for (int i=0; i<_totals; ++i) \
+            pvData[i] = (value_type)(rand() & 1); \
+        break; \
+    case FILL_MODE_RANDS_POSITIVE:	/* all [0,1] positive randomize */ \
+        for (int i=0; i<_totals; ++i) \
+            pvData[i] = (value_type)(rand() & 1); \
+        break; \
+    case FILL_MODE_EYES: \
+        /* 暂未提供 */ \
+        break; \
+    case FILL_MODE_NONE: \
+        /* do nothing */ \
+        break; \
+    } \
+}
+
+MATRIXT_FILL_DATA_FUNC_SIGNED(int64_t)
+MATRIXT_FILL_DATA_FUNC_SIGNED(int32_t)
+MATRIXT_FILL_DATA_FUNC_SIGNED(int16_t)
+MATRIXT_FILL_DATA_FUNC_SIGNED(int8_t)
+MATRIXT_FILL_DATA_FUNC_SIGNED(signed char)
+
+MATRIXT_FILL_DATA_FUNC_UNSIGNED(uint64_t)
+MATRIXT_FILL_DATA_FUNC_UNSIGNED(uint32_t)
+MATRIXT_FILL_DATA_FUNC_UNSIGNED(uint16_t)
+MATRIXT_FILL_DATA_FUNC_UNSIGNED(uint8_t)
+MATRIXT_FILL_DATA_FUNC_UNSIGNED(bool)
+
+/*
+ * AnsiToUnicode converts the ANSI string pszA to a Unicode string
+ * and returns the Unicode string through ppszW. Space for the
+ * the converted string is allocated by AnsiToUnicode.
+ */
+
+ HRESULT __fastcall AnsiToUnicode(LPCSTR pszA, LPOLESTR* ppszW)
+{
+
+    ULONG cCharacters;
+    DWORD dwError;
+
+    // If input is null then just return the same.
+    if (NULL == pszA)
+    {
+        *ppszW = NULL;
+        return NOERROR;
+    }
+
+    // Determine number of wide characters to be allocated for the
+    // Unicode string.
+    cCharacters =  strlen(pszA)+1;
+
+    // Use of the OLE allocator is required if the resultant Unicode
+    // string will be passed to another COM component and if that
+    // component will free it. Otherwise you can use your own allocator.
+    *ppszW = (LPOLESTR) CoTaskMemAlloc(cCharacters*2);
+    if (NULL == *ppszW)
+        return E_OUTOFMEMORY;
+
+    // Covert to Unicode.
+    if (0 == MultiByteToWideChar(CP_ACP, 0, pszA, cCharacters,
+        *ppszW, cCharacters))
+    {
+        dwError = GetLastError();
+        CoTaskMemFree(*ppszW);
+        *ppszW = NULL;
+        return HRESULT_FROM_WIN32(dwError);
+    }
+
+    return NOERROR;
+}
+/*
+ * UnicodeToAnsi converts the Unicode string pszW to an ANSI string
+ * and returns the ANSI string through ppszA. Space for the
+ * the converted string is allocated by UnicodeToAnsi.
+ */
+
+HRESULT __fastcall UnicodeToAnsi(LPCOLESTR pszW, LPSTR* ppszA)
+{
+
+    ULONG cbAnsi, cCharacters;
+    DWORD dwError;
+
+    // If input is null then just return the same.
+    if (pszW == NULL)
+    {
+        *ppszA = NULL;
+        return NOERROR;
+    }
+
+    cCharacters = wcslen(pszW)+1;
+    // Determine number of bytes to be allocated for ANSI string. An
+    // ANSI string can have at most 2 bytes per character (for Double
+    // Byte Character Strings.)
+    cbAnsi = cCharacters*2;
+
+    // Use of the OLE allocator is not required because the resultant
+    // ANSI  string will never be passed to another COM component. You
+    // can use your own allocator.
+    *ppszA = (LPSTR) CoTaskMemAlloc(cbAnsi);
+    if (NULL == *ppszA)
+        return E_OUTOFMEMORY;
+
+    // Convert to ANSI.
+    if (0 == WideCharToMultiByte(CP_ACP, 0, pszW, cCharacters, *ppszA,
+        cbAnsi, NULL, NULL))
+    {
+        dwError = GetLastError();
+        CoTaskMemFree(*ppszA);
+        *ppszA = NULL;
+        return HRESULT_FROM_WIN32(dwError);
+    }
+    return NOERROR;
+}
+
+template<typename T>
+void MatrixT<T>::display( void )
+{
+    display(name());
+}
+
+template<typename T>
+void MatrixT<T>::display( const TCHAR *szText )
+{
+#if defined(MATLAB_USE_DISPLAY) && (MATLAB_USE_DISPLAY)
+    TCHAR* szTypeName = NULL;
+    AnsiToUnicode(typeid(T).name(), &szTypeName);
+	TRACE(("MatrixT<%s>: Name = [ %s ], [rows = %d, cols = %d]\n"), szTypeName, szText, rows, cols);
+	TRACE(_T("============================================================================================================\n\n"));
+	for (int r=0; r<rows; r++) {
+		TRACE(_T("\t"));
+		for (int c=0; c<cols; c++) {
+			TRACE(_T("%11.4E  \t"), get_element(r, c));
+		}
+		TRACE(_T("\n\n"));
+	}
+	TRACE(_T("============================================================================================================\n\n"));
+    if (szTypeName != NULL)
+        CoTaskMemFree(szTypeName);
+#endif
+}
+
+#define MATRIXT_DISPLAY_FUNC_SIGNED(Ty) \
+template<> \
+void MatrixT<Ty>::display( const TCHAR *szText ) \
+{ \
+	TRACE(_T("MatrixT<")_T(#Ty)_T(">: Name = [ %s ], [rows = %d, cols = %d]\n"), szText, rows, cols); \
+	TRACE(_T("============================================================================================================\n\n")); \
+	for (int r=0; r<rows; r++) { \
+		TRACE(_T("\t")); \
+		for (int c=0; c<cols; c++) { \
+			TRACE(_T("%-11d  "), get_element(r, c)); \
+		} \
+		TRACE(_T("\n\n")); \
+	} \
+	TRACE(_T("============================================================================================================\n\n")); \
+}
+
+#define MATRIXT_DISPLAY_FUNC_UNSIGNED(Ty) \
+template<> \
+void MatrixT<Ty>::display( const TCHAR *szText ) \
+{ \
+	TRACE(_T("MatrixT<")_T(#Ty)_T(">: Name = [ %s ], [rows = %d, cols = %d]\n"), szText, rows, cols); \
+	TRACE(_T("============================================================================================================\n\n")); \
+	for (int r=0; r<rows; r++) { \
+		TRACE(_T("\t")); \
+		for (int c=0; c<cols; c++) { \
+			TRACE(_T("%-11u  "), get_element(r, c)); \
+		} \
+		TRACE(_T("\n\n")); \
+	} \
+	TRACE(_T("============================================================================================================\n\n")); \
+}
+
+#if defined(MATLAB_USE_DISPLAY) && (MATLAB_USE_DISPLAY)
+MATRIXT_DISPLAY_FUNC_SIGNED(int64_t)
+MATRIXT_DISPLAY_FUNC_SIGNED(int32_t)
+MATRIXT_DISPLAY_FUNC_SIGNED(int16_t)
+MATRIXT_DISPLAY_FUNC_SIGNED(int8_t)
+MATRIXT_DISPLAY_FUNC_SIGNED(signed char)
+
+MATRIXT_DISPLAY_FUNC_UNSIGNED(uint64_t)
+MATRIXT_DISPLAY_FUNC_UNSIGNED(uint32_t)
+MATRIXT_DISPLAY_FUNC_UNSIGNED(uint16_t)
+MATRIXT_DISPLAY_FUNC_UNSIGNED(uint8_t)
+MATRIXT_DISPLAY_FUNC_UNSIGNED(bool)
+#endif
+
+template<typename T>
+void MatrixT<T>::display_ex( void )
+{
+    display_ex(name());
+}
+
+template<typename T>
+void MatrixT<T>::display_ex( const TCHAR *szText )
+{
+#if defined(MATLAB_USE_DISPLAY_EX) && (MATLAB_USE_DISPLAY_EX)
+    char*  szTypeNameA = NULL;
+    TCHAR* szTypeName = NULL;
+#ifdef _UNICODE
+    szTypeNameA = (char* )typeid(T).name();
+    AnsiToUnicode(szTypeNameA, &szTypeName);
+#else
+    szTypeNameA = (char* )typeid(T).name();
+    szTypeName = szTypeNameA;
+#endif
+    TRACE(_T("MatrixT<%s>: Name = [ %s ], [rows = %d, cols = %d]\n"), szTypeName, szText, rows, cols);
+	TRACE(_T("============================================================================================================\n\n"));
+	for (int r=0; r<rows; r++) {
+		TRACE(_T("\t"));
+		for (int c=0; c<cols; c++) {
+			TRACE(_T("%11.4E  \t"), get_element(r, c));
+		}
+		TRACE(_T("\n\n"));
+	}
+	TRACE(_T("============================================================================================================\n\n"));
+#ifdef _UNICODE
+    if (szTypeName != NULL) {
+        CoTaskMemFree(szTypeName);
+        szTypeName = NULL;
+    }
+#endif
+    if (szTypeNameA) {
+        const int nHeaderSize = 0x48;
+        bool bFound = false;
+        uint32_t* szHeader = (uint32_t *)(szTypeNameA - nHeaderSize);
+        if (szHeader != NULL && (*szHeader) == (uint32_t)szTypeNameA)
+            bFound = true;
+        ::free(szTypeNameA);
+        if (bFound)
+            ::free(szHeader);
+    }
+#endif
+}
+
+#define MATRIXT_DISPLAY_EX_FUNC_SIGNED(Ty) \
+template<> \
+void MatrixT<Ty>::display_ex( const TCHAR *szText ) \
+{ \
+    TRACE(_T("MatrixT<")_T(#Ty)_T(">: Name = [ %s ], [rows = %d, cols = %d]\n"), szText, rows, cols); \
+	TRACE(_T("============================================================================================================\n\n")); \
+	for (int r=0; r<rows; r++) { \
+		TRACE(_T("\t")); \
+		for (int c=0; c<cols; c++) { \
+			TRACE(_T("%-11d  "), get_element(r, c)); \
+		} \
+		TRACE(_T("\n\n")); \
+	} \
+	TRACE(_T("============================================================================================================\n\n")); \
+}
+
+#define MATRIXT_DISPLAY_EX_FUNC_UNSIGNED(Ty) \
+template<> \
+void MatrixT<Ty>::display_ex( const TCHAR *szText ) \
+{ \
+    TRACE(_T("MatrixT<")_T(#Ty)_T(">: Name = [ %s ], [rows = %d, cols = %d]\n"), szText, rows, cols); \
+	TRACE(_T("============================================================================================================\n\n")); \
+	for (int r=0; r<rows; r++) { \
+		TRACE(_T("\t")); \
+		for (int c=0; c<cols; c++) { \
+			TRACE(_T("%-11u  "), get_element(r, c)); \
+		} \
+		TRACE(_T("\n\n")); \
+	} \
+	TRACE(_T("============================================================================================================\n\n")); \
+}
+
+#if defined(MATLAB_USE_DISPLAY_EX) && (MATLAB_USE_DISPLAY_EX)
+MATRIXT_DISPLAY_EX_FUNC_SIGNED(int64_t)
+MATRIXT_DISPLAY_EX_FUNC_SIGNED(int32_t)
+MATRIXT_DISPLAY_EX_FUNC_SIGNED(int16_t)
+MATRIXT_DISPLAY_EX_FUNC_SIGNED(int8_t)
+MATRIXT_DISPLAY_EX_FUNC_SIGNED(signed char)
+
+MATRIXT_DISPLAY_EX_FUNC_UNSIGNED(uint64_t)
+MATRIXT_DISPLAY_EX_FUNC_UNSIGNED(uint32_t)
+MATRIXT_DISPLAY_EX_FUNC_UNSIGNED(uint16_t)
+MATRIXT_DISPLAY_EX_FUNC_UNSIGNED(uint8_t)
+MATRIXT_DISPLAY_EX_FUNC_UNSIGNED(bool)
+#endif
+
 
 #ifndef _MATRIXT_IMPL_internal_H_
 }  // namespace matlab
