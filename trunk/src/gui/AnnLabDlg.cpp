@@ -145,10 +145,15 @@ int CAnnLabDlg::BpNetwork_Test()
     mt1.resize(4, 5);
 
     MatrixT<double> mt2(5, 5);
-    mt2.resize(4, 5);
+    //mt2.resize(4, 5);
+    mt2.display_ex();
 
     MatrixT<int> mt3;
+    mt3.set_name(_T("mt3"));
     mt3.resize(6, 6);
+    mt3(0, 0) = 2;
+    mt3[1][1] = 5;
+    mt3.display_ex();
 
     mt1 = mt2;
 	return indexLayer;

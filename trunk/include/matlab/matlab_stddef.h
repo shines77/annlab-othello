@@ -22,6 +22,9 @@
 #define __MATLAB_STRING_AUX(x)     #x
 #define __MATLAB_STRING(x)         __MATLAB_STRING_AUX(x)
 
+#define STRING_MERGE(a,b,c)     a##b##c
+#define TEST_STRING_DEF(Tx)     STRING_MERGE("first ", " o ", " last")
+
 #define INLINE inline
 
 #define FCN_NAME_LEN      64
