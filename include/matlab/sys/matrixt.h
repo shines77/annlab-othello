@@ -99,8 +99,8 @@ public:
     const value_type get_element( int _row, int _col ) const;          // 获取指定元素的值
 
     // sets
-    void        set_element  ( int _row, int _col, value_type _value ); // 设置指定元素的值
     void        set_element  ( int _index, value_type _value );         // 设置指定元素的值
+    void        set_element  ( int _row, int _col, value_type _value ); // 设置指定元素的值
 
     /////////////////////////////////////////////////////////////////////////
 
@@ -147,10 +147,10 @@ public:
     MatrixT<T>  operator ^  ( value_type _value  );
     MatrixT<T>& operator ^= ( value_type _value  );
 
-    friend MatrixT<T> operator + ( double _value, MatrixT<T>& _Right );
-    friend MatrixT<T> operator - ( double _value, MatrixT<T>& _Right );
-    friend MatrixT<T> operator * ( double _value, MatrixT<T>& _Right );
-    friend MatrixT<T> operator / ( double _value, MatrixT<T>& _Right );
+    friend MatrixT<T> operator + ( value_type _value, MatrixT<T>& _Right );
+    friend MatrixT<T> operator - ( value_type _value, MatrixT<T>& _Right );
+    friend MatrixT<T> operator * ( value_type _value, MatrixT<T>& _Right );
+    friend MatrixT<T> operator / ( value_type _value, MatrixT<T>& _Right );
 
     friend ostream& operator << (ostream& out, const MatrixT<T>& _matrix);
     friend istream& operator >> (istream& in, MatrixT<T>& _matrix);
@@ -158,8 +158,10 @@ public:
     /////////////////////////////////////////////////////////////////////////
 
     // methods
-    void clear    ( void );
+    void free     ( void );
     bool empty    ( void ) const;
+    void clear    ( value_type _fillVal = static_cast<T>(0),
+                    int _initFcn = MAT_INIT_DEFAULT );
     int  resize   ( int _rows, int _cols );
     int  resize_ex( int _rows, int _cols, value_type _fillVal = static_cast<T>(0),
                     int _initFcn = MAT_INIT_DEFAULT );
@@ -238,8 +240,7 @@ protected:
         int _initFcn = MAT_INIT_DEFAULT );
 
 private:
-    // methods
-    void free( void );   /* Notice: use the function carefully! */
+    //
 };
 
 #define _MATRIXT_IMPL_internal_H_
