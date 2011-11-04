@@ -615,19 +615,19 @@
 				Name="gui"
 				>
 				<File
-					RelativePath="..\..\res\gui\AnnLab.ico"
+					RelativePath="..\..\res\vc2008\gui\AnnLab.ico"
 					>
 				</File>
 				<File
-					RelativePath="..\..\res\gui\AnnLab.rc"
+					RelativePath="..\..\res\vc2008\gui\AnnLab.rc"
 					>
 				</File>
 				<File
-					RelativePath="..\..\res\gui\AnnLab.rc2"
+					RelativePath="..\..\res\vc2008\gui\AnnLab.rc2"
 					>
 				</File>
 				<File
-					RelativePath="..\..\res\gui\Resource.h"
+					RelativePath="..\..\res\vc2008\gui\Resource.h"
 					>
 				</File>
 			</Filter>

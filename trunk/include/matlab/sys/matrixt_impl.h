@@ -105,18 +105,14 @@ inline void MatrixT<T>::destroy( void )
 template<typename T>
 inline void MatrixT<T>::free( void )
 {
-    if (pvAlloc != NULL) {
-        delete[] pvAlloc;
-        pvAlloc = NULL;
-        pvData = NULL;
-        if (ppvRowAlloc != NULL) {
-            delete[] ppvRowAlloc;
-            ppvRowAlloc = NULL;
-            ppvRow = NULL;
-        }
-        alloc_size = 0;
-        totals_actual = 0;
-    }
+    destroy();
+}
+
+template<typename T>
+void MatrixT<T>::clear( value_type _fillVal /*= static_cast<T>(0)*/,
+                       int _initFcn /*= MAT_INIT_DEFAULT */ )
+{
+    fill_data(cols, rows, _fillVal, _initFcn);
 }
 
 template<typename T>
@@ -396,12 +392,6 @@ template<typename T>
 inline bool MatrixT<T>::empty( void ) const
 {
 	return (sizes() == 0);
-}
-
-template<typename T>
-inline void MatrixT<T>::clear( void )
-{
-    destroy();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -764,7 +754,7 @@ void MatrixT<T>::fill_data( int _rows, int _cols,
     // init matrix data
     int _totals = _rows * _cols;
     ASSERT(_totals >= 0);
-    if (totals <= 0)
+    if (_totals <= 0)
         return;
 
     switch (_initFcn) {
