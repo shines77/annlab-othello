@@ -4,6 +4,7 @@
 #include "../../include/gui/stdafx.h"
 #include "../../include/gui/AnnLabApp.h"
 #include "../../include/gui/AnnLabDlg.h"
+#include "../../include/matlab/matlab_stddef.h"
 #include "../../include/matlab/sys/AnnList.h"
 #include "../../include/matlab/sys/AnnMatrix.h"
 #include "../../include/matlab/sys/matrixt.h"
@@ -16,7 +17,7 @@
 #define new DEBUG_NEW
 #endif
 
-using namespace matlab;
+//using namespace matlab;
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -153,7 +154,7 @@ int CAnnLabDlg::BpNetwork_Test()
     MatrixT<int> mt3;
     mt3.set_name(_T("mt3"));
     mt3.resize(6, 6);
-    mt3.clear(3, FILL_DATA_SPECIFIED);
+    mt3.clear(INIT_FCN_SPECIFIED, 3);
     mt3(0, 0) = 2;
     mt3[1][1] = 5;
     mt3.display_ex();

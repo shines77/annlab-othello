@@ -261,8 +261,20 @@
 			</Filter>
 			<Filter
 				Name="matlab"
-				Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
+				Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx;h"
 				>
+				<File
+					RelativePath="..\..\src\matlab\matlab_assert.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+				</File>
 				<Filter
 					Name="toolbox"
 					Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
@@ -510,6 +522,10 @@
 				>
 				<File
 					RelativePath="..\..\include\matlab\matlab.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\matlab\matlab_assert.h"
 					>
 				</File>
 				<File

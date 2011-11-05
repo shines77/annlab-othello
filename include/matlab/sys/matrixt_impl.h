@@ -22,39 +22,48 @@ MatrixT<T>::MatrixT( void ) :
 template<typename T>
 MatrixT<T>::MatrixT( int _size )
 {
-    initialize(_size, _size, INIT_TYPE_CONSTRUCTOR);
+    initialize(_size, _size);
 }
 
 template<typename T>
-MatrixT<T>::MatrixT( int _rows, int _cols, int _initFcn /*= FILL_DATA_DEFAULT */ )
+MatrixT<T>::MatrixT( int _rows, int _cols)
 {
-    initialize(_rows, _cols, INIT_TYPE_CONSTRUCTOR, static_cast<T>(0), _initFcn);
+    initialize(_rows, _cols);
+}
+
+template<typename T>
+MatrixT<T>::MatrixT( int _rows, int _cols, int _initFcn,
+                    value_type _fillVal /*= static_cast<T>(0)*/)
+{
+    initialize(_rows, _cols, _initFcn, static_cast<T>(0) );
 }
 
 template<typename T>
 MatrixT<T>::MatrixT( int _rows, int _cols, const value_type& _x )
 {
-    initialize(_rows, _cols, INIT_TYPE_CONSTRUCTOR);
+    initialize(_rows, _cols);
     set_by_scalar(_x);
 }
 
 template<typename T>
 MatrixT<T>::MatrixT( int _rows, int _cols, const value_type* _array )
 {
-    initialize(_rows, _cols, INIT_TYPE_CONSTRUCTOR);
+    initialize(_rows, _cols);
     copy_from_array(_array);
 }
 
 template<typename T>
-MatrixT<T>::MatrixT( const TCHAR *szName, int _rows, int _cols, int _initFcn /*= FILL_DATA_DEFAULT */ )
+MatrixT<T>::MatrixT( const TCHAR *szName, int _rows, int _cols,
+                    int _initFcn /*= INIT_FCN_DEFAULT */,
+                    value_type _fillVal /*= static_cast<T>(0)*/ )
 {
-    initialize_ex(szName, _rows, _cols, INIT_TYPE_CONSTRUCTOR, static_cast<T>(0), _initFcn);
+    initialize_ex(szName, _rows, _cols, _initFcn, _fillVal);
 }
 
 template<typename T>
 MatrixT<T>::MatrixT( const MatrixT<T>& src )
 {
-    initialize_ex(NULL, src.rows, src.cols, INIT_TYPE_CONSTRUCTOR);
+    initialize_ex(NULL, src.rows, src.cols);
     copy_from_array(src.data());
 
     //MatrixT<T>* pMatrix = copy( &src );
@@ -64,15 +73,12 @@ MatrixT<T>::MatrixT( const MatrixT<T>& src )
 template<typename T>
 MatrixT<T>::MatrixT( const MatrixT<T>& src, bool b_copy_data )
 {
-    int _rows, _cols;
-    _rows = src.rows;
-    _cols = src.cols;
-
-    initialize_ex(NULL, _rows, _cols, INIT_TYPE_CONSTRUCTOR);
+    initialize_ex(NULL, src.rows, src.cols);
 
     if (b_copy_data) {
-        MatrixT<T>* pMatrix = copy( &src );
-        ASSERT(pMatrix != NULL);
+        copy_from_array(src.data());
+        //MatrixT<T>* pMatrix = copy( &src );
+        //ASSERT(pMatrix != NULL);
     }
 }
 
@@ -109,35 +115,67 @@ inline void MatrixT<T>::free( void )
 }
 
 template<typename T>
-void MatrixT<T>::clear( value_type _fillVal /*= static_cast<T>(0)*/,
-                       int _initFcn /*= FILL_DATA_DEFAULT */ )
-{
-    fill_data(cols, rows, _fillVal, _initFcn);
-}
-
-template<typename T>
 inline void MatrixT<T>::initialize( int _rows, int _cols,
-                                   int _initMode /*= INIT_TYPE_NONE*/,
-                                   value_type _fillVal /*= 0.0*/,
-                                   int _initFcn /*= FILL_DATA_DEFAULT*/ )
+                                   int _initFcn /*= INIT_FCN_DEFAULT*/,
+                                   value_type _fillVal /*= 0.0*/ )
 {
-    initialize_ex(NULL, _rows, _cols, _initMode, _fillVal, _initFcn);
+    initialize_ex(NULL, _rows, _cols, _initFcn, _fillVal);
 }
 
 template<typename T>
 void MatrixT<T>::initialize_ex( const TCHAR *szName, int _rows, int _cols,
-                               int _initMode /*= INIT_TYPE_NONE*/,
-                               value_type _fillVal /*= 0.0*/,
-                               int _initFcn /*= FILL_DATA_DEFAULT*/ )
+                               int _initFcn /*= INIT_FCN_DEFAULT*/,
+                               value_type _fillVal /*= 0.0*/ )
 {
     size_type _alloc_size;
     int _totals;
     const int nAdditionSize =
-        (int)ceil(double(MAT_ADDR_ALIGN_SIZE) / (double)sizeof(typename T));
+        (int)ceil(double(MAT_CACHE_ALIGN_SIZE) / (double)sizeof(typename T));
     const int nAdditionRowSize =
-        (int)ceil(double(MAT_ADDR_ALIGN_SIZE) / (double)sizeof(pointer));
+        (int)ceil(double(MAT_CACHE_ALIGN_SIZE) / (double)sizeof(pointer));
 
-    if (_initMode == INIT_TYPE_CONSTRUCTOR) {
+    if (szName == NULL)
+        _tcscpy_s(m_szName, _countof(m_szName), _T(""));
+    else
+        _tcscpy_s(m_szName, _countof(m_szName), szName);
+
+    _totals = _rows * _cols;
+    _alloc_size = _totals + nAdditionSize;
+
+    pointer pvNewOrigPtr = new value_type[_alloc_size];
+    ptr_pointer ppvOrigRow = new pointer[_rows + nAdditionRowSize];
+    if (pvNewOrigPtr != NULL && ppvOrigRow != NULL) {
+        pointer pvNewData = (pointer)MAT_CACHE_ALIGN_128(pvNewOrigPtr);
+        ptr_pointer ppvNewRow = (ptr_pointer)MAT_CACHE_ALIGN_128(ppvOrigRow);
+
+        ASSERT(pvNewData != NULL);
+        ASSERT(ppvNewRow != NULL);
+
+        // save the new data buffer
+        pvData = pvNewData;
+        ppvRow = ppvNewRow;
+        pvAlloc = pvNewOrigPtr;
+        ppvRowAlloc = ppvOrigRow;
+        alloc_size = _alloc_size;
+
+        // save the new sizes
+        rows = _rows;
+        cols = _cols;
+        totals = _totals;
+        totals_actual = _totals;
+
+        // save the row pointer
+        pointer p = pvData;
+        for (int i=0; i<rows; ++i) {
+            ppvRow[i] = p;
+            p += cols;
+        }
+
+        // fill data for matrix
+        if (_initFcn != INIT_FCN_NONE)
+            fill_data(_rows, _cols, _initFcn, _fillVal);
+    }
+    else {
         pvData      = NULL;
         ppvRow      = NULL;
         pvAlloc     = NULL;
@@ -148,104 +186,20 @@ void MatrixT<T>::initialize_ex( const TCHAR *szName, int _rows, int _cols,
         totals      = 0;
         totals_actual = 0;
     }
-
-    if (_initMode != INIT_TYPE_RESIZE) {
-        if (szName != NULL)
-            _tcscpy_s(m_szName, _countof(m_szName), szName);
-        else
-            _tcscpy_s(m_szName, _countof(m_szName), _T(""));
-    }
-
-    _totals = _rows * _cols;
-    _alloc_size = _totals + nAdditionSize;
-
-    pointer pvNewOrigPtr = new value_type[_alloc_size];
-    ptr_pointer ppvOrigRow = new pointer[_rows + nAdditionRowSize];
-    if (pvNewOrigPtr != NULL && ppvOrigRow != NULL) {
-        pointer pvNewData = (pointer)MAT_ADDR_ALIGN(pvNewOrigPtr);
-        ptr_pointer ppvNewRow = (ptr_pointer)MAT_ADDR_ALIGN(ppvOrigRow);
-        if (pvAlloc == NULL) {
-            // save the new data buffer
-            pvAlloc = pvNewOrigPtr;
-            ppvRowAlloc = ppvOrigRow;
-            pvData = pvNewData;
-            ppvRow = ppvNewRow;
-            alloc_size = _alloc_size;
-
-            // save the new sizes
-            rows = _rows;
-            cols = _cols;
-            totals = _totals;
-            totals_actual = _totals;
-
-            // save the row pointer
-            pointer p = pvData;
-            for (int i=0; i<rows; ++i) {
-                ppvRow[i] = p;
-                p += cols;
-            }
-
-            // fill data for matrix
-            if (_initFcn != FILL_DATA_NONE)
-                fill_data(_rows, _cols, _fillVal, _initFcn);
-        }
-        else {
-            // reserve(copy) old data and fill data buffer
-            reserve_and_fill_data(pvNewData, _rows, _cols, _fillVal, _initFcn);
-
-            // clear old data
-            if (pvAlloc != NULL) {
-                delete[] pvAlloc;
-                if (ppvRowAlloc = NULL)
-                    delete[] ppvRowAlloc;
-            }
-
-            // save the new data buffer
-            pvAlloc = pvNewOrigPtr;
-            ppvRowAlloc = ppvOrigRow;
-            pvData = pvNewData;
-            ppvRow = ppvNewRow;
-            alloc_size = _alloc_size;
-
-            // save the new sizes
-            rows = _rows;
-            cols = _cols;
-            totals = _totals;
-            totals_actual = _totals;
-
-            // save the row pointer
-            pointer p = pvData;
-            for (int i=0; i<rows; ++i) {
-                ppvRow[i] = p;
-                p += cols;
-            }
-        }               
-    }
 }
 
 template<typename T>
 void MatrixT<T>::init_martix( int _rows, int _cols,
                              int _initMode /*= INIT_TYPE_NONE*/,
-                             value_type _fillVal /*= static_cast<T>(0)*/,
-                             int _initFcn /*= MAT_INIT_DEFAULT */ )
+                             int _initFcn /*= MAT_INIT_DEFAULT */,
+                             value_type _fillVal /*= static_cast<T>(0)*/ )
 {
     size_type _alloc_size;
     int _totals;
     const int nAdditionSize =
-        (int)ceil(double(MAT_ADDR_ALIGN_SIZE) / (double)sizeof(typename T));
+        (int)ceil(double(MAT_CACHE_ALIGN_SIZE) / (double)sizeof(typename T));
     const int nAdditionRowSize =
-        (int)ceil(double(MAT_ADDR_ALIGN_SIZE) / (double)sizeof(typename pointer));
-
-    if (_initMode == INIT_TYPE_CONSTRUCTOR) {
-        pvData      = NULL;
-        ppvRow      = NULL;
-        pvAlloc     = NULL;
-        alloc_size  = 0;
-
-        rows = cols = 0;
-        totals      = 0;
-        totals_actual = 0;
-    }
+        (int)ceil(double(MAT_CACHE_ALIGN_SIZE) / (double)sizeof(typename pointer));
 
     _totals = _rows * _cols;
     _alloc_size = _totals + nAdditionSize;
@@ -253,8 +207,8 @@ void MatrixT<T>::init_martix( int _rows, int _cols,
     pointer pvNewOrigPtr = new value_type[_alloc_size];
     ptr_pointer ppvOrigRow = new pointer[_rows + nAdditionRowSize];
     if (pvNewOrigPtr != NULL && ppvOrigRow != NULL) {
-        pointer pvNewData = (pointer)MAT_ADDR_ALIGN(pvNewOrigPtr);
-        ptr_pointer ppvNewRow = (ptr_pointer)MAT_ADDR_ALIGN(ppvOrigRow);
+        pointer pvNewData = (pointer)MAT_CACHE_ALIGN_128(pvNewOrigPtr);
+        ptr_pointer ppvNewRow = (ptr_pointer)MAT_CACHE_ALIGN_128(ppvOrigRow);
         if (pvAlloc == NULL) {
             // save the new data buffer
             pvAlloc = pvNewOrigPtr;
@@ -277,12 +231,12 @@ void MatrixT<T>::init_martix( int _rows, int _cols,
             }
 
             // fill data for matrix
-            if (_initFcn != FILL_DATA_NONE)
-                fill_data(_rows, _cols, _fillVal, _initFcn);
+            if (_initFcn != INIT_FCN_NONE)
+                fill_data(_rows, _cols, _initFcn, _fillVal);
         }
         else {
             // reserve(copy) old data and fill data buffer
-            reserve_and_fill_data(pvNewData, _rows, _cols, _fillVal, _initFcn);
+            reserve_and_fill_data(pvNewData, _rows, _cols, _initFcn, _fillVal);
 
             // clear old data
             if (pvAlloc != NULL) {
@@ -316,8 +270,8 @@ void MatrixT<T>::init_martix( int _rows, int _cols,
 
 template<typename T>
 void MatrixT<T>::reserve_and_fill_data( pointer pvNewData, int _rows, int _cols,
-                                       value_type _fillVal /*= 0.0*/,
-                                       int _initFcn /*= MAT_INIT_DEFAULT */ )
+                                       int _initFcn /*= MAT_INIT_DEFAULT */,
+                                       value_type _fillVal /*= 0.0*/ )
 {
     ASSERT(pvData != NULL && pvNewData != NULL);
     if (pvData == NULL || pvNewData == NULL)
@@ -350,7 +304,7 @@ void MatrixT<T>::reserve_and_fill_data( pointer pvNewData, int _rows, int _cols,
     if (_copyLength != 0)
         memcpy_s(pvNewData, sizeof(typename T) * _copyLength, pvData, sizeof(typename T) * _copyLength);
 
-    if (_initFcn == FILL_DATA_NONE || _fillLength <= 0)
+    if (_initFcn == INIT_FCN_NONE || _fillLength <= 0)
         return;
 
     pointer pvNewDataFill = pvNewData + _copyLength;
@@ -359,33 +313,40 @@ void MatrixT<T>::reserve_and_fill_data( pointer pvNewData, int _rows, int _cols,
 
     double _fRndNum;
     switch (_initFcn) {
-    case FILL_DATA_ZEROS:       // all zeros
+    case INIT_FCN_ZEROS:       // all zeros
         for (int i=0; i<_fillLength; i++)
             pvNewDataFill[i] = static_cast<T>(0);
         break;
-    case FILL_DATA_ONES:            // all ones
+    case INIT_FCN_ONES:            // all ones
         for (int i=0; i<_fillLength; i++)
             pvNewDataFill[i] = static_cast<T>(1);
         break;
-    case FILL_DATA_RANDS:       // all [-1,1] randomize
+    case INIT_FCN_RANDS:       // all [-1,1] randomize
         for (int i=0; i<_fillLength; i++) {
             _fRndNum = 2.0 * (double)rand() / (double)(RAND_MAX + 1) - 1.0;
             pvNewDataFill[i] = static_cast<T>(_fRndNum);
         }
         break;
-    case FILL_DATA_RANDS_POSITIVE:      // all [0,1] randomize
+    case INIT_FCN_RANDS_POSITIVE:      // all [0,1] randomize
         for (int i=0; i<_fillLength; i++) {
             _fRndNum = (double)rand() / (double)(RAND_MAX + 1);
             pvNewDataFill[i] = static_cast<T>(_fRndNum);
         }
         break;
-    case FILL_DATA_EYES:
+    case INIT_FCN_EYES:
         // 暂未提供
         break;
-    case FILL_DATA_NONE:
+    case INIT_FCN_NONE:
         // do nothing
         break;
     }
+}
+
+template<typename T>
+void MatrixT<T>::clear( int _initFcn /*= INIT_FCN_DEFAULT */,
+                       value_type _fillVal /*= static_cast<T>(0)*/ )
+{
+    fill_data(cols, rows, _initFcn, _fillVal);
 }
 
 template<typename T>
@@ -484,12 +445,12 @@ inline int MatrixT<T>::resize( int _rows, int _cols )
 
 template<typename T>
 inline int MatrixT<T>::resize_ex( int _rows, int _cols,
-                                 value_type _fillVal /*= 0.0*/,
-                                 int _initFcn /*= MAT_INIT_DEFAULT */ )
+                                 int _initFcn /*= MAT_INIT_DEFAULT */,
+                                 value_type _fillVal /*= 0.0*/ )
 {
     if (rows == _rows && cols == _cols) {
-        if (_initFcn != FILL_DATA_NONE)
-            fill_data(_rows, _cols, _fillVal, _initFcn);
+        if (_initFcn != INIT_FCN_NONE)
+            fill_data(_rows, _cols, _initFcn, _fillVal);
         return totals;
     }
 
@@ -745,8 +706,8 @@ inline MatrixT<T> MatrixT<T>::_rands2( int _rows, int _cols ) const
 
 template<typename T>
 void MatrixT<T>::fill_data( int _rows, int _cols,
-                           value_type _fillVal /*= 0.0*/,
-                           int _initFcn /*= MAT_INIT_DEFAULT */ )
+                           int _initFcn /*= MAT_INIT_DEFAULT */,
+                           value_type _fillVal /*= 0.0*/ )
 {
     ASSERT(pvData != NULL);
     ASSERT(_rows <= rows && _rows >= 0 && _cols <= cols && _cols >= 0);
@@ -758,40 +719,40 @@ void MatrixT<T>::fill_data( int _rows, int _cols,
         return;
 
     switch (_initFcn) {
-    case FILL_DATA_ZEROS:           // all zeros
+    case INIT_FCN_ZEROS:           // all zeros
         for (int i=0; i<_totals; ++i)
             pvData[i] = static_cast<T>(0);
         break;
-    case FILL_DATA_ONES:            // all ones
+    case INIT_FCN_ONES:            // all ones
         for (int i=0; i<_totals; ++i)
             pvData[i] = static_cast<T>(1);
         break;
-    case FILL_DATA_EYES:
+    case INIT_FCN_EYES:
         // 暂未提供
         break;
-    case FILL_DATA_RANDS:           // all [-1,1] randomize
+    case INIT_FCN_RANDS:           // all [-1,1] randomize
         for (int i=0; i<_totals; ++i)
             pvData[i] = (value_type)(2.0 * (value_type)rand() / (value_type)(RAND_MAX) - 1.0);
         break;
-    case FILL_DATA_RANDS_POSITIVE:  // all [0,1] positive randomize
+    case INIT_FCN_RANDS_POSITIVE:  // all [0,1] positive randomize
         for (int i=0; i<_totals; ++i)
             pvData[i] = (value_type)rand() / (value_type)(RAND_MAX);
         break;
-    case FILL_DATA_SPECIFIED:
+    case INIT_FCN_SPECIFIED:
         for (int i=0; i<_totals; ++i)
             pvData[i] = _fillVal;
         break;
-    case FILL_DATA_NONE:
+    case INIT_FCN_NONE:
         // do nothing
         break;
     }
 }
 
-#define MATRIXT_FILL_DATA_FUNC_SIGNED(Ty) \
+#define MATRIXT_INIT_FCN_FUNC_SIGNED(Ty) \
 template<> \
 void MatrixT<Ty>::fill_data( int _rows, int _cols, \
-                           value_type _fillVal /*= 0.0*/, \
-                           int _initFcn /*= MAT_INIT_DEFAULT */ ) \
+                            int _initFcn /*= MAT_INIT_DEFAULT */, \
+                            value_type _fillVal /*= 0.0*/ ) \
 { \
     ASSERT(pvData != NULL); \
     ASSERT(_rows <= rows && _rows >= 0 && _cols <= cols && _cols >= 0); \
@@ -803,18 +764,18 @@ void MatrixT<Ty>::fill_data( int _rows, int _cols, \
         return; \
                         \
     switch (_initFcn) { \
-    case FILL_DATA_ZEROS:           /* all zeros */ \
+    case INIT_FCN_ZEROS:           /* all zeros */ \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = static_cast<Ty>(0); \
         break; \
-    case FILL_DATA_ONES:            /* all ones */ \
+    case INIT_FCN_ONES:            /* all ones */ \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = static_cast<Ty>(1); \
         break; \
-    case FILL_DATA_EYES: \
+    case INIT_FCN_EYES: \
         /* 暂未提供 */ \
         break; \
-    case FILL_DATA_RANDS:           /* all [-1,1] randomize */ \
+    case INIT_FCN_RANDS:           /* all [-1,1] randomize */ \
         /* whether is the signed integer type? */ \
         if ((value_type)(0) > (value_type)(-1)) { \
             /* signed integer */ \
@@ -827,25 +788,25 @@ void MatrixT<Ty>::fill_data( int _rows, int _cols, \
                 pvData[i] = (value_type)(rand() & 1); \
         } \
         break; \
-    case FILL_DATA_RANDS_POSITIVE:  /* all [0,1] positive randomize */ \
+    case INIT_FCN_RANDS_POSITIVE:  /* all [0,1] positive randomize */ \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = (value_type)(rand() & 1); \
         break; \
-    case FILL_DATA_SPECIFIED: \
+    case INIT_FCN_SPECIFIED: \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = _fillVal; \
         break; \
-    case FILL_DATA_NONE: \
+    case INIT_FCN_NONE: \
         /* do nothing */ \
         break; \
     } \
 }
 
-#define MATRIXT_FILL_DATA_FUNC_UNSIGNED(Ty) \
+#define MATRIXT_INIT_FCN_FUNC_UNSIGNED(Ty) \
 template<> \
 void MatrixT<Ty>::fill_data( int _rows, int _cols, \
-                           value_type _fillVal /*= 0.0*/, \
-                           int _initFcn /*= MAT_INIT_DEFAULT */ ) \
+                            int _initFcn /*= MAT_INIT_DEFAULT */, \
+                            value_type _fillVal /*= 0.0*/ ) \
 { \
     ASSERT(pvData != NULL); \
     ASSERT(_rows <= rows && _rows >= 0 && _cols <= cols && _cols >= 0); \
@@ -857,47 +818,47 @@ void MatrixT<Ty>::fill_data( int _rows, int _cols, \
         return; \
                         \
     switch (_initFcn) { \
-    case FILL_DATA_ZEROS:           /* all zeros */ \
+    case INIT_FCN_ZEROS:           /* all zeros */ \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = static_cast<Ty>(0); \
         break; \
-    case FILL_DATA_ONES:            /* all ones */ \
+    case INIT_FCN_ONES:            /* all ones */ \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = static_cast<Ty>(1); \
         break; \
-    case FILL_DATA_EYES: \
+    case INIT_FCN_EYES: \
         /* 暂未提供 */ \
         break; \
-    case FILL_DATA_RANDS:           /* all [0,1] randomize */ \
+    case INIT_FCN_RANDS:           /* all [0,1] randomize */ \
         /* unsigned integer, not allowed -1 */ \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = (value_type)(rand() & 1); \
         break; \
-    case FILL_DATA_RANDS_POSITIVE:  /* all [0,1] positive randomize */ \
+    case INIT_FCN_RANDS_POSITIVE:  /* all [0,1] positive randomize */ \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = (value_type)(rand() & 1); \
         break; \
-    case FILL_DATA_SPECIFIED: \
+    case INIT_FCN_SPECIFIED: \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = _fillVal; \
         break; \
-    case FILL_DATA_NONE: \
+    case INIT_FCN_NONE: \
         /* do nothing */ \
         break; \
     } \
 }
 
-MATRIXT_FILL_DATA_FUNC_SIGNED(int64_t)
-MATRIXT_FILL_DATA_FUNC_SIGNED(int32_t)
-MATRIXT_FILL_DATA_FUNC_SIGNED(int16_t)
-MATRIXT_FILL_DATA_FUNC_SIGNED(int8_t)
-MATRIXT_FILL_DATA_FUNC_SIGNED(signed char)
+MATRIXT_INIT_FCN_FUNC_SIGNED(int64_t)
+MATRIXT_INIT_FCN_FUNC_SIGNED(int32_t)
+MATRIXT_INIT_FCN_FUNC_SIGNED(int16_t)
+MATRIXT_INIT_FCN_FUNC_SIGNED(int8_t)
+MATRIXT_INIT_FCN_FUNC_SIGNED(signed char)
 
-MATRIXT_FILL_DATA_FUNC_UNSIGNED(uint64_t)
-MATRIXT_FILL_DATA_FUNC_UNSIGNED(uint32_t)
-MATRIXT_FILL_DATA_FUNC_UNSIGNED(uint16_t)
-MATRIXT_FILL_DATA_FUNC_UNSIGNED(uint8_t)
-MATRIXT_FILL_DATA_FUNC_UNSIGNED(bool)
+MATRIXT_INIT_FCN_FUNC_UNSIGNED(uint64_t)
+MATRIXT_INIT_FCN_FUNC_UNSIGNED(uint32_t)
+MATRIXT_INIT_FCN_FUNC_UNSIGNED(uint16_t)
+MATRIXT_INIT_FCN_FUNC_UNSIGNED(uint8_t)
+MATRIXT_INIT_FCN_FUNC_UNSIGNED(bool)
 
 /*
  * AnsiToUnicode converts the ANSI string pszA to a Unicode string

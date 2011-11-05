@@ -13,21 +13,21 @@ using namespace std;
 
 #define MAT_NAN_ITEM            (-128.0)
 
-#define MAT_ADDR_ALIGN_SIZE     (128UL)
-#define MAT_ADDR_ALIGN_MASK     (MAT_ADDR_ALIGN_SIZE - 1)
-#define MAT_ADDR_ALIGN(x)       (((uint32_t)(x) + MAT_ADDR_ALIGN_MASK) & (~MAT_ADDR_ALIGN_MASK))
+#define MAT_CACHE_ALIGN_SIZE    (128UL)
+#define MAT_CACHE_ALIGN_MASK    (MAT_CACHE_ALIGN_SIZE - 1)
+#define MAT_CACHE_ALIGN_128(x)  (((uint32_t)(x) + MAT_CACHE_ALIGN_MASK) & (~MAT_CACHE_ALIGN_MASK))
 
 namespace matlab {
 
 typedef enum _enumMatFillData {
-    FILL_DATA_NONE = 0,
-    FILL_DATA_ZEROS,
-    FILL_DATA_ONES,
-    FILL_DATA_EYES,
-    FILL_DATA_RANDS,
-    FILL_DATA_RANDS_POSITIVE,
-    FILL_DATA_SPECIFIED,
-    FILL_DATA_MAX
+    INIT_FCN_NONE = 0,
+    INIT_FCN_ZEROS,
+    INIT_FCN_ONES,
+    INIT_FCN_EYES,
+    INIT_FCN_RANDS,
+    INIT_FCN_RANDS_POSITIVE,
+    INIT_FCN_SPECIFIED,
+    INIT_FCN_MAX
 } enumMatFillData;
 
 typedef enum _enumMatInitType {
@@ -55,7 +55,7 @@ public:
     typedef std::size_t size_type;
     typedef std::ptrdiff_t difference_type;
 
-    static const unsigned int FILL_DATA_DEFAULT = FILL_DATA_NONE;
+    static const unsigned int INIT_FCN_DEFAULT = INIT_FCN_NONE;
 
 private:
     pointer     pvData;
@@ -75,10 +75,12 @@ private:
 public:
     MatrixT( void );
     explicit MatrixT( int _size );
-    MatrixT( int _rows, int _cols, int _initFcn = FILL_DATA_DEFAULT );
-    MatrixT( const TCHAR *szName, int _rows, int _cols, int _initFcn = FILL_DATA_DEFAULT );
+    MatrixT( int _rows, int _cols);
     MatrixT( int _rows, int _cols, const value_type& _x );
     MatrixT( int _rows, int _cols, const value_type* _array );
+    MatrixT( int _rows, int _cols, int _initFcn, value_type _fillVal = static_cast<T>(0) );
+    MatrixT( const TCHAR *szName, int _rows, int _cols, int _initFcn = INIT_FCN_DEFAULT,
+        value_type _fillVal = static_cast<T>(0) );
     MatrixT( const MatrixT<T>& src );                                   // 拷贝构造函数
     MatrixT( const MatrixT<T>& src, bool b_copy_data );
     virtual ~MatrixT( void );
@@ -100,8 +102,8 @@ public:
     const value_type get_element( int _row, int _col ) const;          // 获取指定元素的值
 
     // sets
-    void        set_element  ( int _index, value_type _value );         // 设置指定元素的值
-    void        set_element  ( int _row, int _col, value_type _value ); // 设置指定元素的值
+    void        set_element( int _index, value_type _value );          // 设置指定元素的值
+    void        set_element( int _row, int _col, value_type _value );  // 设置指定元素的值
 
     /////////////////////////////////////////////////////////////////////////
 
@@ -161,11 +163,11 @@ public:
     // methods
     void free     ( void );
     bool empty    ( void ) const;
-    void clear    ( value_type _fillVal = static_cast<T>(0),
-                    int _initFcn = FILL_DATA_DEFAULT );
+    void clear    ( int _initFcn = INIT_FCN_DEFAULT,
+                    value_type _fillVal = static_cast<T>(0) );
     int  resize   ( int _rows, int _cols );
-    int  resize_ex( int _rows, int _cols, value_type _fillVal = static_cast<T>(0),
-                    int _initFcn = FILL_DATA_DEFAULT );
+    int  resize_ex( int _rows, int _cols, int _initFcn = INIT_FCN_DEFAULT,
+        value_type _fillVal = static_cast<T>(0) );
 
     // copy()完整复制结构以及数据
     MatrixT<T>* copy ( const MatrixT<T>* src );
@@ -222,23 +224,21 @@ protected:
     // methods
     void destroy( void );
 
-    void initialize(int _rows, int _cols, int _initMode = INIT_TYPE_NONE,
-        value_type _fillVal = static_cast<T>(0),
-        int _initFcn = FILL_DATA_DEFAULT);
-    void initialize_ex(const TCHAR *szName, int _rows, int _cols,
-        int _initMode = INIT_TYPE_NONE,
-        value_type _fillVal = static_cast<T>(0),
-        int _initFcn = FILL_DATA_DEFAULT);
+    void initialize( int _rows, int _cols, int _initFcn = INIT_FCN_DEFAULT,
+        value_type _fillVal = static_cast<T>(0) );
+    void initialize_ex( const TCHAR *szName, int _rows, int _cols,
+        int _initFcn = INIT_FCN_DEFAULT,
+        value_type _fillVal = static_cast<T>(0) );
 
-    void init_martix(int _rows, int _cols, int _initMode = INIT_TYPE_NONE,
-        value_type _fillVal = static_cast<T>(0),
-        int _initFcn = FILL_DATA_DEFAULT );
+    void init_martix( int _rows, int _cols, int _initMode = INIT_TYPE_NONE,
+        int _initFcn = INIT_FCN_DEFAULT,
+        value_type _fillVal = static_cast<T>(0) );
     void fill_data( int _rows, int _cols,
-        value_type _fillVal = static_cast<T>(0),
-        int _initFcn = FILL_DATA_DEFAULT );
+        int _initFcn = INIT_FCN_DEFAULT,
+        value_type _fillVal = static_cast<T>(0) );
     void reserve_and_fill_data( pointer pvNewData, int _rows, int _cols,
-        value_type _fillVal = static_cast<T>(0),
-        int _initFcn = FILL_DATA_DEFAULT );
+        int _initFcn = INIT_FCN_DEFAULT,
+        value_type _fillVal = static_cast<T>(0) );
 
 private:
     //
