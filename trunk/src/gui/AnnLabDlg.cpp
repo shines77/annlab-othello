@@ -146,11 +146,14 @@ int CAnnLabDlg::BpNetwork_Test()
 
     MatrixT<double> mt2(5, 5);
     //mt2.resize(4, 5);
+    mt2[1][1] = 0.2783;
+    mt2[2][2] = 3.32178E+64;
     mt2.display_ex();
 
     MatrixT<int> mt3;
     mt3.set_name(_T("mt3"));
     mt3.resize(6, 6);
+    mt3.clear(3, FILL_DATA_SPECIFIED);
     mt3(0, 0) = 2;
     mt3[1][1] = 5;
     mt3.display_ex();
@@ -174,7 +177,7 @@ void CAnnLabDlg::BpNetwork_ShowTest()
 	}
 	//*/
 #endif
-	::ShowMessage( GetSafeHwnd(), _T("indexLayer"), indexLayer );
+	//::ShowMessage( GetSafeHwnd(), _T("indexLayer"), indexLayer );
 	//ShowMessage( _T("indexLayer"), indexLayer );
 }
 

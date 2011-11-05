@@ -1538,18 +1538,7 @@ CAnnMatrix CAnnMatrix::get_col_vector( int _col ) const
 
 void CAnnMatrix::display( void )
 {
-#if defined(MATLAB_USE_DISPLAY) && (MATLAB_USE_DISPLAY)
-	TRACE(_T("CxMatrix: Name = [ %s ], [rows = %d, cols = %d]\n"), name(), rows, cols);
-	TRACE(_T("============================================================================================================\n\n"));
-	for (int r=0; r<rows; r++) {
-		TRACE(_T("\t"));
-		for (int c=0; c<cols; c++) {
-			TRACE(_T("%0.4f  \t"), get_element(r, c));
-		}
-		TRACE(_T("\n\n"));
-	}
-	TRACE(_T("============================================================================================================\n\n"));
-#endif
+    display(_T("Empty"));
 }
 
 void CAnnMatrix::display( const TCHAR *szName )
@@ -1560,7 +1549,11 @@ void CAnnMatrix::display( const TCHAR *szName )
 	for (int r=0; r<rows; r++) {
 		TRACE(_T("\t"));
 		for (int c=0; c<cols; c++) {
-			TRACE(_T("%0.4f  \t"), get_element(r, c));
+            double value = get_element(r, c);
+            if (abs(value) < 10000000.0)
+                TRACE(_T("%12.4f "), value);
+            else
+                TRACE(_T("%12.4E "), value);
 		}
 		TRACE(_T("\n\n"));
 	}

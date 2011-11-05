@@ -19,6 +19,27 @@ using namespace std;
 
 namespace matlab {
 
+typedef enum _enumMatFillData {
+    FILL_DATA_NONE = 0,
+    FILL_DATA_ZEROS,
+    FILL_DATA_ONES,
+    FILL_DATA_EYES,
+    FILL_DATA_RANDS,
+    FILL_DATA_RANDS_POSITIVE,
+    FILL_DATA_SPECIFIED,
+    FILL_DATA_MAX
+} enumMatFillData;
+
+typedef enum _enumMatInitType {
+    INIT_TYPE_NONE = 0,
+    INIT_TYPE_CONSTRUCTOR,
+    INIT_TYPE_RESIZE,
+    INIT_TYPE_NOT_RESERVED,     // 不保留数据
+    INIT_TYPE_RESERVE_STRUCT,   // 保留数据, 且保持原矩阵元素的逻辑位置, 空白位置用指定数据填白
+    INIT_TYPE_RESERVE_ORDER,    // 保留数据, 仅保持原数据在内存中的物理位置, 空白位置用指定数据填白
+    INIT_TYPE_MAX
+} enumMatInitType;
+
 template<typename T>
 class MatrixT : public CAnnObject
 {
@@ -34,27 +55,7 @@ public:
     typedef std::size_t size_type;
     typedef std::ptrdiff_t difference_type;
 
-    typedef enum _enumMatFillMode {
-        FILL_MODE_NONE = 0,
-        FILL_MODE_ZEROS,
-        FILL_MODE_ONES,
-        FILL_MODE_EYES,
-        FILL_MODE_RANDS,
-        FILL_MODE_RANDS_POSITIVE,
-        FILL_MODE_MAX
-    } enumMatFillMode;
-
-    typedef enum _enumMatInitMode {
-        INIT_MODE_NONE = 0,
-        INIT_MODE_CONSTRUCTOR,
-        INIT_MODE_RESIZE,
-        INIT_MODE_NOT_RESERVED,     // 不保留数据
-        INIT_MODE_RESERVE_STRUCT,   // 保留数据, 且保持原矩阵元素的逻辑位置, 空白位置用指定数据填白
-        INIT_MODE_RESERVE_ORDER,    // 保留数据, 仅保持原数据在内存中的物理位置, 空白位置用指定数据填白
-        INIT_MODE_MAX
-    } enumMatInitMode;
-
-    static const unsigned int MAT_INIT_DEFAULT = FILL_MODE_NONE;
+    static const unsigned int FILL_DATA_DEFAULT = FILL_DATA_NONE;
 
 private:
     pointer     pvData;
@@ -74,8 +75,8 @@ private:
 public:
     MatrixT( void );
     explicit MatrixT( int _size );
-    MatrixT( int _rows, int _cols, int _initFcn = FILL_MODE_NONE );
-    MatrixT( const TCHAR *szName, int _rows, int _cols, int _initFcn = FILL_MODE_NONE );
+    MatrixT( int _rows, int _cols, int _initFcn = FILL_DATA_DEFAULT );
+    MatrixT( const TCHAR *szName, int _rows, int _cols, int _initFcn = FILL_DATA_DEFAULT );
     MatrixT( int _rows, int _cols, const value_type& _x );
     MatrixT( int _rows, int _cols, const value_type* _array );
     MatrixT( const MatrixT<T>& src );                                   // 拷贝构造函数
@@ -161,10 +162,10 @@ public:
     void free     ( void );
     bool empty    ( void ) const;
     void clear    ( value_type _fillVal = static_cast<T>(0),
-                    int _initFcn = MAT_INIT_DEFAULT );
+                    int _initFcn = FILL_DATA_DEFAULT );
     int  resize   ( int _rows, int _cols );
     int  resize_ex( int _rows, int _cols, value_type _fillVal = static_cast<T>(0),
-                    int _initFcn = MAT_INIT_DEFAULT );
+                    int _initFcn = FILL_DATA_DEFAULT );
 
     // copy()完整复制结构以及数据
     MatrixT<T>* copy ( const MatrixT<T>* src );
@@ -221,23 +222,23 @@ protected:
     // methods
     void destroy( void );
 
-    void initialize(int _rows, int _cols, int _initMode = INIT_MODE_NONE,
+    void initialize(int _rows, int _cols, int _initMode = INIT_TYPE_NONE,
         value_type _fillVal = static_cast<T>(0),
-        int _initFcn = MAT_INIT_DEFAULT);
+        int _initFcn = FILL_DATA_DEFAULT);
     void initialize_ex(const TCHAR *szName, int _rows, int _cols,
-        int _initMode = INIT_MODE_NONE,
+        int _initMode = INIT_TYPE_NONE,
         value_type _fillVal = static_cast<T>(0),
-        int _initFcn = MAT_INIT_DEFAULT);
+        int _initFcn = FILL_DATA_DEFAULT);
 
-    void init_martix(int _rows, int _cols, int _initMode = INIT_MODE_NONE,
+    void init_martix(int _rows, int _cols, int _initMode = INIT_TYPE_NONE,
         value_type _fillVal = static_cast<T>(0),
-        int _initFcn = MAT_INIT_DEFAULT );
+        int _initFcn = FILL_DATA_DEFAULT );
     void fill_data( int _rows, int _cols,
         value_type _fillVal = static_cast<T>(0),
-        int _initFcn = MAT_INIT_DEFAULT );
+        int _initFcn = FILL_DATA_DEFAULT );
     void reserve_and_fill_data( pointer pvNewData, int _rows, int _cols,
         value_type _fillVal = static_cast<T>(0),
-        int _initFcn = MAT_INIT_DEFAULT );
+        int _initFcn = FILL_DATA_DEFAULT );
 
 private:
     //
