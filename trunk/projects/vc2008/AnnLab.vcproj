@@ -260,11 +260,11 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="matlab"
+				Name="annlab"
 				Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx;h"
 				>
 				<File
-					RelativePath="..\..\src\matlab\matlab_assert.cpp"
+					RelativePath="..\..\src\annlab\annlab_assert.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -280,7 +280,7 @@
 					Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 					>
 					<File
-						RelativePath="..\..\src\matlab\toolbox\nnerror.cpp"
+						RelativePath="..\..\src\annlab\toolbox\nnerror.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -304,7 +304,7 @@
 						Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 						>
 						<File
-							RelativePath="..\..\src\matlab\toolbox\nnet\nninit.cpp"
+							RelativePath="..\..\src\annlab\toolbox\nnet\nninit.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -324,7 +324,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="..\..\src\matlab\toolbox\nnet\nnnetwork.cpp"
+							RelativePath="..\..\src\annlab\toolbox\nnet\nnnetwork.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -344,7 +344,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="..\..\src\matlab\toolbox\nnet\nntrain.cpp"
+							RelativePath="..\..\src\annlab\toolbox\nnet\nntrain.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -364,7 +364,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="..\..\src\matlab\toolbox\nnet\nnutils.cpp"
+							RelativePath="..\..\src\annlab\toolbox\nnet\nnutils.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -389,7 +389,7 @@
 						Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 						>
 						<File
-							RelativePath="..\..\src\matlab\toolbox\matlab\elmat.cpp"
+							RelativePath="..\..\src\annlab\toolbox\matlab\elmat.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -415,7 +415,7 @@
 					Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 					>
 					<File
-						RelativePath="..\..\src\matlab\sys\AnnList.cpp"
+						RelativePath="..\..\src\annlab\sys\AnnList.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -435,7 +435,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\src\matlab\sys\AnnMatrix.cpp"
+						RelativePath="..\..\src\annlab\sys\AnnMatrix.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -455,7 +455,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\src\matlab\sys\AnnNetwork.cpp"
+						RelativePath="..\..\src\annlab\sys\AnnNetwork.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -517,23 +517,23 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="matlab"
+				Name="annlab"
 				Filter="h;hpp;hxx;hm;inl;inc;xsd"
 				>
 				<File
-					RelativePath="..\..\include\matlab\matlab.h"
+					RelativePath="..\..\include\annlab\annlab.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\matlab\matlab_assert.h"
+					RelativePath="..\..\include\annlab\annlab_assert.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\matlab\matlab_config.h"
+					RelativePath="..\..\include\annlab\annlab_config.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\matlab\matlab_stddef.h"
+					RelativePath="..\..\include\annlab\annlab_stddef.h"
 					>
 				</File>
 				<Filter
@@ -541,7 +541,7 @@
 					Filter="h;hpp;hxx;hm;inl;inc;xsd"
 					>
 					<File
-						RelativePath="..\..\include\matlab\toolbox\nnerror.h"
+						RelativePath="..\..\include\annlab\toolbox\nnerror.h"
 						>
 					</File>
 					<Filter
@@ -549,19 +549,19 @@
 						Filter="h;hpp;hxx;hm;inl;inc;xsd"
 						>
 						<File
-							RelativePath="..\..\include\matlab\toolbox\nnet\nninit.h"
+							RelativePath="..\..\include\annlab\toolbox\nnet\nninit.h"
 							>
 						</File>
 						<File
-							RelativePath="..\..\include\matlab\toolbox\nnet\nnnetwork.h"
+							RelativePath="..\..\include\annlab\toolbox\nnet\nnnetwork.h"
 							>
 						</File>
 						<File
-							RelativePath="..\..\include\matlab\toolbox\nnet\nntrain.h"
+							RelativePath="..\..\include\annlab\toolbox\nnet\nntrain.h"
 							>
 						</File>
 						<File
-							RelativePath="..\..\include\matlab\toolbox\nnet\nnutils.h"
+							RelativePath="..\..\include\annlab\toolbox\nnet\nnutils.h"
 							>
 						</File>
 					</Filter>
@@ -570,7 +570,7 @@
 						Filter="h;hpp;hxx;hm;inl;inc;xsd"
 						>
 						<File
-							RelativePath="..\..\include\matlab\toolbox\matlab\elmat.h"
+							RelativePath="..\..\include\annlab\toolbox\matlab\elmat.h"
 							>
 						</File>
 					</Filter>
@@ -580,27 +580,27 @@
 					Filter="h;hpp;hxx;hm;inl;inc;xsd"
 					>
 					<File
-						RelativePath="..\..\include\matlab\sys\AnnList.h"
+						RelativePath="..\..\include\annlab\sys\AnnList.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\include\matlab\sys\AnnMatrix.h"
+						RelativePath="..\..\include\annlab\sys\AnnMatrix.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\include\matlab\sys\AnnNetwork.h"
+						RelativePath="..\..\include\annlab\sys\AnnNetwork.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\include\matlab\sys\AnnObject.h"
+						RelativePath="..\..\include\annlab\sys\AnnObject.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\include\matlab\sys\matrixt.h"
+						RelativePath="..\..\include\annlab\sys\matrixt.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\include\matlab\sys\matrixt_impl.h"
+						RelativePath="..\..\include\annlab\sys\matrixt_impl.h"
 						>
 					</File>
 				</Filter>
@@ -608,7 +608,7 @@
 					Name="internal"
 					>
 					<File
-						RelativePath="..\..\include\matlab\internal\_matlab_windef.h"
+						RelativePath="..\..\include\annlab\internal\_annlab_windef.h"
 						>
 					</File>
 				</Filter>
@@ -616,7 +616,7 @@
 					Name="vs"
 					>
 					<File
-						RelativePath="..\..\include\matlab\vs\stdint.h"
+						RelativePath="..\..\include\annlab\vs\stdint.h"
 						>
 					</File>
 				</Filter>
@@ -648,7 +648,7 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="matlab"
+				Name="annlab"
 				>
 			</Filter>
 			<Filter
