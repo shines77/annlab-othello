@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../matlab_stddef.h"
+#include "../annlab_stddef.h"
 #include "AnnObject.h"
 #include "AnnList.h"
 #include <list>
@@ -14,7 +14,7 @@ using namespace std;
 #define MAT_CACHE_ALIGN_MASK    (MAT_CACHE_ALIGN_SIZE - 1)
 #define MAT_CACHE_ALIGN_128(x)  (((uint32_t)(x) + MAT_CACHE_ALIGN_MASK) & (~MAT_CACHE_ALIGN_MASK))
 
-namespace matlab {
+namespace annlab {
 
 enum enumMatrixInit {
 	MAT_INIT_NONE = 0,
@@ -305,4 +305,4 @@ CxMatrix operator / ( double _value, CxMatrix & _Right );
 
 //typedef CAnnList<CAnnMatrix> CAnnMatrixList;
 
-}  // namespace matlab
+}  // namespace annlab

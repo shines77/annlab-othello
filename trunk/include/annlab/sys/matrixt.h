@@ -2,7 +2,7 @@
 #ifndef _MATRIXT_H_
 #define _MATRIXT_H_
 
-#include "../matlab_stddef.h"
+#include "../annlab_stddef.h"
 #include <list>
 #include <vector>
 #include <typeinfo.h>
@@ -17,7 +17,7 @@ using namespace std;
 #define MAT_CACHE_ALIGN_MASK    (MAT_CACHE_ALIGN_SIZE - 1)
 #define MAT_CACHE_ALIGN_128(x)  (((uint32_t)(x) + MAT_CACHE_ALIGN_MASK) & (~MAT_CACHE_ALIGN_MASK))
 
-namespace matlab {
+namespace annlab {
 
 typedef enum _enumMatFillData {
     INIT_FCN_NONE = 0,
@@ -248,6 +248,6 @@ private:
 #include "matrixt_impl.h"
 #undef  _MATRIXT_IMPL_internal_H_
 
-}  // namespace matlab
+}  // namespace annlab
 
 #endif  // _MATRIXT_H_

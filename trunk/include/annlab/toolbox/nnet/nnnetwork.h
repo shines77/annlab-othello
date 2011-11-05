@@ -2,11 +2,11 @@
 #ifndef _NNNETWORK_H_
 #define _NNNETWORK_H_
 
-#include "../../matlab.h"
-#include "../../../matlab/sys/AnnNetwork.h"
-#include "../../../matlab/sys/AnnMatrix.h"
+#include "../../annlab.h"
+#include "../../../annlab/sys/AnnNetwork.h"
+#include "../../../annlab/sys/AnnMatrix.h"
 
-namespace matlab {
+namespace annlab {
 
 int parseNetLayers( CAnnNetwork *net,
 				   const TCHAR *szSizesOfLayers,
@@ -26,6 +26,6 @@ int newff( CAnnNetwork *net,
 		  const TCHAR *szTrainFcn,
 		  bool bInitWeightsNow = FALSE );
 
-}  // namespace matlab
+}  // namespace annlab
 
 #endif  /* _NNNETWORK_H_ */

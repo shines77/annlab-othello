@@ -1,9 +1,9 @@
 
 #include "../../../include/gui/stdafx.h"
-#include "../../../include/matlab/matlab_stddef.h"
-#include "../../../include/matlab/sys/AnnNetwork.h"
-#include "../../../include/matlab/toolbox/matlab/elmat.h"
-#include "../../../include/matlab/toolbox/nnet/nnnetwork.h"
+#include "../../../include/annlab/annlab_stddef.h"
+#include "../../../include/annlab/sys/AnnNetwork.h"
+#include "../../../include/annlab/toolbox/matlab/elmat.h"
+#include "../../../include/annlab/toolbox/nnet/nnnetwork.h"
 #include <excpt.h>
 #include <winbase.h>
 #include <math.h>
@@ -20,7 +20,7 @@
 #define NNET_PERFORMFCN_DEFAULT    _T("mse")
 #define NNET_TRAINFCN_DEFAULT      _T("traingd")
 
-namespace matlab {
+namespace annlab {
 
 INLINE void setFcnName( TCHAR *szDstFuncName, int nNameSize, const TCHAR *szFcnName )
 {
@@ -1193,4 +1193,4 @@ bool CAnnNetwork::initwb( CAnnMatrix *pMatrix, int _index, int _numInputs, int _
 	return TRUE;
 }
 
-}  // namespace matlab
+}  // namespace annlab

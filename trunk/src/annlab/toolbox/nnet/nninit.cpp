@@ -1,9 +1,9 @@
 
-#include "../../../../include/matlab/toolbox/nnet/nninit.h"
-#include "../../../../include/matlab/toolbox/matlab/elmat.h"
+#include "../../../../include/annlab/toolbox/nnet/nninit.h"
+#include "../../../../include/annlab/toolbox/matlab/elmat.h"
 #include <math.h>
 
-namespace matlab {
+namespace annlab {
 
 int init( CAnnNetwork *net )
 {
@@ -196,4 +196,4 @@ int initwb( CAnnNetwork *annNetwork,
 	return nRetCode;
 }
 
-}  // namespace matlab
+}  // namespace annlab

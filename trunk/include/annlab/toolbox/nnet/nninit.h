@@ -2,11 +2,11 @@
 #ifndef _NNINIT_H_
 #define _NNINIT_H_
 
-#include "../../matlab.h"
-#include "../../../matlab/sys/AnnNetwork.h"
-#include "../../../matlab/sys/AnnMatrix.h"
+#include "../../annlab.h"
+#include "../../../annlab/sys/AnnNetwork.h"
+#include "../../../annlab/sys/AnnMatrix.h"
 
-namespace matlab {
+namespace annlab {
 
 int init  ( CAnnNetwork *net );
 
@@ -18,6 +18,6 @@ int initwb( CAnnNetwork *net,
 			CAnnMatrix *matrix, int _index, int _numInputs, int _numNeurons,
 			CAnnMatrix *inputRange, CAnnMatrix *activeRange );
 
-}  // namespace matlab
+}  // namespace annlab
 
 #endif  /* _NNINIT_H_ */

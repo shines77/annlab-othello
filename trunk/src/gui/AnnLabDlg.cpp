@@ -4,20 +4,20 @@
 #include "../../include/gui/stdafx.h"
 #include "../../include/gui/AnnLabApp.h"
 #include "../../include/gui/AnnLabDlg.h"
-#include "../../include/matlab/matlab_stddef.h"
-#include "../../include/matlab/sys/AnnList.h"
-#include "../../include/matlab/sys/AnnMatrix.h"
-#include "../../include/matlab/sys/matrixt.h"
-#include "../../include/matlab/toolbox/matlab/elmat.h"
-#include "../../include/matlab/toolbox/nnet/nninit.h"
-#include "../../include/matlab/toolbox/nnet/nntrain.h"
-#include "../../include/matlab/toolbox/nnet/nnnetwork.h"
+#include "../../include/annlab/annlab_stddef.h"
+#include "../../include/annlab/sys/AnnList.h"
+#include "../../include/annlab/sys/AnnMatrix.h"
+#include "../../include/annlab/sys/matrixt.h"
+#include "../../include/annlab/toolbox/matlab/elmat.h"
+#include "../../include/annlab/toolbox/nnet/nninit.h"
+#include "../../include/annlab/toolbox/nnet/nntrain.h"
+#include "../../include/annlab/toolbox/nnet/nnnetwork.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-//using namespace matlab;
+using namespace annlab;
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -97,8 +97,8 @@ int CAnnLabDlg::BpNetwork_Test()
 	trainTx.rands(64, 1);
 
 	CAnnMatrix temp, rands;
-	temp = matlab::ones(16, 16);
-	rands = matlab::rands2(16, 16);
+	temp = annlab::ones(16, 16);
+	rands = annlab::rands2(16, 16);
 	temp = 1.0 - rands;
 	temp = 1.0 + rands;
 	temp *= 3.0;
@@ -111,8 +111,8 @@ int CAnnLabDlg::BpNetwork_Test()
 	pNetwork = net.newff( &inputMinMax, _T("64, 65, 65, 33, 1"), _T("tansig, tansig, tansig, purelin"), _T("traincgf") );
 	pNetwork = net.init();
 
-	nRetCode = matlab::newff( &net, &inputMinMax, _T("64, 65, 65, 33, 1"), _T("tansig, tansig, tansig, purelin"), _T("traincgf") );
-	nRetCode = matlab::init( &net );
+	nRetCode = annlab::newff( &net, &inputMinMax, _T("64, 65, 65, 33, 1"), _T("tansig, tansig, tansig, purelin"), _T("traincgf") );
+	nRetCode = annlab::init( &net );
 
 	net.trainParam.show = TRUE;
 	net.trainParam.epochs = 2000;
@@ -122,7 +122,7 @@ int CAnnLabDlg::BpNetwork_Test()
 
 	CAnnTrainRecord tr;
 	pNetwork = net.train( &trainP, &trainT, &tr );
-	nRetCode = matlab::train( &net, NULL, &trainP, &trainT, NULL );
+	nRetCode = annlab::train( &net, NULL, &trainP, &trainT, NULL );
 
 	CAnnMatrix m(3, 4), m2(3, 4), m3(3, 4), n;
 	//double data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
@@ -132,13 +132,13 @@ int CAnnLabDlg::BpNetwork_Test()
     m3.set_data(data, 3, 4);
     m3 = m2 = m + m2 + m3;
     m3 = m2 - m;
-	n = matlab::normr(m);
+	n = annlab::normr(m);
 	//n.display(_T("n = normr(m);"));
 
-	n = matlab::norm(m);
+	n = annlab::norm(m);
 	//n.display(_T("n = norm(m);"));
 
-	n = matlab::diag(m);
+	n = annlab::diag(m);
 	//n.display(_T("n = diag(m);"));
 
     MatrixT<double> mt1;

@@ -7,7 +7,7 @@
 #define _MATRIXT_IMPL_H_
 
 #ifndef _MATRIXT_IMPL_internal_H_
-namespace matlab {
+namespace annlab {
 #endif
 
 #include <math.h>
@@ -955,7 +955,7 @@ void MatrixT<T>::display( void )
 template<typename T>
 void MatrixT<T>::display( const TCHAR *szText )
 {
-#if defined(MATLAB_USE_DISPLAY) && (MATLAB_USE_DISPLAY)
+#if defined(ANNLAB_USE_DISPLAY) && (ANNLAB_USE_DISPLAY)
     TCHAR* szTypeName = NULL;
     AnsiToUnicode(typeid(T).name(), &szTypeName);
     TRACE(("MatrixT<%s>: Name = [ %s ], [rows = %d, cols = %d]\n"), szTypeName, szText, rows, cols);
@@ -1009,7 +1009,7 @@ void MatrixT<Ty>::display( const TCHAR *szText ) \
     TRACE(_T("============================================================================================================\n\n")); \
 }
 
-#if defined(MATLAB_USE_DISPLAY) && (MATLAB_USE_DISPLAY)
+#if defined(ANNLAB_USE_DISPLAY) && (ANNLAB_USE_DISPLAY)
 MATRIXT_DISPLAY_FUNC_SIGNED(int64_t)
 MATRIXT_DISPLAY_FUNC_SIGNED(int32_t)
 MATRIXT_DISPLAY_FUNC_SIGNED(int16_t)
@@ -1032,7 +1032,7 @@ void MatrixT<T>::display_ex( void )
 template<typename T>
 void MatrixT<T>::display_ex( const TCHAR *szText )
 {
-#if defined(MATLAB_USE_DISPLAY_EX) && (MATLAB_USE_DISPLAY_EX)
+#if defined(ANNLAB_USE_DISPLAY_EX) && (ANNLAB_USE_DISPLAY_EX)
     char*  szTypeNameA = NULL;
     TCHAR* szTypeName = NULL;
 #ifdef _UNICODE
@@ -1107,7 +1107,7 @@ void MatrixT<Ty>::display_ex( const TCHAR *szText ) \
     TRACE(_T("============================================================================================================\n\n")); \
 }
 
-#if defined(MATLAB_USE_DISPLAY_EX) && (MATLAB_USE_DISPLAY_EX)
+#if defined(ANNLAB_USE_DISPLAY_EX) && (ANNLAB_USE_DISPLAY_EX)
 MATRIXT_DISPLAY_EX_FUNC_SIGNED(int64_t)
 MATRIXT_DISPLAY_EX_FUNC_SIGNED(int32_t)
 MATRIXT_DISPLAY_EX_FUNC_SIGNED(int16_t)
@@ -1123,7 +1123,7 @@ MATRIXT_DISPLAY_EX_FUNC_UNSIGNED(bool)
 
 
 #ifndef _MATRIXT_IMPL_internal_H_
-}  // namespace matlab
+}  // namespace annlab
 #endif
 
 #endif  // _MATRIXT_IMPL_H_

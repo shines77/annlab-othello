@@ -1,11 +1,11 @@
 
-#include "../../../include/matlab/toolbox/nnerror.h"
+#include "../../../include/annlab/toolbox/nnerror.h"
 
-namespace matlab {
+namespace annlab {
 
 unsigned long GetErrorInfo( unsigned long errCode )
 {
 	return 0;
 }
 
-}  // namespace matlab
+}  // namespace annlab

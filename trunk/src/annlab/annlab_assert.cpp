@@ -26,8 +26,8 @@
     the GNU General Public License.
 */
 
-// IMPORTANT: To use assertion handling in MATLAB, exactly one of the MATLAB source files
-// should #include matlab_assert_impl.h thus instantiating assertion handling routines.
+// IMPORTANT: To use assertion handling in ANNLAB, exactly one of the ANNLAB source files
+// should #include annlab_assert_impl.h thus instantiating assertion handling routines.
 // The intent of putting it to a separate file is to allow some tests to use it
 // as well in order to avoid dependency on the library.
 
@@ -36,28 +36,27 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include "../../include/matlab/matlab_assert.h"
-#include "../../include/matlab/matlab_config.h"
+#include "../../include/annlab/annlab_assert.h"
 #if _MSC_VER
 #include <crtdbg.h>
-#define __MATLAB_USE_DBGBREAK_DLG   MATLAB_USE_DEBUG
+#define __ANNLAB_USE_DBGBREAK_DLG   ANNLAB_USE_DEBUG
 #endif
 
 using namespace std;
 
-namespace matlab {
+namespace annlab {
     //! Type for an assertion handler
     typedef void(*assertion_handler_type)( const char* filename, int line, const char* expression, const char* comment );
 
     static assertion_handler_type assertion_handler = NULL;
 
-    assertion_handler_type __MATLAB_EXPORTED_FUNC set_assertion_handler( assertion_handler_type new_handler ) {
+    assertion_handler_type __ANNLAB_EXPORTED_FUNC set_assertion_handler( assertion_handler_type new_handler ) {
         assertion_handler_type old_handler = assertion_handler;
         assertion_handler = new_handler;
         return old_handler;
     }
 
-    void __MATLAB_EXPORTED_FUNC assertion_failure( const char* filename, int line, const char* expression, const char* comment ) {
+    void __ANNLAB_EXPORTED_FUNC assertion_failure( const char* filename, int line, const char* expression, const char* comment ) {
         if ( assertion_handler_type assertion_func = assertion_handler ) {
             (*assertion_func)(filename, line, expression, comment);
         } else {
@@ -68,8 +67,8 @@ namespace matlab {
                          expression, line, filename );
                 if ( comment )
                     fprintf( stderr, "Detailed description: %s\n", comment );
-#if __MATLAB_USE_DBGBREAK_DLG
-                if (1 == _CrtDbgReport(_CRT_ASSERT, filename, line, "matlab_debug.dll", "%s\r\n%s", expression, comment ? comment : ""))
+#if __ANNLAB_USE_DBGBREAK_DLG
+                if (1 == _CrtDbgReport(_CRT_ASSERT, filename, line, "annlab_debug.dll", "%s\r\n%s", expression, comment ? comment : ""))
                         _CrtDbgBreak();
 #else
                 fflush(stderr);
@@ -86,7 +85,7 @@ namespace matlab {
 
     namespace internal {
         //! Report a runtime warning.
-        void __MATLAB_EXPORTED_FUNC runtime_warning( const char* format, ... )
+        void __ANNLAB_EXPORTED_FUNC runtime_warning( const char* format, ... )
         {
             char str[1024]; memset(str, 0, 1024);
             va_list args; va_start(args, format);
@@ -96,8 +95,8 @@ namespace matlab {
 #else
             vsnprintf( str, 1024-1, format, args );
 #endif
-            fprintf( stderr, "MATLAB Warning: %s\n", str );
+            fprintf( stderr, "ANNLAB Warning: %s\n", str );
         }
     } // namespace internal
 
-} /* namespace matlab */
+} /* namespace annlab */
