@@ -2,11 +2,11 @@
 #ifndef _NNTRAIN_H_
 #define _NNTRAIN_H_
 
-#include "../../matlab.h"
-#include "../../../matlab/sys/AnnNetwork.h"
-#include "../../../matlab/sys/AnnMatrix.h"
+#include "../../annlab.h"
+#include "../../../annlab/sys/AnnNetwork.h"
+#include "../../../annlab/sys/AnnMatrix.h"
 
-namespace matlab {
+namespace annlab {
 
 int train( CAnnNetwork *net,
 		  CAnnTrainRecord *tr,
@@ -20,6 +20,6 @@ int traincgf( CAnnNetwork *net,
 		  CAnnMatrixList *valV,
 		  CAnnMatrixList *testV );
 
-}  // namespace matlab
+}  // namespace annlab
 
 #endif  /* _NNTRAIN_H_ */

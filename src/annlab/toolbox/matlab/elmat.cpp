@@ -1,8 +1,8 @@
 
-#include "../../../../include/matlab/toolbox/matlab/elmat.h"
+#include "../../../../include/annlab/toolbox/matlab/elmat.h"
 #include <math.h>
 
-namespace matlab {
+namespace annlab {
 
 // 重置大小并初始化为全0矩阵
 CAnnMatrix zeros( int _rows, int _cols )
@@ -454,4 +454,4 @@ CAnnMatrix dotdiv( const CAnnMatrix &x, const CAnnMatrix &y )
 	return _Result;
 }
 
-}  // namespace matlab
+}  // namespace annlab

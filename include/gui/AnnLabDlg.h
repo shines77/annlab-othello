@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "../../include/matlab/sys/AnnNetwork.h"
+#include "../../include/annlab/sys/AnnNetwork.h"
 
 // CAnnLabDlg ¶Ô»°¿ò
 class CAnnLabDlg : public CDialog

@@ -26,21 +26,21 @@
     the GNU General Public License.
 */
 
-#if !defined(_MATLAB_matlab_windef_H_)
-#error Do not #include this internal file directly; use public MATLAB headers instead.
-#endif /* _MATLAB_matlab_windef_H_ */
+#if !defined(_ANNLAB_annlab_windef_H_)
+#error Do not #include this internal file directly; use public ANNLAB headers instead.
+#endif /* _ANNLAB_annlab_windef_H_ */
 
-#ifndef _MATLAB_INTERNAL_MATLAB_WINDEF_H_
-#define _MATLAB_INTERNAL_MATLAB_WINDEF_H_
+#ifndef _ANNLAB_INTERNAL_ANNLAB_WINDEF_H_
+#define _ANNLAB_INTERNAL_ANNLAB_WINDEF_H_
 
-// Check that the target Windows version has all API calls requried for TBB.
+// Check that the target Windows version has all API calls requried for ANNLAB.
 // Do not increase the version in condition beyond 0x0500 without prior discussion!
 #if defined(_WIN32_WINNT) && _WIN32_WINNT<0x0400
-#error MATLAB is unable to run on old Windows versions; _WIN32_WINNT must be 0x0400 or greater.
+#error ANNLAB is unable to run on old Windows versions; _WIN32_WINNT must be 0x0400 or greater.
 #endif
 
 #if !defined(_MT)
-#error MATLAB requires linkage with multithreaded C/C++ runtime library. \
+#error ANNLAB requires linkage with multithreaded C/C++ runtime library. \
        Choose multithreaded DLL runtime in project settings, or use /MD[d] compiler switch.
 #endif
 
@@ -49,38 +49,38 @@ namespace std {
 	using ::size_t; using ::ptrdiff_t;
 }
 
-#define __MATLAB_STRING_AUX(x)		#x
-#define __MATLAB_STRING(x)			__MATLAB_STRING_AUX(x)
+#define __ANNLAB_STRING_AUX(x)		#x
+#define __ANNLAB_STRING(x)			__ANNLAB_STRING_AUX(x)
 
-// Default setting of MATLAB_USE_DEBUG
-#ifdef MATLAB_USE_DEBUG
-#    if MATLAB_USE_DEBUG 
+// Default setting of ANNLAB_USE_DEBUG
+#ifdef ANNLAB_USE_DEBUG
+#    if ANNLAB_USE_DEBUG 
 #        if !defined(_DEBUG)
-#            pragma message(__FILE__ "(" __MATLAB_STRING(__LINE__) ") : Warning: Recommend using /MDd if compiling with MATLAB_USE_DEBUG!=0")
+#            pragma message(__FILE__ "(" __ANNLAB_STRING(__LINE__) ") : Warning: Recommend using /MDd if compiling with ANNLAB_USE_DEBUG!=0")
 #        endif
 #    else
 #        if defined(_DEBUG)
-#            pragma message(__FILE__ "(" __MATLAB_STRING(__LINE__) ") : Warning: Recommend using /MD if compiling with MATLAB_USE_DEBUG==0")
+#            pragma message(__FILE__ "(" __ANNLAB_STRING(__LINE__) ") : Warning: Recommend using /MD if compiling with ANNLAB_USE_DEBUG==0")
 #        endif
 #    endif
 #endif
 
-#if __MATLAB_BUILD && !defined(__MATLAB_NO_IMPLICIT_LINKAGE)
-#define __MATLAB_NO_IMPLICIT_LINKAGE   1
+#if __ANNLAB_BUILD && !defined(__ANNLAB_NO_IMPLICIT_LINKAGE)
+#define __ANNLAB_NO_IMPLICIT_LINKAGE   1
 #endif
 
 #if _MSC_VER
-    #if !__MATLAB_NO_IMPLICIT_LINKAGE
-        #ifdef __MATLAB_LIB_NAME
-	        #pragma comment(lib, __MATLAB_STRING(__MATLAB_LIB_NAME))
+    #if !__ANNLAB_NO_IMPLICIT_LINKAGE
+        #ifdef __ANNLAB_LIB_NAME
+	        #pragma comment(lib, __ANNLAB_STRING(__ANNLAB_LIB_NAME))
         #else
 			#ifdef _DEBUG
-				#pragma comment(lib, "matlab_debug.lib")
+				#pragma comment(lib, "annlab_debug.lib")
 			#else
-				#pragma comment(lib, "matlab.lib")
+				#pragma comment(lib, "annlab.lib")
 			#endif
         #endif
     #endif
 #endif
 
-#endif  // _MATLAB_INTERNAL_MATLAB_WINDEF_H_
+#endif  // _ANNLAB_INTERNAL_ANNLAB_WINDEF_H_

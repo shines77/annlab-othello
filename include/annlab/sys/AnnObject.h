@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../../../include/matlab/matlab_stddef.h"
+#include "../../../include/annlab/annlab_stddef.h"
 
 #define OBJ_NAME_LEN      64
 
-namespace matlab {
+namespace annlab {
 
 class CAnnObject
 {
@@ -31,4 +31,4 @@ public:
 	}
 };
 
-}  // namespace matlab
+}  // namespace annlab

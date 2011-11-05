@@ -1,7 +1,7 @@
 
-#include "../../../../include/matlab/toolbox/nnet/nnutils.h"
+#include "../../../../include/annlab/toolbox/nnet/nnutils.h"
 
-namespace matlab {
+namespace annlab {
 
 int trimString(const TCHAR *szString, TCHAR *szBuffer, DWORD dwBufSize)
 {
@@ -137,4 +137,4 @@ int calcperf2( CAnnNetwork *net, CAnnXArray *X, double *Pd, double *Tl, double *
 	return nRetCode;
 }
 
-}  // namespace matlab
+}  // namespace annlab

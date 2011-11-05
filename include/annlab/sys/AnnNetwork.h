@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../../../include/matlab/matlab_stddef.h"
-#include "../../../include/matlab/sys/AnnObject.h"
-#include "../../../include/matlab/sys/AnnMatrix.h"
+#include "../../../include/annlab/annlab_stddef.h"
+#include "../../../include/annlab/sys/AnnObject.h"
+#include "../../../include/annlab/sys/AnnMatrix.h"
 #include <windows.h>
 
-namespace matlab {
+namespace annlab {
 
 enum enumNetLayerType {
 	LAYER_TYPE_NONE,
@@ -306,4 +306,4 @@ private:
 
 INLINE void setFcnName( TCHAR *szDstFuncName, int nNameSize, const TCHAR *szFcnName );
 
-}  // namespace matlab
+}  // namespace annlab

@@ -1,6 +1,6 @@
 
 #include "../../../include/gui/stdafx.h"
-#include "../../../include/matlab/sys/AnnMatrix.h"
+#include "../../../include/annlab/sys/AnnMatrix.h"
 #include <iostream>
 #include <assert.h>
 #include <math.h>
@@ -8,7 +8,7 @@
 /* whether use optimization of matrix operations */
 #define MATRIX_FAST_MODE       1
 
-namespace matlab {
+namespace annlab {
 
 //////////////////////////////////////////////////////////////////
 // CxVector
@@ -1543,7 +1543,7 @@ void CAnnMatrix::display( void )
 
 void CAnnMatrix::display( const TCHAR *szName )
 {
-#if defined(MATLAB_USE_DISPLAY) && (MATLAB_USE_DISPLAY)
+#if defined(ANNLAB_USE_DISPLAY) && (ANNLAB_USE_DISPLAY)
 	TRACE(_T("CxMatrix: Name = [ %s ], [rows = %d, cols = %d]\n"), szName, rows, cols);
 	TRACE(_T("============================================================================================================\n\n"));
 	for (int r=0; r<rows; r++) {
@@ -1712,4 +1712,4 @@ int CAnnXArray::resize( int _size )
 	return 0;
 }
 
-}  // namespace matlab
+}  // namespace annlab

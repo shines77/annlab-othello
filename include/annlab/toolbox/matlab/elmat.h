@@ -2,10 +2,10 @@
 #ifndef _ELMAT_H_
 #define _ELMAT_H_
 
-#include "../../matlab.h"
-#include "../../../matlab/sys/AnnMatrix.h"
+#include "../../annlab.h"
+#include "../../../annlab/sys/AnnMatrix.h"
 
-namespace matlab {
+namespace annlab {
 
 CAnnMatrix zeros  ( int _rows, int _cols );
 CAnnMatrix ones   ( int _rows, int _cols );
@@ -38,6 +38,6 @@ double dotprod ( const CAnnVector &x, const CAnnVector y );
 CAnnMatrix dotprod ( const CAnnMatrix &x, const CAnnMatrix &y );
 CAnnMatrix dotdiv  ( const CAnnMatrix &x, const CAnnMatrix &y );
 
-}  // namespace matlab
+}  // namespace annlab
 
 #endif  /* _ELMAT_H_ */

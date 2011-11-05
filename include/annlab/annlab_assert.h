@@ -26,46 +26,51 @@
     the GNU General Public License.
 */
 
-//#include "matlab_stddef.h"
+#ifndef _ANNLAB_ASSERT_H_
+#define _ANNLAB_ASSERT_H_
 
-#ifndef __MATLAB_EXPORTED_FUNC
+#include "annlab_config.h"
+
+#ifndef __ANNLAB_EXPORTED_FUNC
   #if _MSC_VER >= 1400
-    #define __MATLAB_EXPORTED_FUNC   __cdecl
+    #define __ANNLAB_EXPORTED_FUNC   __cdecl
   #else
-    #define __MATLAB_EXPORTED_FUNC
+    #define __ANNLAB_EXPORTED_FUNC
   #endif
 #endif
 
-namespace matlab {
+namespace annlab {
 
     //! Type for an assertion handler
     typedef void(*assertion_handler_type)( const char* filename, int line, const char* expression, const char* comment );
 
-#if MATLAB_USE_ASSERT
+#if ANNLAB_USE_ASSERT
 
     //! Assert that x is true.
     /** If x is false, print assertion failure message.  
         If the comment argument is not NULL, it is printed as part of the failure message.  
         The comment argument has no other effect. */
-    #define __MATLAB_ASSERT(predicate,message) ((predicate)?((void)0):tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
-    #define __MATLAB_ASSERT_EX __MATLAB_ASSERT
+    #define __ANNLAB_ASSERT(predicate, message)     ((predicate) ? ((void)0) : annlab::assertion_failure(__FILE__,__LINE__,#predicate,message))
+    #define __ANNLAB_ASSERT_EX                      __ANNLAB_ASSERT
 
     //! Set assertion handler and return previous value of it.
-    assertion_handler_type __MATLAB_EXPORTED_FUNC set_assertion_handler( assertion_handler_type new_handler );
+    assertion_handler_type __ANNLAB_EXPORTED_FUNC set_assertion_handler( assertion_handler_type new_handler );
 
     //! Process an assertion failure.
-    /** Normally called from __MATLAB_ASSERT macro.
+    /** Normally called from __ANNLAB_ASSERT macro.
         If assertion handler is null, print message for assertion failure and abort.
         Otherwise call the assertion handler. */
-    void __MATLAB_EXPORTED_FUNC assertion_failure( const char* filename, int line, const char* expression, const char* comment );
+    void __ANNLAB_EXPORTED_FUNC assertion_failure( const char* filename, int line, const char* expression, const char* comment );
 
-#else /* !MATLAB_USE_ASSERT */
+#else /* !ANNLAB_USE_ASSERT */
 
-    //! No-op version of __MATLAB_ASSERT.
-    #define __MATLAB_ASSERT(predicate,comment)		((void)0)
+    //! No-op version of __ANNLAB_ASSERT.
+    #define __ANNLAB_ASSERT(predicate, comment)     ((void)0)
     //! "Extended" version is useful to suppress warnings if a variable is only used with an assert
-    #define __MATLAB_ASSERT_EX(predicate,comment)	((void)(1 && (predicate)))
+    #define __ANNLAB_ASSERT_EX(predicate, comment)  ((void)(1 && (predicate)))
 
-#endif /* !MATLAB_USE_ASSERT */
+#endif /* !ANNLAB_USE_ASSERT */
 
-} /* namespace matlab */
+} /* namespace annlab */
+
+#endif  // _ANNLAB_ASSERT_H_

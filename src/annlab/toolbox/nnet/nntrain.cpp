@@ -1,8 +1,8 @@
 
-#include "../../../../include/matlab/toolbox/nnet/nntrain.h"
-#include "../../../../include/matlab/toolbox/nnet/nnutils.h"
+#include "../../../../include/annlab/toolbox/nnet/nntrain.h"
+#include "../../../../include/annlab/toolbox/nnet/nnutils.h"
 
-namespace matlab {
+namespace annlab {
 
 /******************************************************************************
 %
@@ -392,4 +392,4 @@ int traincgf( CAnnNetwork *net,
 	return nRetCode;
 }
 
-}  // namespace matlab  // namespace matlab
+}  // namespace annlab  // namespace annlab

@@ -1,8 +1,8 @@
 
-#include "../../../../include/matlab/toolbox/nnet/nnnetwork.h"
-#include "../../../../include/matlab/toolbox/nnet/nnutils.h"
+#include "../../../../include/annlab/toolbox/nnet/nnnetwork.h"
+#include "../../../../include/annlab/toolbox/nnet/nnutils.h"
 
-namespace matlab {
+namespace annlab {
 
 int parseNetLayers( CAnnNetwork *net,
 				   const TCHAR *szSizesOfLayers,
@@ -67,7 +67,7 @@ int parseNetLayers( CAnnNetwork *net,
 		else
 			break;
 	}
-	__MY_TRACE(_T("matlab::parseNetLayers() Exit: _indexLayer = %d.\n"), _indexLayer);
+	__MY_TRACE(_T("annlab::parseNetLayers() Exit: _indexLayer = %d.\n"), _indexLayer);
 	return _indexLayer;
 }
 
@@ -118,7 +118,7 @@ int parseTransFcns( CAnnNetwork *net,
 		else
 			break;
 	}
-	__MY_TRACE(_T("matlab::parseTransFcns() Exit: _indexFcns = %d.\n"), _indexFcns);
+	__MY_TRACE(_T("annlab::parseTransFcns() Exit: _indexFcns = %d.\n"), _indexFcns);
 	return _indexFcns;
 }
 
@@ -231,4 +231,4 @@ int newff( CAnnNetwork *net, const CAnnMatrix *_inputMinMax,
 	return 0;
 }
 
-}  // namespace matlab
+}  // namespace annlab
