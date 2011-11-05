@@ -117,7 +117,7 @@
 // ann_config.h should be included the first since it contains macro definitions used in other headers
 #include "matlab_config.h"
 
-#if _MSC_VER >=1400
+#if defined(_MSC_VER) && _MSC_VER >=1400
     #define __MATLAB_EXPORTED_FUNC   __cdecl
     #define __MATLAB_EXPORTED_METHOD __thiscall
 #else
@@ -127,7 +127,7 @@
 
 #include <cstddef>      /* Need size_t and ptrdiff_t */
 
-#if _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER
     #define _MATLAB_matlab_windef_H_
     #include "internal/_matlab_windef.h"
     #undef  _MATLAB_matlab_windef_H_
@@ -230,17 +230,17 @@ struct padded : padded_base<T, sizeof(T)> {};
 //! Throws std::runtime_error with what() returning error_code description prefixed with aux_info
 void __MATLAB_EXPORTED_FUNC handle_perror( int error_code, const char* aux_info );
 
-#if MATLAB_USE_EXCEPTIONS
+#if defined(MATLAB_USE_EXCEPTIONS) && MATLAB_USE_EXCEPTIONS
     #define __MATLAB_TRY try
-    #define __MATLAB_CATCH(e) catch(e)
-    #define __MATLAB_THROW(e) throw e
-    #define __MATLAB_RETHROW() throw
+    #define __MATLAB_CATCH(e)   catch(e)
+    #define __MATLAB_THROW(e)   throw e
+    #define __MATLAB_RETHROW()  throw
 #else /* !MATLAB_USE_EXCEPTIONS */
     inline bool __MATLAB_false() { return false; }
     #define __MATLAB_TRY
-    #define __MATLAB_CATCH(e) if ( tbb::internal::__MATLAB_false() )
-    #define __MATLAB_THROW(e) ((void)0)
-    #define __MATLAB_RETHROW() ((void)0)
+    #define __MATLAB_CATCH(e)   if ( matlab::internal::__MATLAB_false() )
+    #define __MATLAB_THROW(e)   ((void)0)
+    #define __MATLAB_RETHROW()  ((void)0)
 #endif /* !MATLAB_USE_EXCEPTIONS */
 
 //! Report a runtime warning.
