@@ -42,7 +42,7 @@
 #ifdef _DEBUG
 #define MATLAB_USE_ASSERT       1
 #define MATLAB_USE_TRACE        1
-#define MATLAB_USE_DISPLAY      1
+#define MATLAB_USE_DISPLAY      0
 #define MATLAB_USE_DISPLAY_EX   1
 #endif
 

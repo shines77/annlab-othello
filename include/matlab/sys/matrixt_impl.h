@@ -22,39 +22,39 @@ MatrixT<T>::MatrixT( void ) :
 template<typename T>
 MatrixT<T>::MatrixT( int _size )
 {
-    initialize(_size, _size, INIT_MODE_CONSTRUCTOR);
+    initialize(_size, _size, INIT_TYPE_CONSTRUCTOR);
 }
 
 template<typename T>
-MatrixT<T>::MatrixT( int _rows, int _cols, int _initFcn /*= MAT_INIT_NONE */ )
+MatrixT<T>::MatrixT( int _rows, int _cols, int _initFcn /*= FILL_DATA_DEFAULT */ )
 {
-    initialize(_rows, _cols, INIT_MODE_CONSTRUCTOR, static_cast<T>(0), _initFcn);
+    initialize(_rows, _cols, INIT_TYPE_CONSTRUCTOR, static_cast<T>(0), _initFcn);
 }
 
 template<typename T>
 MatrixT<T>::MatrixT( int _rows, int _cols, const value_type& _x )
 {
-    initialize(_rows, _cols, INIT_MODE_CONSTRUCTOR);
+    initialize(_rows, _cols, INIT_TYPE_CONSTRUCTOR);
     set_by_scalar(_x);
 }
 
 template<typename T>
 MatrixT<T>::MatrixT( int _rows, int _cols, const value_type* _array )
 {
-    initialize(_rows, _cols, INIT_MODE_CONSTRUCTOR);
+    initialize(_rows, _cols, INIT_TYPE_CONSTRUCTOR);
     copy_from_array(_array);
 }
 
 template<typename T>
-MatrixT<T>::MatrixT( const TCHAR *szName, int _rows, int _cols, int _initFcn /*= MAT_INIT_NONE */ )
+MatrixT<T>::MatrixT( const TCHAR *szName, int _rows, int _cols, int _initFcn /*= FILL_DATA_DEFAULT */ )
 {
-    initialize_ex(szName, _rows, _cols, INIT_MODE_CONSTRUCTOR, static_cast<T>(0), _initFcn);
+    initialize_ex(szName, _rows, _cols, INIT_TYPE_CONSTRUCTOR, static_cast<T>(0), _initFcn);
 }
 
 template<typename T>
 MatrixT<T>::MatrixT( const MatrixT<T>& src )
 {
-    initialize_ex(NULL, src.rows, src.cols, INIT_MODE_CONSTRUCTOR);
+    initialize_ex(NULL, src.rows, src.cols, INIT_TYPE_CONSTRUCTOR);
     copy_from_array(src.data());
 
     //MatrixT<T>* pMatrix = copy( &src );
@@ -68,7 +68,7 @@ MatrixT<T>::MatrixT( const MatrixT<T>& src, bool b_copy_data )
     _rows = src.rows;
     _cols = src.cols;
 
-    initialize_ex(NULL, _rows, _cols, INIT_MODE_CONSTRUCTOR);
+    initialize_ex(NULL, _rows, _cols, INIT_TYPE_CONSTRUCTOR);
 
     if (b_copy_data) {
         MatrixT<T>* pMatrix = copy( &src );
@@ -110,25 +110,25 @@ inline void MatrixT<T>::free( void )
 
 template<typename T>
 void MatrixT<T>::clear( value_type _fillVal /*= static_cast<T>(0)*/,
-                       int _initFcn /*= MAT_INIT_DEFAULT */ )
+                       int _initFcn /*= FILL_DATA_DEFAULT */ )
 {
     fill_data(cols, rows, _fillVal, _initFcn);
 }
 
 template<typename T>
 inline void MatrixT<T>::initialize( int _rows, int _cols,
-                                   int _initMode /*= INIT_MODE_NONE*/,
+                                   int _initMode /*= INIT_TYPE_NONE*/,
                                    value_type _fillVal /*= 0.0*/,
-                                   int _initFcn /*= MAT_INIT_DEFAULT*/ )
+                                   int _initFcn /*= FILL_DATA_DEFAULT*/ )
 {
     initialize_ex(NULL, _rows, _cols, _initMode, _fillVal, _initFcn);
 }
 
 template<typename T>
 void MatrixT<T>::initialize_ex( const TCHAR *szName, int _rows, int _cols,
-                               int _initMode /*= INIT_MODE_NONE*/,
+                               int _initMode /*= INIT_TYPE_NONE*/,
                                value_type _fillVal /*= 0.0*/,
-                               int _initFcn /*= MAT_INIT_DEFAULT*/ )
+                               int _initFcn /*= FILL_DATA_DEFAULT*/ )
 {
     size_type _alloc_size;
     int _totals;
@@ -137,7 +137,7 @@ void MatrixT<T>::initialize_ex( const TCHAR *szName, int _rows, int _cols,
     const int nAdditionRowSize =
         (int)ceil(double(MAT_ADDR_ALIGN_SIZE) / (double)sizeof(pointer));
 
-    if (_initMode == INIT_MODE_CONSTRUCTOR) {
+    if (_initMode == INIT_TYPE_CONSTRUCTOR) {
         pvData      = NULL;
         ppvRow      = NULL;
         pvAlloc     = NULL;
@@ -149,7 +149,7 @@ void MatrixT<T>::initialize_ex( const TCHAR *szName, int _rows, int _cols,
         totals_actual = 0;
     }
 
-    if (_initMode != INIT_MODE_RESIZE) {
+    if (_initMode != INIT_TYPE_RESIZE) {
         if (szName != NULL)
             _tcscpy_s(m_szName, _countof(m_szName), szName);
         else
@@ -186,7 +186,7 @@ void MatrixT<T>::initialize_ex( const TCHAR *szName, int _rows, int _cols,
             }
 
             // fill data for matrix
-            if (_initFcn != FILL_MODE_NONE)
+            if (_initFcn != FILL_DATA_NONE)
                 fill_data(_rows, _cols, _fillVal, _initFcn);
         }
         else {
@@ -219,13 +219,13 @@ void MatrixT<T>::initialize_ex( const TCHAR *szName, int _rows, int _cols,
                 ppvRow[i] = p;
                 p += cols;
             }
-        }				
+        }               
     }
 }
 
 template<typename T>
 void MatrixT<T>::init_martix( int _rows, int _cols,
-                             int _initMode /*= INIT_MODE_NONE*/,
+                             int _initMode /*= INIT_TYPE_NONE*/,
                              value_type _fillVal /*= static_cast<T>(0)*/,
                              int _initFcn /*= MAT_INIT_DEFAULT */ )
 {
@@ -236,7 +236,7 @@ void MatrixT<T>::init_martix( int _rows, int _cols,
     const int nAdditionRowSize =
         (int)ceil(double(MAT_ADDR_ALIGN_SIZE) / (double)sizeof(typename pointer));
 
-    if (_initMode == INIT_MODE_CONSTRUCTOR) {
+    if (_initMode == INIT_TYPE_CONSTRUCTOR) {
         pvData      = NULL;
         ppvRow      = NULL;
         pvAlloc     = NULL;
@@ -277,7 +277,7 @@ void MatrixT<T>::init_martix( int _rows, int _cols,
             }
 
             // fill data for matrix
-            if (_initFcn != FILL_MODE_NONE)
+            if (_initFcn != FILL_DATA_NONE)
                 fill_data(_rows, _cols, _fillVal, _initFcn);
         }
         else {
@@ -310,7 +310,7 @@ void MatrixT<T>::init_martix( int _rows, int _cols,
                 ppvRow[i] = p;
                 p += cols;
             }
-        }				
+        }               
     }
 }
 
@@ -350,7 +350,7 @@ void MatrixT<T>::reserve_and_fill_data( pointer pvNewData, int _rows, int _cols,
     if (_copyLength != 0)
         memcpy_s(pvNewData, sizeof(typename T) * _copyLength, pvData, sizeof(typename T) * _copyLength);
 
-    if (_initFcn == FILL_MODE_NONE || _fillLength <= 0)
+    if (_initFcn == FILL_DATA_NONE || _fillLength <= 0)
         return;
 
     pointer pvNewDataFill = pvNewData + _copyLength;
@@ -359,30 +359,30 @@ void MatrixT<T>::reserve_and_fill_data( pointer pvNewData, int _rows, int _cols,
 
     double _fRndNum;
     switch (_initFcn) {
-    case FILL_MODE_ZEROS:		// all zeros
+    case FILL_DATA_ZEROS:       // all zeros
         for (int i=0; i<_fillLength; i++)
             pvNewDataFill[i] = static_cast<T>(0);
         break;
-    case FILL_MODE_ONES:			// all ones
+    case FILL_DATA_ONES:            // all ones
         for (int i=0; i<_fillLength; i++)
             pvNewDataFill[i] = static_cast<T>(1);
         break;
-    case FILL_MODE_RANDS:		// all [-1,1] randomize
+    case FILL_DATA_RANDS:       // all [-1,1] randomize
         for (int i=0; i<_fillLength; i++) {
             _fRndNum = 2.0 * (double)rand() / (double)(RAND_MAX + 1) - 1.0;
             pvNewDataFill[i] = static_cast<T>(_fRndNum);
         }
         break;
-    case FILL_MODE_RANDS_POSITIVE:		// all [0,1] randomize
+    case FILL_DATA_RANDS_POSITIVE:      // all [0,1] randomize
         for (int i=0; i<_fillLength; i++) {
             _fRndNum = (double)rand() / (double)(RAND_MAX + 1);
             pvNewDataFill[i] = static_cast<T>(_fRndNum);
         }
         break;
-    case FILL_MODE_EYES:
+    case FILL_DATA_EYES:
         // 暂未提供
         break;
-    case FILL_MODE_NONE:
+    case FILL_DATA_NONE:
         // do nothing
         break;
     }
@@ -391,7 +391,7 @@ void MatrixT<T>::reserve_and_fill_data( pointer pvNewData, int _rows, int _cols,
 template<typename T>
 inline bool MatrixT<T>::empty( void ) const
 {
-	return (sizes() == 0);
+    return (sizes() == 0);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -407,14 +407,14 @@ inline bool MatrixT<T>::empty( void ) const
 template <typename T>
 inline typename MatrixT<T>::size_type MatrixT<T>::size( int n /*= 0 */ ) const
 {
-	size_type _size;
-	if (n == 1)
-		_size = rows;
-	else if (n == 2)
-		_size = cols;
-	else
-		_size = totals;
-	return _size;
+    size_type _size;
+    if (n == 1)
+        _size = rows;
+    else if (n == 2)
+        _size = cols;
+    else
+        _size = totals;
+    return _size;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -442,15 +442,15 @@ inline typename MatrixT<T>::size_type MatrixT<T>::sizes( void ) const
 template<typename T>
 inline bool MatrixT<T>::is_same_size( const MatrixT<T>* target, int n /*= 0 */ )
 {
-	if (target != NULL) {
-		if (n == 1)
-			return (rows == target->rows);
-		else if (n == 2)
-			return (cols == target->cols);
-		else
-			return (rows == target->rows && cols == target->cols);
-	}
-	return false;
+    if (target != NULL) {
+        if (n == 1)
+            return (rows == target->rows);
+        else if (n == 2)
+            return (cols == target->cols);
+        else
+            return (rows == target->rows && cols == target->cols);
+    }
+    return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -462,7 +462,7 @@ inline bool MatrixT<T>::is_same_size( const MatrixT<T>* target, int n /*= 0 */ )
 template<typename T>
 inline bool MatrixT<T>::is_same_sizes( const MatrixT<T>& target )
 {
-	return (rows == target.rows && cols == target.cols);
+    return (rows == target.rows && cols == target.cols);
 }
 
 template<typename T>
@@ -478,7 +478,7 @@ inline int MatrixT<T>::resize( int _rows, int _cols )
     }
 
     destroy();
-    init_martix(_rows, _cols, INIT_MODE_RESIZE);
+    init_martix(_rows, _cols, INIT_TYPE_RESIZE);
     return totals;
 }
 
@@ -488,13 +488,13 @@ inline int MatrixT<T>::resize_ex( int _rows, int _cols,
                                  int _initFcn /*= MAT_INIT_DEFAULT */ )
 {
     if (rows == _rows && cols == _cols) {
-        if (_initFcn != FILL_MODE_NONE)
+        if (_initFcn != FILL_DATA_NONE)
             fill_data(_rows, _cols, _fillVal, _initFcn);
         return totals;
     }
 
     destroy();
-    initialize(_rows, _cols, INIT_MODE_RESIZE, _fillVal, _initFcn);
+    initialize(_rows, _cols, INIT_TYPE_RESIZE, _fillVal, _initFcn);
     return totals;
 }
 
@@ -503,8 +503,8 @@ inline void MatrixT<T>::copy_from_array( const_pointer _array )
 {
     __MY_ASSERT((_array != NULL), _T(""));
 
-	for (int i=0; i<totals; ++i)
-		pvData[i] = _array[i];
+    for (int i=0; i<totals; ++i)
+        pvData[i] = _array[i];
 }
 
 template<typename T>
@@ -512,8 +512,8 @@ inline void MatrixT<T>::set_by_scalar( const_value_type _x )
 {
     __MY_ASSERT((_array != NULL), _T(""));
 
-	for (int i=0; i<totals; ++i)
-		pvData[i] = _x;
+    for (int i=0; i<totals; ++i)
+        pvData[i] = _x;
 }
 
 template<typename T>
@@ -523,8 +523,8 @@ MatrixT<T>::copy_from_array_s( const_pointer _array, size_type _size )
     __MY_ASSERT((_array != NULL), _T(""));
 
     size_type copy_size = (_size <= totals) ? _size : totals;
-	for (int i=0; i<(int)copy_size; ++i)
-		pvData[i] = _array[i];
+    for (int i=0; i<(int)copy_size; ++i)
+        pvData[i] = _array[i];
     return copy_size;
 }
 
@@ -614,7 +614,7 @@ MatrixT<T>& MatrixT<T>::operator = ( MatrixT<T>& _Right )
     }
     else {
         destroy();
-        initialize(_Right.rows, _Right.cols, INIT_MODE_RESIZE);
+        initialize(_Right.rows, _Right.cols, INIT_TYPE_RESIZE);
         copy_from_array(_Right.data());
 
         //MatrixT<T>* dest = copy(&_Right);
@@ -674,25 +674,25 @@ inline MatrixT<T>& MatrixT<T>::transpose( void )
 
     // 对称矩阵(方块矩阵)
     if (cols == rows) {
-	    // 转置各元素
-	    for (int i=0; i<rows; ++i) {
-		    for (int j=i+1; j<cols; ++j)
-			    set_element(j, i, get_element(i, j));
-	    }
+        // 转置各元素
+        for (int i=0; i<rows; ++i) {
+            for (int j=i+1; j<cols; ++j)
+                set_element(j, i, get_element(i, j));
+        }
     }
     else {
-	    MatrixT<T> _trans((MatrixT<T> &)*this);
-	    // 转置各元素
-	    for (int i=0; i<rows; ++i) {
-		    for (int j=0; j<cols; ++j)
-			    set_element(j, i, _trans.get_element(i, j));
-	    }
+        MatrixT<T> _trans((MatrixT<T> &)*this);
+        // 转置各元素
+        for (int i=0; i<rows; ++i) {
+            for (int j=0; j<cols; ++j)
+                set_element(j, i, _trans.get_element(i, j));
+        }
         int temp = rows;
         rows = cols;
         cols = temp;
     }
 
-	return *this;
+    return *this;
 }
 
 template<typename T>
@@ -758,26 +758,30 @@ void MatrixT<T>::fill_data( int _rows, int _cols,
         return;
 
     switch (_initFcn) {
-    case FILL_MODE_ZEROS:		    // all zeros
+    case FILL_DATA_ZEROS:           // all zeros
         for (int i=0; i<_totals; ++i)
             pvData[i] = static_cast<T>(0);
         break;
-    case FILL_MODE_ONES:			    // all ones
+    case FILL_DATA_ONES:            // all ones
         for (int i=0; i<_totals; ++i)
             pvData[i] = static_cast<T>(1);
         break;
-    case FILL_MODE_RANDS:		    // all [-1,1] randomize
+    case FILL_DATA_EYES:
+        // 暂未提供
+        break;
+    case FILL_DATA_RANDS:           // all [-1,1] randomize
         for (int i=0; i<_totals; ++i)
             pvData[i] = (value_type)(2.0 * (value_type)rand() / (value_type)(RAND_MAX) - 1.0);
         break;
-    case FILL_MODE_RANDS_POSITIVE:	// all [0,1] positive randomize
+    case FILL_DATA_RANDS_POSITIVE:  // all [0,1] positive randomize
         for (int i=0; i<_totals; ++i)
             pvData[i] = (value_type)rand() / (value_type)(RAND_MAX);
         break;
-    case FILL_MODE_EYES:
-        // 暂未提供
+    case FILL_DATA_SPECIFIED:
+        for (int i=0; i<_totals; ++i)
+            pvData[i] = _fillVal;
         break;
-    case FILL_MODE_NONE:
+    case FILL_DATA_NONE:
         // do nothing
         break;
     }
@@ -799,15 +803,18 @@ void MatrixT<Ty>::fill_data( int _rows, int _cols, \
         return; \
                         \
     switch (_initFcn) { \
-    case FILL_MODE_ZEROS:		    /* all zeros */ \
+    case FILL_DATA_ZEROS:           /* all zeros */ \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = static_cast<Ty>(0); \
         break; \
-    case FILL_MODE_ONES:			    /* all ones */ \
+    case FILL_DATA_ONES:            /* all ones */ \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = static_cast<Ty>(1); \
         break; \
-    case FILL_MODE_RANDS:		    /* all [-1,1] randomize */ \
+    case FILL_DATA_EYES: \
+        /* 暂未提供 */ \
+        break; \
+    case FILL_DATA_RANDS:           /* all [-1,1] randomize */ \
         /* whether is the signed integer type? */ \
         if ((value_type)(0) > (value_type)(-1)) { \
             /* signed integer */ \
@@ -820,14 +827,15 @@ void MatrixT<Ty>::fill_data( int _rows, int _cols, \
                 pvData[i] = (value_type)(rand() & 1); \
         } \
         break; \
-    case FILL_MODE_RANDS_POSITIVE:	/* all [0,1] positive randomize */ \
+    case FILL_DATA_RANDS_POSITIVE:  /* all [0,1] positive randomize */ \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = (value_type)(rand() & 1); \
         break; \
-    case FILL_MODE_EYES: \
-        /* 暂未提供 */ \
+    case FILL_DATA_SPECIFIED: \
+        for (int i=0; i<_totals; ++i) \
+            pvData[i] = _fillVal; \
         break; \
-    case FILL_MODE_NONE: \
+    case FILL_DATA_NONE: \
         /* do nothing */ \
         break; \
     } \
@@ -849,27 +857,31 @@ void MatrixT<Ty>::fill_data( int _rows, int _cols, \
         return; \
                         \
     switch (_initFcn) { \
-    case FILL_MODE_ZEROS:		    /* all zeros */ \
+    case FILL_DATA_ZEROS:           /* all zeros */ \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = static_cast<Ty>(0); \
         break; \
-    case FILL_MODE_ONES:			    /* all ones */ \
+    case FILL_DATA_ONES:            /* all ones */ \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = static_cast<Ty>(1); \
         break; \
-    case FILL_MODE_RANDS:		    /* all [0,1] randomize */ \
+    case FILL_DATA_EYES: \
+        /* 暂未提供 */ \
+        break; \
+    case FILL_DATA_RANDS:           /* all [0,1] randomize */ \
         /* unsigned integer, not allowed -1 */ \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = (value_type)(rand() & 1); \
         break; \
-    case FILL_MODE_RANDS_POSITIVE:	/* all [0,1] positive randomize */ \
+    case FILL_DATA_RANDS_POSITIVE:  /* all [0,1] positive randomize */ \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = (value_type)(rand() & 1); \
         break; \
-    case FILL_MODE_EYES: \
-        /* 暂未提供 */ \
+    case FILL_DATA_SPECIFIED: \
+        for (int i=0; i<_totals; ++i) \
+            pvData[i] = _fillVal; \
         break; \
-    case FILL_MODE_NONE: \
+    case FILL_DATA_NONE: \
         /* do nothing */ \
         break; \
     } \
@@ -985,16 +997,20 @@ void MatrixT<T>::display( const TCHAR *szText )
 #if defined(MATLAB_USE_DISPLAY) && (MATLAB_USE_DISPLAY)
     TCHAR* szTypeName = NULL;
     AnsiToUnicode(typeid(T).name(), &szTypeName);
-	TRACE(("MatrixT<%s>: Name = [ %s ], [rows = %d, cols = %d]\n"), szTypeName, szText, rows, cols);
-	TRACE(_T("============================================================================================================\n\n"));
-	for (int r=0; r<rows; r++) {
-		TRACE(_T("\t"));
-		for (int c=0; c<cols; c++) {
-			TRACE(_T("%11.4E  \t"), get_element(r, c));
-		}
-		TRACE(_T("\n\n"));
-	}
-	TRACE(_T("============================================================================================================\n\n"));
+    TRACE(("MatrixT<%s>: Name = [ %s ], [rows = %d, cols = %d]\n"), szTypeName, szText, rows, cols);
+    TRACE(_T("============================================================================================================\n\n"));
+    for (int r=0; r<rows; r++) {
+        TRACE(_T("\t"));
+        for (int c=0; c<cols; c++) {
+            value_type value = get_element(r, c);
+            if (abs(value) < static_cast<T>(10000000.0))
+                TRACE(_T("%12.4f "), value);
+            else
+                TRACE(_T("%12.4E "), value);
+        }
+        TRACE(_T("\n\n"));
+    }
+    TRACE(_T("============================================================================================================\n\n"));
     if (szTypeName != NULL)
         CoTaskMemFree(szTypeName);
 #endif
@@ -1004,32 +1020,32 @@ void MatrixT<T>::display( const TCHAR *szText )
 template<> \
 void MatrixT<Ty>::display( const TCHAR *szText ) \
 { \
-	TRACE(_T("MatrixT<")_T(#Ty)_T(">: Name = [ %s ], [rows = %d, cols = %d]\n"), szText, rows, cols); \
-	TRACE(_T("============================================================================================================\n\n")); \
-	for (int r=0; r<rows; r++) { \
-		TRACE(_T("\t")); \
-		for (int c=0; c<cols; c++) { \
-			TRACE(_T("%-11d  "), get_element(r, c)); \
-		} \
-		TRACE(_T("\n\n")); \
-	} \
-	TRACE(_T("============================================================================================================\n\n")); \
+    TRACE(_T("MatrixT<")_T(#Ty)_T(">: Name = [ %s ], [rows = %d, cols = %d]\n"), szText, rows, cols); \
+    TRACE(_T("============================================================================================================\n\n")); \
+    for (int r=0; r<rows; r++) { \
+        TRACE(_T("\t")); \
+        for (int c=0; c<cols; c++) { \
+            TRACE(_T("%10d  "), get_element(r, c)); \
+        } \
+        TRACE(_T("\n\n")); \
+    } \
+    TRACE(_T("============================================================================================================\n\n")); \
 }
 
 #define MATRIXT_DISPLAY_FUNC_UNSIGNED(Ty) \
 template<> \
 void MatrixT<Ty>::display( const TCHAR *szText ) \
 { \
-	TRACE(_T("MatrixT<")_T(#Ty)_T(">: Name = [ %s ], [rows = %d, cols = %d]\n"), szText, rows, cols); \
-	TRACE(_T("============================================================================================================\n\n")); \
-	for (int r=0; r<rows; r++) { \
-		TRACE(_T("\t")); \
-		for (int c=0; c<cols; c++) { \
-			TRACE(_T("%-11u  "), get_element(r, c)); \
-		} \
-		TRACE(_T("\n\n")); \
-	} \
-	TRACE(_T("============================================================================================================\n\n")); \
+    TRACE(_T("MatrixT<")_T(#Ty)_T(">: Name = [ %s ], [rows = %d, cols = %d]\n"), szText, rows, cols); \
+    TRACE(_T("============================================================================================================\n\n")); \
+    for (int r=0; r<rows; r++) { \
+        TRACE(_T("\t")); \
+        for (int c=0; c<cols; c++) { \
+            TRACE(_T("%10u "), get_element(r, c)); \
+        } \
+        TRACE(_T("\n\n")); \
+    } \
+    TRACE(_T("============================================================================================================\n\n")); \
 }
 
 #if defined(MATLAB_USE_DISPLAY) && (MATLAB_USE_DISPLAY)
@@ -1066,15 +1082,19 @@ void MatrixT<T>::display_ex( const TCHAR *szText )
     szTypeName = szTypeNameA;
 #endif
     TRACE(_T("MatrixT<%s>: Name = [ %s ], [rows = %d, cols = %d]\n"), szTypeName, szText, rows, cols);
-	TRACE(_T("============================================================================================================\n\n"));
-	for (int r=0; r<rows; r++) {
-		TRACE(_T("\t"));
-		for (int c=0; c<cols; c++) {
-			TRACE(_T("%11.4E  \t"), get_element(r, c));
-		}
-		TRACE(_T("\n\n"));
-	}
-	TRACE(_T("============================================================================================================\n\n"));
+    TRACE(_T("============================================================================================================\n\n"));
+    for (int r=0; r<rows; r++) {
+        TRACE(_T("\t"));
+        for (int c=0; c<cols; c++) {
+            value_type value = get_element(r, c);
+            if (abs(value) < static_cast<T>(10000000.0))
+                TRACE(_T("%12.4f "), value);
+            else
+                TRACE(_T("%12.4E "), value);
+        }
+        TRACE(_T("\n\n"));
+    }
+    TRACE(_T("============================================================================================================\n\n"));
 #ifdef _UNICODE
     if (szTypeName != NULL) {
         CoTaskMemFree(szTypeName);
@@ -1099,15 +1119,15 @@ template<> \
 void MatrixT<Ty>::display_ex( const TCHAR *szText ) \
 { \
     TRACE(_T("MatrixT<")_T(#Ty)_T(">: Name = [ %s ], [rows = %d, cols = %d]\n"), szText, rows, cols); \
-	TRACE(_T("============================================================================================================\n\n")); \
-	for (int r=0; r<rows; r++) { \
-		TRACE(_T("\t")); \
-		for (int c=0; c<cols; c++) { \
-			TRACE(_T("%-11d  "), get_element(r, c)); \
-		} \
-		TRACE(_T("\n\n")); \
-	} \
-	TRACE(_T("============================================================================================================\n\n")); \
+    TRACE(_T("============================================================================================================\n\n")); \
+    for (int r=0; r<rows; r++) { \
+        TRACE(_T("\t")); \
+        for (int c=0; c<cols; c++) { \
+            TRACE(_T("%10d "), get_element(r, c)); \
+        } \
+        TRACE(_T("\n\n")); \
+    } \
+    TRACE(_T("============================================================================================================\n\n")); \
 }
 
 #define MATRIXT_DISPLAY_EX_FUNC_UNSIGNED(Ty) \
@@ -1115,15 +1135,15 @@ template<> \
 void MatrixT<Ty>::display_ex( const TCHAR *szText ) \
 { \
     TRACE(_T("MatrixT<")_T(#Ty)_T(">: Name = [ %s ], [rows = %d, cols = %d]\n"), szText, rows, cols); \
-	TRACE(_T("============================================================================================================\n\n")); \
-	for (int r=0; r<rows; r++) { \
-		TRACE(_T("\t")); \
-		for (int c=0; c<cols; c++) { \
-			TRACE(_T("%-11u  "), get_element(r, c)); \
-		} \
-		TRACE(_T("\n\n")); \
-	} \
-	TRACE(_T("============================================================================================================\n\n")); \
+    TRACE(_T("============================================================================================================\n\n")); \
+    for (int r=0; r<rows; r++) { \
+        TRACE(_T("\t")); \
+        for (int c=0; c<cols; c++) { \
+            TRACE(_T("%10u "), get_element(r, c)); \
+        } \
+        TRACE(_T("\n\n")); \
+    } \
+    TRACE(_T("============================================================================================================\n\n")); \
 }
 
 #if defined(MATLAB_USE_DISPLAY_EX) && (MATLAB_USE_DISPLAY_EX)
