@@ -75,7 +75,7 @@ private:
 public:
     MatrixT( void );
     explicit MatrixT( int _size );
-    MatrixT( int _rows, int _cols);
+    MatrixT( int _rows, int _cols );
     MatrixT( int _rows, int _cols, const value_type& _x );
     MatrixT( int _rows, int _cols, const value_type* _array );
     MatrixT( int _rows, int _cols, int _initFcn, value_type _fillVal = static_cast<T>(0) );

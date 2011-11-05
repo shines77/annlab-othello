@@ -1,6 +1,7 @@
 
 #include "../../../include/gui/stdafx.h"
 #include "../../../include/annlab/sys/AnnMatrix.h"
+#include "../../../include/annlab/annlab_assert.h"
 #include <iostream>
 #include <assert.h>
 #include <math.h>
@@ -225,6 +226,14 @@ CAnnMatrix::CAnnMatrix( const CAnnMatrix & scrMatrix, bool bCopyData )
 
 CAnnMatrix::~CAnnMatrix( void )
 {
+    //_ASSERTE(m_pData == NULL);
+    //__ANNLAB_CRT_ASSERT(m_pData == NULL);
+    //__ANNLAB_CRT_ASSERT(m_pData == NULL, "1111111111");
+    //__ANNLAB_CRT_ASSERT_EX(m_pData == NULL, "222222222 m_pData is not NULL.");
+    //__ANNLAB_ASSERT(m_pData == NULL);
+    //__ANNLAB_ASSERT(m_pData == NULL, "44444444 m_pData is not NULL.");
+    //__ANNLAB_CRT_ASSERT_EX(m_pData == NULL, NULL);
+    //__ANNLAB_CRT_ASSERT_EX(m_pData == NULL, "m_pData is not NULL.");
 	free_matrix();
 }
 
