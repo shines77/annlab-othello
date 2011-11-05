@@ -74,10 +74,10 @@ bool CAnnVector::initVector( const TCHAR *szName, int _size,
 
 		length = _size;
 		if (length > 0) {
-			mem_alloc = length + MAT_ADDR_ALIGN_SIZE;
+			mem_alloc = length + MAT_CACHE_ALIGN_SIZE;
 			m_pOrigData = new double[mem_alloc];
 			if (m_pOrigData != NULL) {
-				m_pData = (double *)MAT_ADDR_ALIGN(m_pOrigData);
+				m_pData = (double *)MAT_CACHE_ALIGN_128(m_pOrigData);
 				// init vector data
 				bResult = initData(length, _initFcn);
 			}
@@ -247,7 +247,7 @@ bool CAnnMatrix::init_matrix( const TCHAR *szName, int _rows, int _cols,
 {
 	bool bResult = false;
     const int nAdditionSize =
-        (int)ceil(double(MAT_ADDR_ALIGN_SIZE) / (double)sizeof(double));
+        (int)ceil(double(MAT_CACHE_ALIGN_SIZE) / (double)sizeof(double));
 
 	if (_initMode == INIT_MODE_CONSTRUCTOR) {
 		rows = cols = 0;
@@ -271,7 +271,7 @@ bool CAnnMatrix::init_matrix( const TCHAR *szName, int _rows, int _cols,
 			_malloc_size = _length + nAdditionSize;
 			double *pNewOrigData = new double[_malloc_size];
 			if (pNewOrigData != NULL) {
-				double *pNewData = (double *)MAT_ADDR_ALIGN(pNewOrigData);
+				double *pNewData = (double *)MAT_CACHE_ALIGN_128(pNewOrigData);
 				if (m_pOrigData == NULL) {
 					// save the new data buffer
 					m_pOrigData = pNewOrigData;

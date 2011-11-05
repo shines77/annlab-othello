@@ -8,11 +8,11 @@
 
 using namespace std;
 
-#define MAT_NAN_ITEM         (-128.0)
+#define MAT_NAN_ITEM            (-128.0)
 
-#define MAT_ADDR_ALIGN_SIZE  (128UL)
-#define MAT_ADDR_ALIGN_MASK  (MAT_ADDR_ALIGN_SIZE - 1)
-#define MAT_ADDR_ALIGN(x)    (((uint32_t)(x) + MAT_ADDR_ALIGN_MASK) & (~MAT_ADDR_ALIGN_MASK))
+#define MAT_CACHE_ALIGN_SIZE    (128UL)
+#define MAT_CACHE_ALIGN_MASK    (MAT_CACHE_ALIGN_SIZE - 1)
+#define MAT_CACHE_ALIGN_128(x)  (((uint32_t)(x) + MAT_CACHE_ALIGN_MASK) & (~MAT_CACHE_ALIGN_MASK))
 
 namespace matlab {
 
