@@ -30,6 +30,9 @@
 #define _ANNLAB_ASSERT_H_
 
 #include "annlab_config.h"
+#if _MSC_VER
+#include <crtdbg.h>
+#endif
 
 #ifndef __ANNLAB_EXPORTED_FUNC
   #if _MSC_VER >= 1400
@@ -38,6 +41,34 @@
     #define __ANNLAB_EXPORTED_FUNC
   #endif
 #endif
+
+#if _MSC_VER
+/* Asserts */
+/* We use !! below to ensure that any overloaded operators used to evaluate expr do not end up at operator || */
+#define __ANNLAB_CRT_ASSERT_EXPR(expr, msg) \
+        (void) ((!!(expr)) || \
+                (1 != _CrtDbgReportW(_CRT_ASSERT, _CRT_WIDE(__FILE__), __LINE__, NULL, msg)) || \
+                (_CrtDbgBreak(), 0))
+
+#ifndef __ANNLAB_CRT_ASSERT
+#define __ANNLAB_CRT_ASSERT(expr, ...)      __ANNLAB_CRT_ASSERT_EXPR((expr), _CRT_WIDE(#expr))
+#endif
+
+#ifndef __ANNLAB_CRT_ASSERT_EX
+#define __ANNLAB_CRT_ASSERT_EX(expr, msg) \
+    __ANNLAB_CRT_ASSERT_EXPR((expr), (((msg) == NULL) ? _CRT_WIDE(#expr) \
+    : _CRT_WIDE(#expr)_CRT_WIDE("\n\nDescription: ")_CRT_WIDE(#msg)))
+#endif
+
+#else
+#ifndef __ANNLAB_CRT_ASSERT
+#define __ANNLAB_CRT_ASSERT(expr)
+#endif
+
+#ifndef __ANNLAB_CRT_ASSERTE
+#define __ANNLAB_CRT__ASSERTE(expr)
+#endif
+#endif /* !_MSC_VER */
 
 namespace annlab {
 
@@ -50,8 +81,8 @@ namespace annlab {
     /** If x is false, print assertion failure message.  
         If the comment argument is not NULL, it is printed as part of the failure message.  
         The comment argument has no other effect. */
-    #define __ANNLAB_ASSERT(predicate, message)     ((predicate) ? ((void)0) : annlab::assertion_failure(__FILE__,__LINE__,#predicate,message))
-    #define __ANNLAB_ASSERT_EX                      __ANNLAB_ASSERT
+    #define __ANNLAB_ASSERT(predicate, ...)         ((predicate) ? ((void)0) : annlab::assertion_failure(__FILE__,__LINE__,#predicate,NULL))
+    #define __ANNLAB_ASSERT_EX(predicate, message)  ((predicate) ? ((void)0) : annlab::assertion_failure(__FILE__,__LINE__,#predicate,message))
 
     //! Set assertion handler and return previous value of it.
     assertion_handler_type __ANNLAB_EXPORTED_FUNC set_assertion_handler( assertion_handler_type new_handler );

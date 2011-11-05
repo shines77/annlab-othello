@@ -264,7 +264,7 @@ void MatrixT<T>::init_martix( int _rows, int _cols,
                 ppvRow[i] = p;
                 p += cols;
             }
-        }               
+        }
     }
 }
 
