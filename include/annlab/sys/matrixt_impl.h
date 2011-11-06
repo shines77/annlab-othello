@@ -32,13 +32,6 @@ MatrixT<T>::MatrixT( int _rows, int _cols)
 }
 
 template<typename T>
-MatrixT<T>::MatrixT( int _rows, int _cols, int _initFcn,
-                    value_type _fillVal /*= static_cast<T>(0)*/)
-{
-    initialize(_rows, _cols, _initFcn, static_cast<T>(0) );
-}
-
-template<typename T>
 MatrixT<T>::MatrixT( int _rows, int _cols, const value_type& _x )
 {
     initialize(_rows, _cols);
@@ -50,6 +43,13 @@ MatrixT<T>::MatrixT( int _rows, int _cols, const value_type* _array )
 {
     initialize(_rows, _cols);
     copy_from_array(_array);
+}
+
+template<typename T>
+MatrixT<T>::MatrixT( int _rows, int _cols, int _initFcn,
+                    value_type _fillVal /*= static_cast<T>(0)*/)
+{
+    initialize(_rows, _cols, _initFcn, static_cast<T>(0) );
 }
 
 template<typename T>
@@ -85,7 +85,17 @@ MatrixT<T>::MatrixT( const MatrixT<T>& src, bool b_copy_data )
 template<typename T>
 MatrixT<T>::~MatrixT( void )
 {
-    destroy();
+    destroy_data();
+}
+
+template<typename T>
+inline void MatrixT<T>::destroy_data( void )
+{
+    if (pvAlloc != NULL) {
+        delete[] pvAlloc;
+        if (ppvRowAlloc != NULL)
+            delete[] ppvRowAlloc;
+    }
 }
 
 template<typename T>
@@ -343,14 +353,14 @@ void MatrixT<T>::reserve_and_fill_data( pointer pvNewData, int _rows, int _cols,
 }
 
 template<typename T>
-void MatrixT<T>::clear( int _initFcn /*= INIT_FCN_DEFAULT */,
+void MatrixT<T>::fill( int _initFcn /*= INIT_FCN_DEFAULT */,
                        value_type _fillVal /*= static_cast<T>(0)*/ )
 {
     fill_data(cols, rows, _initFcn, _fillVal);
 }
 
 template<typename T>
-inline bool MatrixT<T>::empty( void ) const
+inline bool MatrixT<T>::is_empty( void ) const
 {
     return (sizes() == 0);
 }
@@ -432,15 +442,43 @@ inline int MatrixT<T>::resize( int _rows, int _cols )
     if (rows == _rows && cols == _cols)
         return totals;
 
-    if (_rows * _cols == totals) {
+    int _totals = _rows * _cols;
+    if (_totals <= totals_actual) {
+        if (_rows > rows) {
+            if (ppvRowAlloc != NULL)
+                delete[] ppvRowAlloc;
+
+            const int nAdditionRowSize =
+                (int)ceil(double(MAT_CACHE_ALIGN_SIZE) / (double)sizeof(typename pointer));
+            ptr_pointer ppvOrigRow = new pointer[_rows + nAdditionRowSize];
+            if (ppvOrigRow != NULL) {
+                ptr_pointer ppvNewRow = (ptr_pointer)MAT_CACHE_ALIGN_128(ppvOrigRow);
+                __ANNLAB_ASSERT(ppvNewRow != NULL);
+
+                ppvRow = ppvNewRow;
+                ppvRowAlloc = ppvOrigRow;
+
+                // reset the row pointers
+                pointer p = pvData;
+                for (int i=0; i<_rows; ++i) {
+                    ppvRow[i] = p;
+                    p += _cols;
+                }
+            }
+            else {
+                ppvRowAlloc = NULL;
+                ppvRow = NULL;
+            }
+        }
         rows = _rows;
         cols = _cols;
-        return totals;
+        totals = _totals;
+        return _totals;
     }
 
     destroy();
     init_martix(_rows, _cols, INIT_TYPE_RESIZE);
-    return totals;
+    return _totals;
 }
 
 template<typename T>
@@ -504,37 +542,37 @@ inline MatrixT<T>* MatrixT<T>::copy( const MatrixT<T>* src )
 }
 
 template<typename T>
-inline typename MatrixT<T>::value_type MatrixT<T>::get_element( int _index )
+inline typename MatrixT<T>::value_type MatrixT<T>::get_at( int _index )
 {
     return pvData[_index];
 }
 
 template<typename T>
-inline typename const MatrixT<T>::value_type MatrixT<T>::get_element( int _index ) const
+inline typename const MatrixT<T>::value_type MatrixT<T>::get_at( int _index ) const
 {
     return pvData[_index];
 }
 
 template<typename T>
-inline typename MatrixT<T>::value_type MatrixT<T>::get_element( int _row, int _col )
+inline typename MatrixT<T>::value_type MatrixT<T>::get_at( int _row, int _col )
 {
     return pvData[_col * rows + _row];
 }
 
 template<typename T>
-inline typename const MatrixT<T>::value_type MatrixT<T>::get_element( int _row, int _col ) const
+inline typename const MatrixT<T>::value_type MatrixT<T>::get_at( int _row, int _col ) const
 {
     return pvData[_col * rows + _row];
 }
 
 template<typename T>
-inline void MatrixT<T>::set_element( int _index, value_type _value )
+inline void MatrixT<T>::set_at( int _index, value_type _value )
 {
     pvData[_index] = _value;
 }
 
 template<typename T>
-inline void MatrixT<T>::set_element( int _row, int _col, value_type _value )
+inline void MatrixT<T>::set_at( int _row, int _col, value_type _value )
 {
     pvData[_col * rows + _row] = _value;
 }
@@ -549,41 +587,6 @@ template<typename T>
 inline MatrixT<T>::operator const T*() const
 {
     return pvData;
-}
-
-template<typename T>
-MatrixT<T>& MatrixT<T>::operator = ( value_type _value )
-{
-    // resize to one item matrix
-    resize(1, 1);
-
-    // set the single data
-    set_element(0, 0, _value);
-
-    // finally return a reference to ourselves
-    return *this;
-}
-
-template<typename T>
-MatrixT<T>& MatrixT<T>::operator = ( MatrixT<T>& _Right )
-{
-    if (&_Right == this || _Right.data() == pvData)
-        return *this;
-
-    if (rows == _Right.rows && cols == _Right.cols) {
-        copy_from_array(_Right.data());
-    }
-    else {
-        destroy();
-        initialize(_Right.rows, _Right.cols, INIT_TYPE_RESIZE);
-        copy_from_array(_Right.data());
-
-        //MatrixT<T>* dest = copy(&_Right);
-        //ASSERT(dest != NULL);
-    }
-
-    // finally return a reference to ourselves
-    return *this;
 }
 
 template<typename T>
@@ -623,6 +626,184 @@ inline typename MatrixT<T>::const_reference MatrixT<T>::operator()( int _row, in
 }
 
 template<typename T>
+inline MatrixT<T>& MatrixT<T>::operator = ( value_type _value )
+{
+    // resize to one item matrix
+    resize(1, 1);
+
+    // set the single data
+    set_at(0, 0, _value);
+
+    // finally return a reference to ourselves
+    return *this;
+}
+
+template<typename T>
+inline MatrixT<T>& MatrixT<T>::operator = ( MatrixT<T>& _Right )
+{
+    if (&_Right == this || _Right.data() == pvData)
+        return *this;
+
+    if (rows == _Right.rows && cols == _Right.cols) {
+        copy_from_array(_Right.data());
+    }
+    else {
+        destroy();
+        initialize(_Right.rows, _Right.cols, INIT_TYPE_RESIZE);
+        copy_from_array(_Right.data());
+
+        //MatrixT<T>* dest = copy(&_Right);
+        //ASSERT(dest != NULL);
+    }
+
+    // finally return a reference to ourselves
+    return *this;
+}
+
+template<typename T>
+inline MatrixT<T> MatrixT<T>::operator+( value_type _value )
+{
+    // Matrix addition
+#if MATRIXT_FAST_MODE
+    // Copy the current matrix
+    MatrixT<T> _Result((MatrixT<T> &)*this);
+
+    int _length       = _Result.sizes();
+    value_type *pData = _Result.get_data();
+
+    __ANNLAB_ASSERT(pData != NULL);
+    for (int i=0; i<_length; ++i) {
+        (*pData) +=_value;
+        pData++;
+    }
+#else
+    // Create the result matrix
+    MatrixT<T> _Result(rows, cols);
+
+    for (int i=0; i<rows; ++i) {
+        for (int j=0; j<cols; ++j)
+            _Result.set_at(i, j, get_at(i, j) + _value);
+    }
+#endif
+
+    return _Result;
+}
+
+template<typename T>
+inline MatrixT<T> MatrixT<T>::operator+( MatrixT<T>& _Right )
+{
+
+}
+template<typename T>
+inline MatrixT<T>& MatrixT<T>::operator+=( value_type _value )
+{
+
+}
+template<typename T>
+inline MatrixT<T>& MatrixT<T>::operator+=( MatrixT<T>& _Right )
+{
+
+}
+
+template<typename T>
+inline MatrixT<T> MatrixT<T>::operator*( value_type _value )
+{
+    // Copy the current matrix
+    MatrixT<T> _Result((MatrixT<T> &)_Right);
+
+    int _length       = _Result.sizes();
+    value_type *pData = _Result.get_data();
+
+    __ANNLAB_ASSERT(pData != NULL);
+    for (int i=0; i<_length; ++i) {
+        (*pData) *= _value;
+        pData++;
+    }
+}
+
+template<typename T>
+inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
+{
+    // 首先检查乘矩阵的行数和被乘矩阵的列数是否相同
+    __ANNLAB_ASSERT(cols == _Right.rows);
+
+    int _newRows, _newCols, _oldCols;
+    _newRows = rows;
+    _newCols = _Right.cols;
+    _oldCols = cols;
+
+    // 创建目标乘积矩阵
+    MatrixT<T> _Result(_newRows, _newCols);
+
+    // Matrix multiplication，即
+    //
+    // [A][B][C]   [G][H]     [A*G + B*I + C*K][A*H + B*J + C*L]
+    // [D][E][F] * [I][J]  =  [D*G + E*I + F*K][D*H + E*J + F*L]
+    //             [K][L]
+    //
+    value_type _value;
+    for (int i=0; i<_newRows; ++i) {
+        for (int j=0; j<_newCols; ++j) {
+            _value = static_cast<T>(0.0);
+            for (int k=0; k<_oldCols; ++k)
+                _value += get_at(i, k) * _Right.get_at(k, j);
+            _Result.set_at(i, j, _value);
+        }
+    }
+
+    return _Result;
+}
+
+template<typename T>
+inline MatrixT<T>& MatrixT<T>::operator*=( value_type _value )
+{
+    return *this;
+    // Matrix multiplication
+    for (int i=0; i<rows; ++i) {
+        for (int j=0; j<cols; ++j)
+            set_at(i, j, get_at(i, j) * _value) ;
+    }
+
+    return *this;
+}
+
+template<typename T>
+inline MatrixT<T>& MatrixT<T>::operator*=( MatrixT<T>& _Right )
+{
+    // 首先检查乘矩阵的行数和被乘矩阵的列数是否相同
+    __ANNLAB_ASSERT(cols == _Right.rows);
+
+    // Copy the current matrix
+    MatrixT<T> _Left((MatrixT<T> &)*this);
+
+    int _newRows, _newCols, _oldCols;
+    _newRows = rows;
+    _newCols = _Right.cols;
+    _oldCols = cols;
+
+    // 创建目标乘积矩阵
+    int _size = resize(_newRows, _newCols);
+
+    // Matrix multiplication，即
+    //
+    // [A][B][C]   [G][H]     [A*G + B*I + C*K][A*H + B*J + C*L]
+    // [D][E][F] * [I][J]  =  [D*G + E*I + F*K][D*H + E*J + F*L]
+    //             [K][L]
+    //
+    value_type _value;
+    for (int i=0; i<_newRows; ++i) {
+        for (int j=0; j<_newCols; ++j) {
+            _value = static_cast<T>(0.0);
+            for (int k=0; k<_oldCols; ++k)
+                _value += _Left.get_at(i, k) * _Right.get_at(k, j);
+            set_at(i, j, _value);
+        }
+    }
+
+    return *this;
+}
+
+template<typename T>
 inline MatrixT<T>& MatrixT<T>::transpose( void )
 {
     // 单行或单列的矩阵, 即Vector
@@ -638,7 +819,7 @@ inline MatrixT<T>& MatrixT<T>::transpose( void )
         // 转置各元素
         for (int i=0; i<rows; ++i) {
             for (int j=i+1; j<cols; ++j)
-                set_element(j, i, get_element(i, j));
+                set_at(j, i, get_at(i, j));
         }
     }
     else {
@@ -646,7 +827,7 @@ inline MatrixT<T>& MatrixT<T>::transpose( void )
         // 转置各元素
         for (int i=0; i<rows; ++i) {
             for (int j=0; j<cols; ++j)
-                set_element(j, i, _trans.get_element(i, j));
+                set_at(j, i, _trans.get_at(i, j));
         }
         int temp = rows;
         rows = cols;
@@ -659,49 +840,96 @@ inline MatrixT<T>& MatrixT<T>::transpose( void )
 template<typename T>
 inline int MatrixT<T>::zeros( int _rows, int _cols )
 {
-
+    // 重置大小并初始化为全0矩阵
+    return resize(_rows, _cols, INIT_FCN_ZEROS);
 }
 
 template<typename T>
 inline int MatrixT<T>::ones( int _rows, int _cols )
 {
-
+    // 重置大小并初始化为全1矩阵
+    return resize(_rows, _cols, INIT_FCN_ONES);
 }
 
 template<typename T>
 inline int MatrixT<T>::rands( int _rows, int _cols )
 {
-
+    // 重置大小并初始化为[-1,1]随机数矩阵
+    return resize(_rows, _cols, INIT_FCN_RANDS);
 }
 
 template<typename T>
 inline int MatrixT<T>::rands2( int _rows, int _cols )
 {
-
+    // 重置大小并初始化为[0,1]随机数矩阵
+    return resize(_rows, _cols, INIT_FCN_RANDS_POSITIVE);
 }
 
 template<typename T>
 inline MatrixT<T> MatrixT<T>::_zeros( int _rows, int _cols ) const
 {
+    // Copy the current matrix
+    MatrixT<T> _zeros(_rows, _cols);
 
+    // 所有元素置0
+    for (int i=0; i<_rows; ++i) {
+        for (int j=0; j<_cols; ++j)
+            _zeros.set_at(i, j, static_cast<T>(0.0));
+    }
+
+    return _zeros;
 }
 
 template<typename T>
 inline MatrixT<T> MatrixT<T>::_ones( int _rows, int _cols ) const
 {
+    // Copy the current matrix
+    MatrixT<T> _ones(_rows, _cols);
 
+    // 所有元素置1
+    for (int i=0; i<_rows; ++i) {
+        for (int j=0; j<_cols; ++j)
+            _ones.set_at(i, j, static_cast<T>(1.0));
+    }
+
+    return _ones;
 }
 
 template<typename T>
 inline MatrixT<T> MatrixT<T>::_rands( int _rows, int _cols ) const
 {
+    // Copy the current matrix
+    MatrixT<T> _rands(_rows, _cols);
 
+    // 所有元素置[-1,1]的随机数
+    value_type _fRndNum;
+    for (int i=0; i<_rows; ++i) {
+        for (int j=0; j<_cols; ++j) {
+            _fRndNum = static_cast<T>(2.0) * (value_type)rand() / (value_type)(RAND_MAX)
+                - static_cast<T>(1.0);
+            _rands.set_at(i, j, _fRndNum);
+        }
+    }
+
+    return _rands;
 }
 
 template<typename T>
 inline MatrixT<T> MatrixT<T>::_rands2( int _rows, int _cols ) const
 {
+    // Copy the current matrix
+    CAnnMatrix _rands(_rows, _cols);
 
+    // 所有元素置[0,1]的随机数
+    value_type _fRndNum;
+    for (int i=0; i<_rows; ++i) {
+        for (int j=0; j<_cols; ++j) {
+            _fRndNum = = (value_type)rand() / (value_type)(RAND_MAX);
+            _rands.set_at(i, j, _fRndNum);
+        }
+    }
+
+    return _rands;
 }
 
 template<typename T>
@@ -963,7 +1191,7 @@ void MatrixT<T>::display( const TCHAR *szText )
     for (int r=0; r<rows; r++) {
         TRACE(_T("\t"));
         for (int c=0; c<cols; c++) {
-            value_type value = get_element(r, c);
+            value_type value = get_at(r, c);
             if (abs(value) < static_cast<T>(10000000.0))
                 TRACE(_T("%12.4f "), value);
             else
@@ -986,7 +1214,7 @@ void MatrixT<Ty>::display( const TCHAR *szText ) \
     for (int r=0; r<rows; r++) { \
         TRACE(_T("\t")); \
         for (int c=0; c<cols; c++) { \
-            TRACE(_T("%10d  "), get_element(r, c)); \
+            TRACE(_T("%10d  "), get_at(r, c)); \
         } \
         TRACE(_T("\n\n")); \
     } \
@@ -1002,7 +1230,7 @@ void MatrixT<Ty>::display( const TCHAR *szText ) \
     for (int r=0; r<rows; r++) { \
         TRACE(_T("\t")); \
         for (int c=0; c<cols; c++) { \
-            TRACE(_T("%10u "), get_element(r, c)); \
+            TRACE(_T("%10u "), get_at(r, c)); \
         } \
         TRACE(_T("\n\n")); \
     } \
@@ -1047,7 +1275,7 @@ void MatrixT<T>::display_ex( const TCHAR *szText )
     for (int r=0; r<rows; r++) {
         TRACE(_T("\t"));
         for (int c=0; c<cols; c++) {
-            value_type value = get_element(r, c);
+            value_type value = get_at(r, c);
             if (abs(value) < static_cast<T>(10000000.0))
                 TRACE(_T("%12.4f "), value);
             else
@@ -1084,7 +1312,7 @@ void MatrixT<Ty>::display_ex( const TCHAR *szText ) \
     for (int r=0; r<rows; r++) { \
         TRACE(_T("\t")); \
         for (int c=0; c<cols; c++) { \
-            TRACE(_T("%10d "), get_element(r, c)); \
+            TRACE(_T("%10d "), get_at(r, c)); \
         } \
         TRACE(_T("\n\n")); \
     } \
@@ -1100,7 +1328,7 @@ void MatrixT<Ty>::display_ex( const TCHAR *szText ) \
     for (int r=0; r<rows; r++) { \
         TRACE(_T("\t")); \
         for (int c=0; c<cols; c++) { \
-            TRACE(_T("%10u "), get_element(r, c)); \
+            TRACE(_T("%10u "), get_at(r, c)); \
         } \
         TRACE(_T("\n\n")); \
     } \

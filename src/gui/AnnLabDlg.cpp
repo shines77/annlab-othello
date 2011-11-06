@@ -5,6 +5,8 @@
 #include "../../include/gui/AnnLabApp.h"
 #include "../../include/gui/AnnLabDlg.h"
 #include "../../include/annlab/annlab_stddef.h"
+#include "../../include/annlab/tickcount_t.h"
+#include "../../include/annlab/itimer_t.h"
 #include "../../include/annlab/sys/AnnList.h"
 #include "../../include/annlab/sys/AnnMatrix.h"
 #include "../../include/annlab/sys/matrixt.h"
@@ -119,6 +121,7 @@ int CAnnLabDlg::BpNetwork_Test()
 
 	CAnnMatrixList trainP, trainT;
 	trainP.size();
+    double a = abs(0.0);
 
 	CAnnTrainRecord tr;
 	pNetwork = net.train( &trainP, &trainT, &tr );
@@ -154,7 +157,7 @@ int CAnnLabDlg::BpNetwork_Test()
     MatrixT<int> mt3;
     mt3.set_name(_T("mt3"));
     mt3.resize(6, 6);
-    mt3.clear(INIT_FCN_SPECIFIED, 3);
+    mt3.fill(INIT_FCN_SPECIFIED, 3);
     mt3(0, 0) = 2;
     mt3[1][1] = 5;
     mt3.display_ex();
