@@ -10,6 +10,7 @@
 #include "../../include/annlab/sys/AnnList.h"
 #include "../../include/annlab/sys/AnnMatrix.h"
 #include "../../include/annlab/sys/matrixt.h"
+#include "../../include/annlab/sys/matrix.h"
 #include "../../include/annlab/toolbox/matlab/elmat.h"
 #include "../../include/annlab/toolbox/nnet/nninit.h"
 #include "../../include/annlab/toolbox/nnet/nntrain.h"
@@ -71,6 +72,8 @@ BEGIN_MESSAGE_MAP(CAnnLabDlg, CDialog)
 	ON_WM_QUERYDRAGICON()
 	//}}AFX_MSG_MAP
     ON_BN_CLICKED(IDC_BTN_TEST, &CAnnLabDlg::OnBnClickedBtnTest)
+    ON_BN_CLICKED(IDC_BTN_TEST2, &CAnnLabDlg::OnBnClickedBtnTest2)
+    ON_BN_CLICKED(IDC_BTN_TEST3, &CAnnLabDlg::OnBnClickedBtnTest3)
 END_MESSAGE_MAP()
 
 SHOWMESSAGE_IMP(CAnnLabDlg)
@@ -78,8 +81,13 @@ SHOWMESSAGE_IMP(CAnnLabDlg)
 
 int CAnnLabDlg::Matrix_Test()
 {
+#if _DEBUG
+    int size = 500;
+    int N = 1;
+#else
     int size = 1000;
     int N = 2;
+#endif
 
     SetProcessAffinityMask(GetCurrentProcess(), 2);
     SetThreadAffinityMask(GetCurrentProcess(), 2);
@@ -96,34 +104,34 @@ int CAnnLabDlg::Matrix_Test()
     TCHAR szBuffer[256], szText[512];
 
     timer.begin();
-    for(i=0; i<N; ++i)
+    for(i=0; i<N*10; ++i)
         Z = A + B;  //  or Z = A+B+C ... etc
 
-    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("MatrixT: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N*10));
     _tcscpy_s(szText, _countof(szText), szBuffer);
 
     timer.begin();
     for(i=0; i<N; ++i)
         Z = A * B;  //  or Z = A+B+C ... etc
 
-    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for multiplication = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("MatrixT: time taken for multiplication = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
     _tcscat_s(szText, _countof(szText), szBuffer);
 
     //::ShowMessage( GetSafeHwnd(), szText );
     //_tcscpy_s(szText, _countof(szText), _T(""));
 
     timer.begin();
-    for(i=0; i<N; ++i)
+    for(i=0; i<N*10; ++i)
         Z = A + B + C;  //  or Z = A+B+C ... etc
 
-    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("MatrixT: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N*10));
     _tcscat_s(szText, _countof(szText), szBuffer);
 
     timer.begin();
     for(i=0; i<N; ++i)
         Z = A * B * C;  //  or Z = A+B+C ... etc
 
-    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for multiplication = %0.5f sec(s)."), timer.end().seconds() / double(N));
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("MatrixT: time taken for multiplication = %0.5f sec(s)."), timer.end().seconds() / double(N));
     _tcscat_s(szText, _countof(szText), szBuffer);
 
     ::ShowMessage( GetSafeHwnd(), szText );
@@ -133,8 +141,77 @@ int CAnnLabDlg::Matrix_Test()
 
 int CAnnLabDlg::Matrix_Test2()
 {
+#if _DEBUG
+    int size = 500;
+    int N = 1;
+#else
+    int size = 1000;
+    int N = 2;
+#endif
+
+    SetProcessAffinityMask(GetCurrentProcess(), 2);
+    SetThreadAffinityMask(GetCurrentProcess(), 2);
+
+    //Armadillo
+    // size and N are specified by the user on the command line
+    annlab::Matrix<double> A(size, size);
+    annlab::Matrix<double> B(size, size);
+    annlab::Matrix<double> C(size, size);
+    annlab::Matrix<double> Z(size, size);
+    int i;
+    A.fill(1);
+    B.fill(1);
+    C.fill(1);
+    Z.fill(2);
+
+    annlab::itimer_t timer;
+    TCHAR szBuffer[256], szText[512];
+
+    timer.begin();
+    for(i=0; i<N*10; ++i)
+        Z = A + B;  //  or Z = A+B+C ... etc
+
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("splab::matrix: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N*10));
+    _tcscpy_s(szText, _countof(szText), szBuffer);
+
+    timer.begin();
+    for(i=0; i<N; ++i)
+        Z = A * B;  //  or Z = A+B+C ... etc
+
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("splab::matrix: time taken for multiplication = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
+    _tcscat_s(szText, _countof(szText), szBuffer);
+
+    //::ShowMessage( GetSafeHwnd(), szText );
+    //_tcscpy_s(szText, _countof(szText), _T(""));
+
+    timer.begin();
+    for(i=0; i<N*10; ++i)
+        Z = A + B + C;  //  or Z = A+B+C ... etc
+
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("splab::matrix: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N*10));
+    _tcscat_s(szText, _countof(szText), szBuffer);
+
+    timer.begin();
+    for(i=0; i<N; ++i)
+        Z = A * B * C;  //  or Z = A+B+C ... etc
+
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("splab::matrix: time taken for multiplication = %0.5f sec(s)."), timer.end().seconds() / double(N));
+    _tcscat_s(szText, _countof(szText), szBuffer);
+
+    ::ShowMessage( GetSafeHwnd(), szText );
+
+    return 0;
+}
+
+int CAnnLabDlg::Matrix_Test3()
+{
+#if _DEBUG
+    int size = 500;
+    int N = 1;
+#else
     int size = 1000;
     int N = 1;
+#endif
 
     SetProcessAffinityMask(GetCurrentProcess(), 2);
     SetThreadAffinityMask(GetCurrentProcess(), 2);
@@ -155,34 +232,34 @@ int CAnnLabDlg::Matrix_Test2()
     TCHAR szBuffer[256], szText[512];
 
     timer.begin();
-    for(i=0; i<N; ++i)
+    for(i=0; i<N*10; ++i)
         Z = A + B;  //  or Z = A+B+C ... etc
 
-    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("CAnnMatrix: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N*10));
     _tcscpy_s(szText, _countof(szText), szBuffer);
 
     timer.begin();
     for(i=0; i<N; ++i)
         Z = A * B;  //  or Z = A+B+C ... etc
 
-    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for multiplication = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("CAnnMatrix: time taken for multiplication = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
     _tcscat_s(szText, _countof(szText), szBuffer);
 
     //::ShowMessage( GetSafeHwnd(), szText );
     //_tcscpy_s(szText, _countof(szText), _T(""));
 
     timer.begin();
-    for(i=0; i<N; ++i)
+    for(i=0; i<N*10; ++i)
         Z = A + B + C;  //  or Z = A+B+C ... etc
 
-    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("CAnnMatrix: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N*10));
     _tcscat_s(szText, _countof(szText), szBuffer);
 
     timer.begin();
     for(i=0; i<N; ++i)
         Z = A * B * C;  //  or Z = A+B+C ... etc
 
-    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for multiplication = %0.5f sec(s)."), timer.end().seconds() / double(N));
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("CAnnMatrix: time taken for multiplication = %0.5f sec(s)."), timer.end().seconds() / double(N));
     _tcscat_s(szText, _countof(szText), szBuffer);
 
     ::ShowMessage( GetSafeHwnd(), szText );
@@ -287,7 +364,6 @@ void CAnnLabDlg::BpNetwork_ShowTest()
 	int indexLayer;
 #if 1
     indexLayer = Matrix_Test();
-    indexLayer = Matrix_Test2();
 	indexLayer = BpNetwork_Test();
 #else
 	///*
@@ -388,6 +464,18 @@ HCURSOR CAnnLabDlg::OnQueryDragIcon()
 
 void CAnnLabDlg::OnBnClickedBtnTest()
 {
-    // ²âÊÔ¾ØÕó
+    // ¾ØÕó²âÊÔÒ»
     BpNetwork_ShowTest();
+}
+
+void CAnnLabDlg::OnBnClickedBtnTest2()
+{
+    // ¾ØÕó²âÊÔ¶þ
+    int indexLayer = Matrix_Test2();
+}
+
+void CAnnLabDlg::OnBnClickedBtnTest3()
+{
+    // ¾ØÕó²âÊÔÈý
+    int indexLayer = Matrix_Test3();
 }
