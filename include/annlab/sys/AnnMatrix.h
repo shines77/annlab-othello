@@ -205,6 +205,11 @@ public:
 	// ¾ØÕóµÄ×ªÖÃ
 	CAnnMatrix & transpose( void );
 
+	int zeros  ( void );
+	int ones   ( void );
+	int rands  ( void );
+	int rands2 ( void );
+
 	int zeros  ( int _rows, int _cols );
 	int ones   ( int _rows, int _cols );
 	int rands  ( int _rows, int _cols );

@@ -31,10 +31,14 @@ protected:
 
 private:
 	int  BpNetwork_Test();
+    int  Matrix_Test();
+    int  Matrix_Test2();
 	void BpNetwork_ShowTest();
 
 	SHOWMESSAGE_DECLEAR;
 
 private:
 	CAnnNetwork m_net;
+public:
+    afx_msg void OnBnClickedBtnTest();
 };

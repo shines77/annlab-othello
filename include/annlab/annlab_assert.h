@@ -96,7 +96,7 @@ namespace annlab {
 #else /* !ANNLAB_USE_ASSERT */
 
     //! No-op version of __ANNLAB_ASSERT.
-    #define __ANNLAB_ASSERT(predicate, comment)     ((void)0)
+    #define __ANNLAB_ASSERT(predicate, ...)         ((void)0)
     //! "Extended" version is useful to suppress warnings if a variable is only used with an assert
     #define __ANNLAB_ASSERT_EX(predicate, comment)  ((void)(1 && (predicate)))
 

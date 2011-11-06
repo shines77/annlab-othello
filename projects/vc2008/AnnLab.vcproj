@@ -678,5 +678,9 @@
 		</File>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="\Project\Vc.Net\AnnLab\res\vc2008\gui\AnnLab.rc"
+		/>
 	</Globals>
 </VisualStudioProject>
