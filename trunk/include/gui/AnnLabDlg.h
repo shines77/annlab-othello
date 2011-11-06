@@ -27,18 +27,20 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
+    afx_msg void OnBnClickedBtnTest();
 	DECLARE_MESSAGE_MAP()
 
 private:
 	int  BpNetwork_Test();
     int  Matrix_Test();
     int  Matrix_Test2();
+    int  Matrix_Test3();
 	void BpNetwork_ShowTest();
-
 	SHOWMESSAGE_DECLEAR;
 
 private:
 	CAnnNetwork m_net;
 public:
-    afx_msg void OnBnClickedBtnTest();
+    afx_msg void OnBnClickedBtnTest2();
+    afx_msg void OnBnClickedBtnTest3();
 };

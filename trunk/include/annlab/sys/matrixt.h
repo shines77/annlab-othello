@@ -79,9 +79,9 @@ public:
     MatrixT( int _rows, int _cols );
     MatrixT( int _rows, int _cols, const value_type& _x );
     MatrixT( int _rows, int _cols, const value_type* _array );
-    MatrixT( int _rows, int _cols, int _initFcn, value_type _fillVal = static_cast<T>(0) );
+    MatrixT( int _rows, int _cols, int _initFcn, value_type _fillVal = value_type(0.0) );
     MatrixT( const TCHAR *szName, int _rows, int _cols, int _initFcn = INIT_FCN_DEFAULT,
-        value_type _fillVal = static_cast<T>(0) );
+        value_type _fillVal = value_type(0.0) );
     MatrixT( const MatrixT<T>& src );                                   // 拷贝构造函数
     MatrixT( const MatrixT<T>& src, bool b_copy_data );
     virtual ~MatrixT( void );
@@ -167,10 +167,10 @@ public:
     // methods
     inline void free     ( void );
     inline void fill     ( int _initFcn = INIT_FCN_DEFAULT,
-                    value_type _fillVal = static_cast<T>(0) );
+                    value_type _fillVal = value_type(0.0) );
     inline int  resize   ( int _rows, int _cols );
     inline int  resize_ex( int _rows, int _cols, int _initFcn = INIT_FCN_DEFAULT,
-                        value_type _fillVal = static_cast<T>(0) );
+                        value_type _fillVal = value_type(0.0) );
 
     // copy()完整复制结构以及数据
     inline MatrixT<T>* copy ( const MatrixT<T>* src );
@@ -229,20 +229,20 @@ protected:
     inline void destroy_data( void );
 
     inline void initialize( int _rows, int _cols, int _initFcn = INIT_FCN_DEFAULT,
-            value_type _fillVal = static_cast<T>(0) );
+            value_type _fillVal = value_type(0.0) );
     inline void initialize_ex( const TCHAR *szName, int _rows, int _cols,
             int _initFcn = INIT_FCN_DEFAULT,
-            value_type _fillVal = static_cast<T>(0) );
+            value_type _fillVal = value_type(0.0) );
 
     inline void init_martix( int _rows, int _cols, int _initMode = INIT_TYPE_NONE,
             int _initFcn = INIT_FCN_DEFAULT,
-            value_type _fillVal = static_cast<T>(0) );
+            value_type _fillVal = value_type(0.0) );
     inline void fill_data( int _rows, int _cols,
             int _initFcn = INIT_FCN_DEFAULT,
-            value_type _fillVal = static_cast<T>(0) );
+            value_type _fillVal = value_type(0.0) );
     inline void reserve_and_fill_data( pointer pvNewData, int _rows, int _cols,
             int _initFcn = INIT_FCN_DEFAULT,
-            value_type _fillVal = static_cast<T>(0) );
+            value_type _fillVal = value_type(0.0) );
 
 private:
     //

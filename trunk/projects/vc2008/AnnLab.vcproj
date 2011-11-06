@@ -612,11 +612,31 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\include\annlab\sys\matrix-impl.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\annlab\sys\matrix.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\include\annlab\sys\matrixt.h"
 						>
 					</File>
 					<File
 						RelativePath="..\..\include\annlab\sys\matrixt_impl.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\annlab\sys\usingdeclare.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\annlab\sys\vector-impl.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\annlab\sys\vector.h"
 						>
 					</File>
 				</Filter>

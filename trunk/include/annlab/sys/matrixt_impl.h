@@ -47,15 +47,15 @@ MatrixT<T>::MatrixT( int _rows, int _cols, const value_type* _array )
 
 template<typename T>
 MatrixT<T>::MatrixT( int _rows, int _cols, int _initFcn,
-                    value_type _fillVal /*= static_cast<T>(0)*/)
+                    value_type _fillVal /*= value_type(0.0)*/)
 {
-    initialize(_rows, _cols, _initFcn, static_cast<T>(0) );
+    initialize(_rows, _cols, _initFcn, value_type(0.0) );
 }
 
 template<typename T>
 MatrixT<T>::MatrixT( const TCHAR *szName, int _rows, int _cols,
                     int _initFcn /*= INIT_FCN_DEFAULT */,
-                    value_type _fillVal /*= static_cast<T>(0)*/ )
+                    value_type _fillVal /*= value_type(0.0)*/ )
 {
     initialize_ex(szName, _rows, _cols, _initFcn, _fillVal);
 }
@@ -202,7 +202,7 @@ template<typename T>
 void MatrixT<T>::init_martix( int _rows, int _cols,
                              int _initMode /*= INIT_TYPE_NONE*/,
                              int _initFcn /*= MAT_INIT_DEFAULT */,
-                             value_type _fillVal /*= static_cast<T>(0)*/ )
+                             value_type _fillVal /*= value_type(0.0)*/ )
 {
     size_type _alloc_size;
     int _totals;
@@ -325,7 +325,7 @@ void MatrixT<T>::reserve_and_fill_data( pointer pvNewData, int _rows, int _cols,
     switch (_initFcn) {
     case INIT_FCN_ZEROS:       // all zeros
         for (int i=0; i<_fillLength; i++)
-            pvNewDataFill[i] = static_cast<T>(0);
+            pvNewDataFill[i] = value_type(0.0);
         break;
     case INIT_FCN_ONES:            // all ones
         for (int i=0; i<_fillLength; i++)
@@ -354,7 +354,7 @@ void MatrixT<T>::reserve_and_fill_data( pointer pvNewData, int _rows, int _cols,
 
 template<typename T>
 void MatrixT<T>::fill( int _initFcn /*= INIT_FCN_DEFAULT */,
-                       value_type _fillVal /*= static_cast<T>(0)*/ )
+                       value_type _fillVal /*= value_type(0.0)*/ )
 {
     fill_data(cols, rows, _initFcn, _fillVal);
 }
@@ -694,8 +694,10 @@ inline MatrixT<T> MatrixT<T>::operator+( MatrixT<T>& _Right )
 {
     // Copy the current matrix
     MatrixT<T> _Result((MatrixT<T> &)*this);
+#if _DEBUG
     if (_Right.is_empty())
         return _Result;
+#endif
 
     // Check whether it is its own matrix
     __ANNLAB_ASSERT(rows == _Right.rows && cols == _Right.cols);
@@ -719,9 +721,7 @@ inline MatrixT<T> MatrixT<T>::operator+( MatrixT<T>& _Right )
     __ANNLAB_ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
     //if (pData != NULL && pDataRight != NULL && _length == _lenRight) {
         for (int i=0; i<_length; ++i) {
-            (*pData) += (value_type)(*pDataRight);
-            pData++;
-            pDataRight++;
+            (*pData++) += (value_type)(*pDataRight++);
         }
     //}
 #else
@@ -762,17 +762,21 @@ inline MatrixT<T>& MatrixT<T>::operator+=( value_type _value )
 template<typename T>
 inline MatrixT<T>& MatrixT<T>::operator+=( MatrixT<T>& _Right )
 {
+#if _DEBUG
     if (_Right.is_empty())
         return *this;
+#endif
 
     // Check whether it is its own matrix
     __ANNLAB_ASSERT(rows == _Right.rows && cols == _Right.cols);
 
+#if _DEBUG
     if (rows != _Right.rows || cols != _Right.cols) {
         throw _T("Incompatible dimensions in operator += ( MatrixT<T> & _Right ). ");
         //exit(1);
         return *this;
     }
+#endif
 
     // Matrix addition
 #if MATRIXT_FAST_MODE
@@ -784,9 +788,7 @@ inline MatrixT<T>& MatrixT<T>::operator+=( MatrixT<T>& _Right )
     __ANNLAB_ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
     //if (pData != NULL && pDataRight != NULL && _length == _lenRight) {
         for (int i=0; i<_length; i++) {
-            (*pData) += (value_type)(*pDataRight);
-            pData++;
-            pDataRight++;
+            (*pData++) += (value_type)(*pDataRight++);
         }
     //}
 #else
@@ -838,7 +840,7 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
     value_type _value;
     for (int i=0; i<_newRows; ++i) {
         for (int j=0; j<_newCols; ++j) {
-            _value = static_cast<T>(0.0);
+            _value = value_type(0.0);
             for (int k=0; k<_oldCols; ++k)
                 _value += get_at(i, k) * _Right.get_at(k, j);
             _Result.set_at(i, j, _value);
@@ -887,7 +889,7 @@ inline MatrixT<T>& MatrixT<T>::operator*=( MatrixT<T>& _Right )
     value_type _value;
     for (int i=0; i<_newRows; ++i) {
         for (int j=0; j<_newCols; ++j) {
-            _value = static_cast<T>(0.0);
+            _value = value_type(0.0);
             for (int k=0; k<_oldCols; ++k)
                 _value += _Left.get_at(i, k) * _Right.get_at(k, j);
             set_at(i, j, _value);
@@ -968,7 +970,7 @@ inline MatrixT<T> MatrixT<T>::_zeros( int _rows, int _cols )
     // 所有元素置0
     for (int i=0; i<_rows; ++i) {
         for (int j=0; j<_cols; ++j)
-            _zeros.set_at(i, j, static_cast<T>(0.0));
+            _zeros.set_at(i, j, value_type(0.0));
     }
 
     return _zeros;
@@ -983,7 +985,7 @@ inline MatrixT<T> MatrixT<T>::_ones( int _rows, int _cols )
     // 所有元素置1
     for (int i=0; i<_rows; ++i) {
         for (int j=0; j<_cols; ++j)
-            _ones.set_at(i, j, static_cast<T>(1.0));
+            _ones.set_at(i, j, value_type(1.0));
     }
 
     return _ones;
@@ -999,8 +1001,8 @@ inline MatrixT<T> MatrixT<T>::_rands( int _rows, int _cols )
     value_type _fRndNum;
     for (int i=0; i<_rows; ++i) {
         for (int j=0; j<_cols; ++j) {
-            _fRndNum = static_cast<T>(2.0) * (value_type)rand() / (value_type)(RAND_MAX)
-                - static_cast<T>(1.0);
+            _fRndNum = value_type(2.0) * value_type(rand()) / value_type(RAND_MAX)
+                - value_type(1.0);
             _rands.set_at(i, j, _fRndNum);
         }
     }
@@ -1018,7 +1020,7 @@ inline MatrixT<T> MatrixT<T>::_rands2( int _rows, int _cols )
     value_type _fRndNum;
     for (int i=0; i<_rows; ++i) {
         for (int j=0; j<_cols; ++j) {
-            _fRndNum = = (value_type)rand() / (value_type)(RAND_MAX);
+            _fRndNum = = value_type(rand()) / value_type(RAND_MAX);
             _rands.set_at(i, j, _fRndNum);
         }
     }
@@ -1043,22 +1045,22 @@ inline void MatrixT<T>::fill_data( int _rows, int _cols,
     switch (_initFcn) {
     case INIT_FCN_ZEROS:           // all zeros
         for (int i=0; i<_totals; ++i)
-            pvData[i] = static_cast<T>(0);
+            pvData[i] = value_type(0.0);
         break;
     case INIT_FCN_ONES:            // all ones
         for (int i=0; i<_totals; ++i)
-            pvData[i] = static_cast<T>(1);
+            pvData[i] = value_type(1.0);
         break;
     case INIT_FCN_EYES:
         // 暂未提供
         break;
     case INIT_FCN_RANDS:           // all [-1,1] randomize
         for (int i=0; i<_totals; ++i)
-            pvData[i] = (value_type)(2.0 * (value_type)rand() / (value_type)(RAND_MAX) - 1.0);
+            pvData[i] = value_type(value_type(2.0) * value_type(rand()) / value_type(RAND_MAX) - value_type(1.0));
         break;
     case INIT_FCN_RANDS_POSITIVE:  // all [0,1] positive randomize
         for (int i=0; i<_totals; ++i)
-            pvData[i] = (value_type)rand() / (value_type)(RAND_MAX);
+            pvData[i] = value_type(rand()) / value_type(RAND_MAX);
         break;
     case INIT_FCN_SPECIFIED:
         for (int i=0; i<_totals; ++i)
@@ -1088,11 +1090,11 @@ inline void MatrixT<Ty>::fill_data( int _rows, int _cols, \
     switch (_initFcn) { \
     case INIT_FCN_ZEROS:           /* all zeros */ \
         for (int i=0; i<_totals; ++i) \
-            pvData[i] = static_cast<Ty>(0); \
+            pvData[i] = value_type(0.0); \
         break; \
     case INIT_FCN_ONES:            /* all ones */ \
         for (int i=0; i<_totals; ++i) \
-            pvData[i] = static_cast<Ty>(1); \
+            pvData[i] = value_type(1.0); \
         break; \
     case INIT_FCN_EYES: \
         /* 暂未提供 */ \
@@ -1142,11 +1144,11 @@ inline void MatrixT<Ty>::fill_data( int _rows, int _cols, \
     switch (_initFcn) { \
     case INIT_FCN_ZEROS:           /* all zeros */ \
         for (int i=0; i<_totals; ++i) \
-            pvData[i] = static_cast<Ty>(0); \
+            pvData[i] = value_type(0.0); \
         break; \
     case INIT_FCN_ONES:            /* all ones */ \
         for (int i=0; i<_totals; ++i) \
-            pvData[i] = static_cast<Ty>(1); \
+            pvData[i] = value_type(1.0); \
         break; \
     case INIT_FCN_EYES: \
         /* 暂未提供 */ \
