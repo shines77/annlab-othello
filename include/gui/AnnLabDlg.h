@@ -43,4 +43,5 @@ private:
 public:
     afx_msg void OnBnClickedBtnTest2();
     afx_msg void OnBnClickedBtnTest3();
+    afx_msg void OnBnClickedBtnTest4();
 };

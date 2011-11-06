@@ -628,10 +628,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\include\annlab\sys\usingdeclare.h"
-						>
-					</File>
-					<File
 						RelativePath="..\..\include\annlab\sys\vector-impl.h"
 						>
 					</File>

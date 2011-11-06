@@ -14,7 +14,7 @@ namespace annlab {
 
 template<typename T>
 MatrixT<T>::MatrixT( void ) :
-    pvData(NULL), ppvRow(NULL), pvAlloc(NULL), ppvRowAlloc(NULL),
+    pvData(NULL), ppvCol(NULL), pvAlloc(NULL), ppvColAlloc(NULL),
     rows(0), cols(0), totals(0), totals_actual(0), alloc_size(0)
 {
 }
@@ -93,8 +93,8 @@ inline void MatrixT<T>::destroy_data( void )
 {
     if (pvAlloc != NULL) {
         delete[] pvAlloc;
-        if (ppvRowAlloc != NULL)
-            delete[] ppvRowAlloc;
+        if (ppvColAlloc != NULL)
+            delete[] ppvColAlloc;
     }
 }
 
@@ -105,10 +105,10 @@ inline void MatrixT<T>::destroy( void )
         delete[] pvAlloc;
         pvAlloc = NULL;
         pvData = NULL;
-        if (ppvRowAlloc != NULL) {
-            delete[] ppvRowAlloc;
-            ppvRowAlloc = NULL;
-            ppvRow = NULL;
+        if (ppvColAlloc != NULL) {
+            delete[] ppvColAlloc;
+            ppvColAlloc = NULL;
+            ppvCol = NULL;
         }
     }
     alloc_size = 0;
@@ -153,19 +153,19 @@ void MatrixT<T>::initialize_ex( const TCHAR *szName, int _rows, int _cols,
     _alloc_size = _totals + nAdditionSize;
 
     pointer pvNewOrigPtr = new value_type[_alloc_size];
-    ptr_pointer ppvOrigRow = new pointer[_rows + nAdditionRowSize];
-    if (pvNewOrigPtr != NULL && ppvOrigRow != NULL) {
+    ptr_pointer ppvOrigCol = new pointer[_cols + nAdditionRowSize];
+    if (pvNewOrigPtr != NULL && ppvOrigCol != NULL) {
         pointer pvNewData = (pointer)MAT_CACHE_ALIGN_128(pvNewOrigPtr);
-        ptr_pointer ppvNewRow = (ptr_pointer)MAT_CACHE_ALIGN_128(ppvOrigRow);
+        ptr_pointer ppvNewCol = (ptr_pointer)MAT_CACHE_ALIGN_128(ppvOrigCol);
 
         ASSERT(pvNewData != NULL);
-        ASSERT(ppvNewRow != NULL);
+        ASSERT(ppvNewCol != NULL);
 
         // save the new data buffer
         pvData = pvNewData;
-        ppvRow = ppvNewRow;
+        ppvCol = ppvNewCol;
         pvAlloc = pvNewOrigPtr;
-        ppvRowAlloc = ppvOrigRow;
+        ppvColAlloc = ppvOrigCol;
         alloc_size = _alloc_size;
 
         // save the new sizes
@@ -176,9 +176,9 @@ void MatrixT<T>::initialize_ex( const TCHAR *szName, int _rows, int _cols,
 
         // save the row pointer
         pointer p = pvData;
-        for (int i=0; i<rows; ++i) {
-            ppvRow[i] = p;
-            p += cols;
+        for (int i=0; i<cols; ++i) {
+            ppvCol[i] = p;
+            p += rows;
         }
 
         // fill data for matrix
@@ -187,9 +187,9 @@ void MatrixT<T>::initialize_ex( const TCHAR *szName, int _rows, int _cols,
     }
     else {
         pvData      = NULL;
-        ppvRow      = NULL;
+        ppvCol      = NULL;
         pvAlloc     = NULL;
-        ppvRowAlloc = NULL;
+        ppvColAlloc = NULL;
         alloc_size  = 0;
 
         rows = cols = 0;
@@ -215,16 +215,16 @@ void MatrixT<T>::init_martix( int _rows, int _cols,
     _alloc_size = _totals + nAdditionSize;
 
     pointer pvNewOrigPtr = new value_type[_alloc_size];
-    ptr_pointer ppvOrigRow = new pointer[_rows + nAdditionRowSize];
-    if (pvNewOrigPtr != NULL && ppvOrigRow != NULL) {
+    ptr_pointer ppvOrigCol = new pointer[_cols + nAdditionRowSize];
+    if (pvNewOrigPtr != NULL && ppvOrigCol != NULL) {
         pointer pvNewData = (pointer)MAT_CACHE_ALIGN_128(pvNewOrigPtr);
-        ptr_pointer ppvNewRow = (ptr_pointer)MAT_CACHE_ALIGN_128(ppvOrigRow);
+        ptr_pointer ppvNewCol = (ptr_pointer)MAT_CACHE_ALIGN_128(ppvOrigCol);
         if (pvAlloc == NULL) {
             // save the new data buffer
             pvAlloc = pvNewOrigPtr;
-            ppvRowAlloc = ppvOrigRow;
+            ppvColAlloc = ppvOrigCol;
             pvData = pvNewData;
-            ppvRow = ppvNewRow;
+            ppvCol = ppvNewCol;
             alloc_size = _alloc_size;
 
             // save the new sizes
@@ -235,9 +235,9 @@ void MatrixT<T>::init_martix( int _rows, int _cols,
 
             // save the row pointer
             pointer p = pvData;
-            for (int i=0; i<rows; ++i) {
-                ppvRow[i] = p;
-                p += cols;
+            for (int i=0; i<cols; ++i) {
+                ppvCol[i] = p;
+                p += rows;
             }
 
             // fill data for matrix
@@ -246,20 +246,20 @@ void MatrixT<T>::init_martix( int _rows, int _cols,
         }
         else {
             // reserve(copy) old data and fill data buffer
-            reserve_and_fill_data(pvNewData, _rows, _cols, _initFcn, _fillVal);
+            //reserve_and_fill_data(pvNewData, _rows, _cols, _initFcn, _fillVal);
 
             // clear old data
             if (pvAlloc != NULL) {
                 delete[] pvAlloc;
-                if (ppvRowAlloc = NULL)
-                    delete[] ppvRowAlloc;
+                if (ppvColAlloc = NULL)
+                    delete[] ppvColAlloc;
             }
 
             // save the new data buffer
             pvAlloc = pvNewOrigPtr;
-            ppvRowAlloc = ppvOrigRow;
+            ppvColAlloc = ppvOrigCol;
             pvData = pvNewData;
-            ppvRow = ppvNewRow;
+            ppvCol = ppvNewCol;
             alloc_size = _alloc_size;
 
             // save the new sizes
@@ -270,9 +270,9 @@ void MatrixT<T>::init_martix( int _rows, int _cols,
 
             // save the row pointer
             pointer p = pvData;
-            for (int i=0; i<rows; ++i) {
-                ppvRow[i] = p;
-                p += cols;
+            for (int i=0; i<cols; ++i) {
+                ppvCol[i] = p;
+                p += rows;
             }
         }
     }
@@ -445,29 +445,29 @@ inline int MatrixT<T>::resize( int _rows, int _cols )
     int _totals = _rows * _cols;
     if (_totals <= totals_actual) {
         if (_rows > rows) {
-            if (ppvRowAlloc != NULL)
-                delete[] ppvRowAlloc;
+            if (ppvColAlloc != NULL)
+                delete[] ppvColAlloc;
 
             const int nAdditionRowSize =
                 (int)ceil(double(MAT_CACHE_ALIGN_SIZE) / (double)sizeof(typename pointer));
-            ptr_pointer ppvOrigRow = new pointer[_rows + nAdditionRowSize];
-            if (ppvOrigRow != NULL) {
-                ptr_pointer ppvNewRow = (ptr_pointer)MAT_CACHE_ALIGN_128(ppvOrigRow);
-                __ANNLAB_ASSERT(ppvNewRow != NULL);
+            ptr_pointer ppvOrigCol = new pointer[_cols + nAdditionRowSize];
+            if (ppvOrigCol != NULL) {
+                ptr_pointer ppvNewCol = (ptr_pointer)MAT_CACHE_ALIGN_128(ppvOrigCol);
+                __ANNLAB_ASSERT(ppvNewCol != NULL);
 
-                ppvRow = ppvNewRow;
-                ppvRowAlloc = ppvOrigRow;
+                ppvCol = ppvNewCol;
+                ppvColAlloc = ppvOrigCol;
 
                 // reset the row pointers
                 pointer p = pvData;
-                for (int i=0; i<_rows; ++i) {
-                    ppvRow[i] = p;
-                    p += _cols;
+                for (int i=0; i<_cols; ++i) {
+                    ppvCol[i] = p;
+                    p += _rows;
                 }
             }
             else {
-                ppvRowAlloc = NULL;
-                ppvRow = NULL;
+                ppvColAlloc = NULL;
+                ppvCol = NULL;
             }
         }
         rows = _rows;
@@ -477,7 +477,7 @@ inline int MatrixT<T>::resize( int _rows, int _cols )
     }
 
     destroy();
-    init_martix(_rows, _cols, INIT_TYPE_RESIZE);
+    init_martix(_rows, _cols);
     return _totals;
 }
 
@@ -493,8 +493,147 @@ inline int MatrixT<T>::resize_ex( int _rows, int _cols,
     }
 
     destroy();
-    initialize(_rows, _cols, INIT_TYPE_RESIZE, _fillVal, _initFcn);
+    initialize(_rows, _cols, _fillVal, _initFcn);
     return totals;
+}
+
+template<typename T>
+inline void MatrixT<T>::copy_data( pointer dest, const_pointer src, int _totals )
+{
+    switch (totals)
+    {
+    default:
+        copy_big_data(dest, src, _totals);
+        break;
+    case 8:
+        dest[7] = src[7];
+    case 7:
+        dest[6] = src[6];
+    case 6:
+        dest[5] = src[5];
+    case 5:
+        dest[4] = src[4];
+    case 4:
+        dest[3] = src[3];
+    case 3:
+        dest[2] = src[2];
+    case 2:
+        dest[1] = src[1];
+    case 1:
+        dest[0] = src[0];
+    }
+}
+
+template<typename T>
+inline void MatrixT<T>::copy_big_data( pointer dest, const_pointer src, int _totals )
+{
+    switch (totals)
+    {
+    default:
+        std::memcpy(dest, src, totals * sizeof(T));
+        break;
+    case 32:
+        dest[31] = src[31];
+    case 31:
+        dest[30] = src[30];
+    case 30:
+        dest[29] = src[29];
+    case 29:
+        dest[28] = src[28];
+    case 28:
+        dest[27] = src[27];
+    case 27:
+        dest[26] = src[26];
+    case 26:
+        dest[25] = src[25];
+    case 25:
+        dest[24] = src[24];
+    case 24:
+        dest[23] = src[23];
+    case 23:
+        dest[22] = src[22];
+    case 22:
+        dest[21] = src[21];
+    case 21:
+        dest[20] = src[20];
+    case 20:
+        dest[19] = src[19];
+    case 19:
+        dest[18] = src[18];
+    case 18:
+        dest[17] = src[17];
+    case 17:
+        dest[16] = src[16];
+    case 16:
+        dest[15] = src[15];
+    case 15:
+        dest[14] = src[14];
+    case 14:
+        dest[13] = src[13];
+    case 13:
+        dest[12] = src[12];
+    case 12:
+        dest[11] = src[11];
+    case 11:
+        dest[10] = src[10];
+    case 10:
+        dest[9] = src[9];
+    case 9:
+        dest[8] = src[8];
+    case 8:
+        dest[7] = src[7];
+    case 7:
+        dest[6] = src[6];
+    case 6:
+        dest[5] = src[5];
+    case 5:
+        dest[4] = src[4];
+    case 4:
+        dest[3] = src[3];
+    case 3:
+        dest[2] = src[2];
+    case 2:
+        dest[1] = src[1];
+    case 1:
+        dest[0] = src[0];
+    }
+}
+
+template<typename T>
+inline void MatrixT<T>::copy_row( const MatrixT<T>& src, int _row )
+{
+    const int _cols = src.cols;
+    pointer dest = get_data();
+
+    switch (_cols) {
+    default:
+        int i,j;
+        for (i=0, j=1; j<_cols; i+=2, j+=2) {
+            dest[i] = src.get_at(_row, i); 
+            dest[j] = src.get_at(_row, j);
+        }
+
+        if (i < _cols) {
+            dest[i] = src.get_at(_row, i); 
+        }
+        break;
+    case 8:
+      dest[7] = src.get_at(_row, 7);
+    case 7:
+      dest[6] = src.get_at(_row, 6);
+    case 6:
+      dest[5] = src.get_at(_row, 5);
+    case 5:
+      dest[4] = src.get_at(_row, 4);
+    case 4:
+      dest[3] = src.get_at(_row, 3);
+    case 3:
+      dest[2] = src.get_at(_row, 2);
+    case 2:
+      dest[1] = src.get_at(_row, 1);
+    case 1:
+      dest[0] = src.get_at(_row, 0);
+    }
 }
 
 template<typename T>
@@ -502,8 +641,12 @@ inline void MatrixT<T>::copy_from_array( const_pointer _array )
 {
     __MY_ASSERT((_array != NULL), _T(""));
 
+#if MATRIXT_FAST_MODE
+    copy_data(pvData, _array, totals);
+#else
     for (int i=0; i<totals; ++i)
         pvData[i] = _array[i];
+#endif
 }
 
 template<typename T>
@@ -542,37 +685,37 @@ inline MatrixT<T>* MatrixT<T>::copy( const MatrixT<T>* src )
 }
 
 template<typename T>
-inline typename MatrixT<T>::value_type MatrixT<T>::get_at( int _index )
+inline typename MatrixT<T>::value_type& MatrixT<T>::get_at( int _index )
 {
     return pvData[_index];
 }
 
 template<typename T>
-inline typename const MatrixT<T>::value_type MatrixT<T>::get_at( int _index ) const
+inline typename MatrixT<T>::value_type MatrixT<T>::get_at( int _index ) const
 {
     return pvData[_index];
 }
 
 template<typename T>
-inline typename MatrixT<T>::value_type MatrixT<T>::get_at( int _row, int _col )
+inline typename MatrixT<T>::value_type& MatrixT<T>::get_at( int _row, int _col )
 {
     return pvData[_col * rows + _row];
 }
 
 template<typename T>
-inline typename const MatrixT<T>::value_type MatrixT<T>::get_at( int _row, int _col ) const
+inline typename MatrixT<T>::value_type MatrixT<T>::get_at( int _row, int _col ) const
 {
     return pvData[_col * rows + _row];
 }
 
 template<typename T>
-inline void MatrixT<T>::set_at( int _index, value_type _value )
+inline void MatrixT<T>::set_at( int _index, const value_type _value )
 {
     pvData[_index] = _value;
 }
 
 template<typename T>
-inline void MatrixT<T>::set_at( int _row, int _col, value_type _value )
+inline void MatrixT<T>::set_at( int _row, int _col, const value_type _value )
 {
     pvData[_col * rows + _row] = _value;
 }
@@ -592,13 +735,13 @@ inline MatrixT<T>::operator const T*() const
 template<typename T>
 inline typename MatrixT<T>::pointer MatrixT<T>::operator[]( int _row )
 {
-    return ppvRow[_row];
+    return ppvCol[_row];
 }
 
 template<typename T>
 inline typename MatrixT<T>::const_pointer MatrixT<T>::operator[]( int _row ) const
 {
-    return ppvRow[_row];
+    return ppvCol[_row];
 }
 
 template<typename T>
@@ -608,7 +751,7 @@ inline typename MatrixT<T>::reference MatrixT<T>::operator()( int _index )
 }
 
 template<typename T>
-inline typename MatrixT<T>::const_reference MatrixT<T>::operator()( int _index ) const
+inline typename MatrixT<T>::value_type MatrixT<T>::operator()( int _index ) const
 {
     return pvData[_index];
 }
@@ -620,9 +763,33 @@ inline typename MatrixT<T>::reference MatrixT<T>::operator()( int _row, int _col
 }
 
 template<typename T>
-inline typename MatrixT<T>::const_reference MatrixT<T>::operator()( int _row, int _col ) const
+inline typename MatrixT<T>::value_type MatrixT<T>::operator()( int _row, int _col ) const
 {
     return pvData[_col * rows + _row];
+}
+
+template<typename T>
+inline typename MatrixT<T>::pointer MatrixT<T>::get_rowptr( int _row )
+{
+    return &(pvData[_row * cols]);
+}
+
+template<typename T>
+inline typename MatrixT<T>::const_pointer MatrixT<T>::get_rowptr( int _row ) const
+{
+    return const_pointer(&(pvData[_row * cols]));
+}
+
+template<typename T>
+inline typename MatrixT<T>::pointer MatrixT<T>::get_colptr( int _col )
+{
+    return &(pvData[_col * rows]);
+}
+
+template<typename T>
+inline typename MatrixT<T>::const_pointer MatrixT<T>::get_colptr( int _col ) const
+{
+    return const_pointer(&(pvData[_col * rows]));
 }
 
 template<typename T>
@@ -641,7 +808,7 @@ inline MatrixT<T>& MatrixT<T>::operator = ( value_type _value )
 template<typename T>
 inline MatrixT<T>& MatrixT<T>::operator = ( MatrixT<T>& _Right )
 {
-    if (&_Right == this || _Right.get_data() == pvData)
+    if ((&_Right) == this || (pvData == _Right.get_data() && pvData != NULL))
         return *this;
 
     if (rows == _Right.rows && cols == _Right.cols) {
@@ -649,7 +816,7 @@ inline MatrixT<T>& MatrixT<T>::operator = ( MatrixT<T>& _Right )
     }
     else {
         destroy();
-        initialize(_Right.rows, _Right.cols, INIT_TYPE_RESIZE);
+        initialize(_Right.rows, _Right.cols);
         copy_from_array(_Right.get_data());
 
         //MatrixT<T>* dest = copy(&_Right);
@@ -720,9 +887,24 @@ inline MatrixT<T> MatrixT<T>::operator+( MatrixT<T>& _Right )
 
     __ANNLAB_ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
     //if (pData != NULL && pDataRight != NULL && _length == _lenRight) {
+#if 0
         for (int i=0; i<_length; ++i) {
             (*pData++) += (value_type)(*pDataRight++);
         }
+#else
+        value_type *pData2      = pData + 1;
+        value_type *pDataRight2 = pDataRight + 1;
+        for (int i=0; i<_length/2; ++i) {
+            (*pData)  += (value_type)(*pDataRight);
+            (*pData2) += (value_type)(*pDataRight2);
+            pData += 2;
+            pData2 += 2;
+            pDataRight += 2;
+            pDataRight2 += 2;
+        }
+        if (_length & 1)
+            (*pData) += (value_type)(*pDataRight);
+#endif
     //}
 #else
     for (int i=0; i<rows; ++i) {
@@ -837,6 +1019,53 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
     // [D][E][F] * [I][J]  =  [D*G + E*I + F*K][D*H + E*J + F*L]
     //             [K][L]
     //
+#if MATRIXT_FAST_MODE
+  #if 1
+    value_type _value1, _value2;
+    MatrixT<T> tmp_row(1, _oldCols);
+    pointer tmp_rowdata;
+    pointer right_colptr;
+
+    for (int _row=0; _row<_newRows; ++_row) {
+        tmp_row.copy_row(*this, _row);
+        for (int _col=0; _col<_newCols; ++_col) {
+            _value1 = value_type(0.0);
+            _value2 = value_type(0.0);
+            tmp_rowdata  = tmp_row.get_data();
+            right_colptr = _Right.get_colptr(_col);
+            int i, j;
+            for (i=0, j=1; j<_oldCols; i+=2, j+=2) {
+                //_value1 += get_at(i, k) * _Right.get_at(k, j);
+                _value1 = tmp_rowdata[i] * right_colptr[i];
+                _value2 = tmp_rowdata[j] * right_colptr[j];
+            }
+            if (i < _oldCols)
+                _value1 = tmp_rowdata[i] * right_colptr[i];
+            _Result.set_at(_row, _col, _value1 + _value2);
+        }
+    }
+  #else
+    value_type _value1, _value2;
+    pointer right_colptr;
+
+    for (int _row=0; _row<_newRows; ++_row) {
+        for (int _col=0; _col<_newCols; ++_col) {
+            _value1 = value_type(0.0);
+            _value2 = value_type(0.0);
+            right_colptr = _Right.get_colptr(_col);
+            int i, j;
+            for (i=0, j=1; j<_oldCols; i+=2, j+=2) {
+                //_value1 += get_at(i, k) * _Right.get_at(k, j);
+                _value1 = get_at(_row, i) * right_colptr[i];
+                _value2 = get_at(_row, j) * right_colptr[j];
+            }
+            if (i < _oldCols)
+                _value1 = get_at(_row, i) * right_colptr[i];
+            _Result.set_at(_row, _col, _value1 + _value2);
+        }
+    }
+  #endif
+#else
     value_type _value;
     for (int i=0; i<_newRows; ++i) {
         for (int j=0; j<_newCols; ++j) {
@@ -846,6 +1075,7 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
             _Result.set_at(i, j, _value);
         }
     }
+#endif  // !MATRIXT_FAST_MODE
 
     return _Result;
 }

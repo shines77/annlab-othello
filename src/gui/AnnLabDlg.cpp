@@ -71,9 +71,10 @@ BEGIN_MESSAGE_MAP(CAnnLabDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	//}}AFX_MSG_MAP
-    ON_BN_CLICKED(IDC_BTN_TEST, &CAnnLabDlg::OnBnClickedBtnTest)
+    ON_BN_CLICKED(IDC_BTN_TEST1, &CAnnLabDlg::OnBnClickedBtnTest)
     ON_BN_CLICKED(IDC_BTN_TEST2, &CAnnLabDlg::OnBnClickedBtnTest2)
     ON_BN_CLICKED(IDC_BTN_TEST3, &CAnnLabDlg::OnBnClickedBtnTest3)
+    ON_BN_CLICKED(IDC_BTN_TEST4, &CAnnLabDlg::OnBnClickedBtnTest4)
 END_MESSAGE_MAP()
 
 SHOWMESSAGE_IMP(CAnnLabDlg)
@@ -363,7 +364,6 @@ void CAnnLabDlg::BpNetwork_ShowTest()
 {
 	int indexLayer;
 #if 1
-    indexLayer = Matrix_Test();
 	indexLayer = BpNetwork_Test();
 #else
 	///*
@@ -465,7 +465,7 @@ HCURSOR CAnnLabDlg::OnQueryDragIcon()
 void CAnnLabDlg::OnBnClickedBtnTest()
 {
     // æÿ’Û≤‚ ‘“ª
-    BpNetwork_ShowTest();
+    int indexLayer = Matrix_Test();
 }
 
 void CAnnLabDlg::OnBnClickedBtnTest2()
@@ -478,4 +478,10 @@ void CAnnLabDlg::OnBnClickedBtnTest3()
 {
     // æÿ’Û≤‚ ‘»˝
     int indexLayer = Matrix_Test3();
+}
+
+void CAnnLabDlg::OnBnClickedBtnTest4()
+{
+    // ∆‰À˚æÿ’Û≤‚ ‘
+    BpNetwork_ShowTest();
 }
