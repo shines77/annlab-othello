@@ -60,9 +60,9 @@ public:
 
 private:
     pointer     pvData;
-    ptr_pointer ppvRow;
+    ptr_pointer ppvCol;
     pointer     pvAlloc;
-    ptr_pointer ppvRowAlloc;
+    ptr_pointer ppvColAlloc;
 
 public:
     int rows;
@@ -89,6 +89,12 @@ public:
     // gets
     inline pointer   get_data     ( void ) const { return pvData;  };   // 获得数据指针
     inline pointer   alloc_ptr    ( void ) const { return pvAlloc; };   // 获得原始数据指针
+
+    inline pointer          get_rowptr ( int _row ); 
+    inline const_pointer    get_rowptr ( int _row ) const;
+    inline pointer          get_colptr ( int _col );
+    inline const_pointer    get_colptr ( int _col ) const;
+
     inline size_type element_size ( void ) const { return sizeof(typename T); };
     inline size_type alloc_bytes  ( void ) const { return sizeof(typename T) * alloc_size; };
 
@@ -98,14 +104,14 @@ public:
     inline bool      is_same_size ( const MatrixT<T>* target, int n = 0 );
     inline bool      is_same_sizes( const MatrixT<T>& target );
 
-    inline value_type get_at( int _index );                             // 获取指定元素的值
-    inline const value_type get_at( int _index ) const;                 // 获取指定元素的值
-    inline value_type get_at( int _row, int _col );                     // 获取指定元素的值
-    inline const value_type get_at( int _row, int _col ) const;         // 获取指定元素的值
+    inline value_type& get_at( int _index );                            // 获取指定元素的值
+    inline value_type  get_at( int _index ) const;                      // 获取指定元素的值
+    inline value_type& get_at( int _row, int _col );                    // 获取指定元素的值
+    inline value_type  get_at( int _row, int _col ) const;              // 获取指定元素的值
 
     // sets
-    inline void      set_at( int _index, value_type _value );           // 设置指定元素的值
-    inline void      set_at( int _row, int _col, value_type _value );   // 设置指定元素的值
+    inline void set_at( int _index, const value_type _value );          // 设置指定元素的值
+    inline void set_at( int _row, int _col, const value_type _value );  // 设置指定元素的值
 
     /////////////////////////////////////////////////////////////////////////
 
@@ -118,9 +124,10 @@ public:
     inline const_pointer operator[]( int _row ) const;
 
     inline reference operator()( int _index );
-    inline const_reference operator()( int _index ) const;
+    inline value_type operator()( int _index ) const;
+
     inline reference operator()( int _row, int _col );
-    inline const_reference operator()( int _row, int _col ) const;
+    inline value_type operator()( int _row, int _col ) const;
 
     // operator override (重载运算符)
 
@@ -179,6 +186,9 @@ public:
 
     inline void copy_from_array ( const_pointer _array );
     inline void set_by_scalar   ( const_value_type _x );
+    
+    inline void copy_data(pointer dest, const_pointer src, int _totals);
+    inline void copy_big_data(pointer dest, const_pointer src, int _totals);
 
     inline size_type copy_from_array_s( const_pointer _array, size_type _size );
 
@@ -203,6 +213,8 @@ public:
 
     /////////////////////////////////////////////////////////////////////////
     // get part of matrix
+
+    inline void copy_row( const MatrixT<T>& src, int _row );
 
     // 获取矩阵的指定行矩阵
     inline int get_row_vector( int _row, double* pVector ) const;

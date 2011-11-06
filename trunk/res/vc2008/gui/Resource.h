@@ -7,12 +7,10 @@
 #define IDS_ABOUTBOX                    101
 #define IDD_ANNLAB_DIALOG               102
 #define IDR_MAINFRAME                   128
-#define IDC_BUTTON1                     1000
-#define IDC_BTN_TEST                    1000
 #define IDC_BTN_TEST1                   1000
 #define IDC_BTN_TEST2                   1001
-#define IDC_BUTTON3                     1002
 #define IDC_BTN_TEST3                   1002
+#define IDC_BTN_TEST4                   1003
 
 // Next default values for new objects
 // 
