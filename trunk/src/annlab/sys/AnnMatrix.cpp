@@ -1496,7 +1496,7 @@ CAnnMatrix CAnnMatrix::_rands( int _rows, int _cols ) const
 	double _dblRand;
 	for (int i=0; i<_rows; ++i) {
 		for (int j=0; j<_cols; ++j) {
-			_dblRand = 2.0 * (double)rand() / (double)(RAND_MAX + 1) - 1.0;
+			_dblRand = 2.0 * (double)rand() / (double)(RAND_MAX) - 1.0;
 			_rands.set_element(i, j, _dblRand);
 		}
 	}
@@ -1509,11 +1509,11 @@ CAnnMatrix CAnnMatrix::_rands2( int _rows, int _cols ) const
 	// Copy the current matrix
 	CAnnMatrix _rands(_rows, _cols);
 
-	// 所有元素置[-1,1]的随机数
+	// 所有元素置[0,1]的随机数
 	double _dblRand;
 	for (int i=0; i<_rows; ++i) {
 		for (int j=0; j<_cols; ++j) {
-			_dblRand = (double)rand() / (double)(RAND_MAX + 1);
+			_dblRand = (double)rand() / (double)(RAND_MAX);
 			_rands.set_element(i, j, _dblRand);
 		}
 	}

@@ -544,6 +544,14 @@
 					RelativePath="..\..\include\annlab\annlab_stddef.h"
 					>
 				</File>
+				<File
+					RelativePath="..\..\include\annlab\itimer_t.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\annlab\tickcount_t.h"
+					>
+				</File>
 				<Filter
 					Name="toolbox"
 					Filter="h;hpp;hxx;hm;inl;inc;xsd"
