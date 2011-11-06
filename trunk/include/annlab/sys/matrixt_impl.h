@@ -64,7 +64,7 @@ template<typename T>
 MatrixT<T>::MatrixT( const MatrixT<T>& src )
 {
     initialize_ex(NULL, src.rows, src.cols);
-    copy_from_array(src.data());
+    copy_from_array(src.get_data());
 
     //MatrixT<T>* pMatrix = copy( &src );
     //ASSERT(pMatrix != NULL);
@@ -76,7 +76,7 @@ MatrixT<T>::MatrixT( const MatrixT<T>& src, bool b_copy_data )
     initialize_ex(NULL, src.rows, src.cols);
 
     if (b_copy_data) {
-        copy_from_array(src.data());
+        copy_from_array(src.get_data());
         //MatrixT<T>* pMatrix = copy( &src );
         //ASSERT(pMatrix != NULL);
     }
@@ -537,7 +537,7 @@ template<typename T>
 inline MatrixT<T>* MatrixT<T>::copy( const MatrixT<T>* src )
 {
     resize(src->rows, src->cols);
-    copy_from_array(src->data());
+    copy_from_array(src->get_data());
     return NULL;
 }
 
@@ -641,16 +641,16 @@ inline MatrixT<T>& MatrixT<T>::operator = ( value_type _value )
 template<typename T>
 inline MatrixT<T>& MatrixT<T>::operator = ( MatrixT<T>& _Right )
 {
-    if (&_Right == this || _Right.data() == pvData)
+    if (&_Right == this || _Right.get_data() == pvData)
         return *this;
 
     if (rows == _Right.rows && cols == _Right.cols) {
-        copy_from_array(_Right.data());
+        copy_from_array(_Right.get_data());
     }
     else {
         destroy();
         initialize(_Right.rows, _Right.cols, INIT_TYPE_RESIZE);
-        copy_from_array(_Right.data());
+        copy_from_array(_Right.get_data());
 
         //MatrixT<T>* dest = copy(&_Right);
         //ASSERT(dest != NULL);
@@ -692,17 +692,111 @@ inline MatrixT<T> MatrixT<T>::operator+( value_type _value )
 template<typename T>
 inline MatrixT<T> MatrixT<T>::operator+( MatrixT<T>& _Right )
 {
+    // Copy the current matrix
+    MatrixT<T> _Result((MatrixT<T> &)*this);
+    if (_Right.is_empty())
+        return _Result;
 
+    // Check whether it is its own matrix
+    __ANNLAB_ASSERT(rows == _Right.rows && cols == _Right.cols);
+
+#if _DEBUG
+    if (rows != _Right.rows || cols != _Right.cols) {
+        throw _T("Incompatible dimensions in operator + ( MatrixT<T> & _Right ).");
+        //exit(1);
+        //_Result.copy(this);
+        return _Result;
+    }
+#endif
+
+    // Matrix addition
+#if MATRIXT_FAST_MODE
+    int _length   = _Result.sizes();
+    int _lenRight = _Right.sizes();
+    value_type *pData      = _Result.get_data();
+    value_type *pDataRight = _Right.get_data();
+
+    __ANNLAB_ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
+    //if (pData != NULL && pDataRight != NULL && _length == _lenRight) {
+        for (int i=0; i<_length; ++i) {
+            (*pData) += (value_type)(*pDataRight);
+            pData++;
+            pDataRight++;
+        }
+    //}
+#else
+    for (int i=0; i<rows; ++i) {
+        for (int j=0; j<cols; ++j)
+            _Result.set_at(i, j, get_at(i, j) + _Right.get_at(i, j));
+    }
+#endif
+
+    return _Result;
 }
+
 template<typename T>
 inline MatrixT<T>& MatrixT<T>::operator+=( value_type _value )
 {
+    // Matrix addition
+#if MATRIXT_FAST_MODE
+    int _length       = sizes();
+    value_type *pData = get_data();
 
+    __ANNLAB_ASSERT(pData != NULL);
+    if (pData != NULL) {
+        for (int i=0; i<_length; i++) {
+            (*pData) += _value;
+            pData++;
+        }
+    }
+#else
+    for (int i=0; i<rows; ++i) {
+        for (int j=0; j<cols; ++j)
+            set_at(i, j, get_at(i, j) + _value);
+    }
+#endif
+
+    return *this;
 }
+
 template<typename T>
 inline MatrixT<T>& MatrixT<T>::operator+=( MatrixT<T>& _Right )
 {
+    if (_Right.is_empty())
+        return *this;
 
+    // Check whether it is its own matrix
+    __ANNLAB_ASSERT(rows == _Right.rows && cols == _Right.cols);
+
+    if (rows != _Right.rows || cols != _Right.cols) {
+        throw _T("Incompatible dimensions in operator += ( MatrixT<T> & _Right ). ");
+        //exit(1);
+        return *this;
+    }
+
+    // Matrix addition
+#if MATRIXT_FAST_MODE
+    int _length   = sizes();
+    int _lenRight = _Right.sizes();
+    value_type *pData      = get_data();
+    value_type *pDataRight = _Right.get_data();
+
+    __ANNLAB_ASSERT(pData != NULL && pDataRight != NULL && _length == _lenRight);
+    //if (pData != NULL && pDataRight != NULL && _length == _lenRight) {
+        for (int i=0; i<_length; i++) {
+            (*pData) += (value_type)(*pDataRight);
+            pData++;
+            pDataRight++;
+        }
+    //}
+#else
+    for (int i=0; i<rows; ++i) {
+        for (int j=0; j<cols; ++j)
+            set_at(i, j, get_at(i, j) + _Right.get_at(i, j));
+    }
+#endif
+
+    return *this;
 }
 
 template<typename T>
@@ -866,7 +960,7 @@ inline int MatrixT<T>::rands2( int _rows, int _cols )
 }
 
 template<typename T>
-inline MatrixT<T> MatrixT<T>::_zeros( int _rows, int _cols ) const
+inline MatrixT<T> MatrixT<T>::_zeros( int _rows, int _cols )
 {
     // Copy the current matrix
     MatrixT<T> _zeros(_rows, _cols);
@@ -881,7 +975,7 @@ inline MatrixT<T> MatrixT<T>::_zeros( int _rows, int _cols ) const
 }
 
 template<typename T>
-inline MatrixT<T> MatrixT<T>::_ones( int _rows, int _cols ) const
+inline MatrixT<T> MatrixT<T>::_ones( int _rows, int _cols )
 {
     // Copy the current matrix
     MatrixT<T> _ones(_rows, _cols);
@@ -896,7 +990,7 @@ inline MatrixT<T> MatrixT<T>::_ones( int _rows, int _cols ) const
 }
 
 template<typename T>
-inline MatrixT<T> MatrixT<T>::_rands( int _rows, int _cols ) const
+inline MatrixT<T> MatrixT<T>::_rands( int _rows, int _cols )
 {
     // Copy the current matrix
     MatrixT<T> _rands(_rows, _cols);
@@ -915,7 +1009,7 @@ inline MatrixT<T> MatrixT<T>::_rands( int _rows, int _cols ) const
 }
 
 template<typename T>
-inline MatrixT<T> MatrixT<T>::_rands2( int _rows, int _cols ) const
+inline MatrixT<T> MatrixT<T>::_rands2( int _rows, int _cols )
 {
     // Copy the current matrix
     CAnnMatrix _rands(_rows, _cols);
@@ -933,7 +1027,7 @@ inline MatrixT<T> MatrixT<T>::_rands2( int _rows, int _cols ) const
 }
 
 template<typename T>
-void MatrixT<T>::fill_data( int _rows, int _cols,
+inline void MatrixT<T>::fill_data( int _rows, int _cols,
                            int _initFcn /*= MAT_INIT_DEFAULT */,
                            value_type _fillVal /*= 0.0*/ )
 {
@@ -978,7 +1072,7 @@ void MatrixT<T>::fill_data( int _rows, int _cols,
 
 #define MATRIXT_INIT_FCN_FUNC_SIGNED(Ty) \
 template<> \
-void MatrixT<Ty>::fill_data( int _rows, int _cols, \
+inline void MatrixT<Ty>::fill_data( int _rows, int _cols, \
                             int _initFcn /*= MAT_INIT_DEFAULT */, \
                             value_type _fillVal /*= 0.0*/ ) \
 { \
@@ -1032,7 +1126,7 @@ void MatrixT<Ty>::fill_data( int _rows, int _cols, \
 
 #define MATRIXT_INIT_FCN_FUNC_UNSIGNED(Ty) \
 template<> \
-void MatrixT<Ty>::fill_data( int _rows, int _cols, \
+inline void MatrixT<Ty>::fill_data( int _rows, int _cols, \
                             int _initFcn /*= MAT_INIT_DEFAULT */, \
                             value_type _fillVal /*= 0.0*/ ) \
 { \

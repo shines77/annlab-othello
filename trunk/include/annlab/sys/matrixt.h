@@ -87,8 +87,8 @@ public:
     virtual ~MatrixT( void );
 
     // gets
-    inline pointer   data      ( void ) const { return pvData;  };      // 获得数据指针
-    inline pointer   alloc_ptr ( void ) const { return pvAlloc; };      // 获得原始数据指针
+    inline pointer   get_data     ( void ) const { return pvData;  };   // 获得数据指针
+    inline pointer   alloc_ptr    ( void ) const { return pvAlloc; };   // 获得原始数据指针
     inline size_type element_size ( void ) const { return sizeof(typename T); };
     inline size_type alloc_bytes  ( void ) const { return sizeof(typename T) * alloc_size; };
 
@@ -152,6 +152,7 @@ public:
     inline MatrixT<T>  operator ^  ( value_type _value  );
     inline MatrixT<T>& operator ^= ( value_type _value  );
 
+    /*
     friend inline MatrixT<T> operator + ( value_type _value, MatrixT<T>& _Right );
     friend inline MatrixT<T> operator - ( value_type _value, MatrixT<T>& _Right );
     friend inline MatrixT<T> operator * ( value_type _value, MatrixT<T>& _Right );
@@ -159,6 +160,7 @@ public:
 
     friend inline ostream& operator << (ostream& out, const MatrixT<T>& _matrix);
     friend inline istream& operator >> (istream& in, MatrixT<T>& _matrix);
+    //*/
 
     /////////////////////////////////////////////////////////////////////////
 
@@ -194,10 +196,10 @@ public:
     inline int rands  ( int _rows, int _cols );
     inline int rands2 ( int _rows, int _cols );
 
-    inline MatrixT<T> _zeros  ( int _rows, int _cols ) const;
-    inline MatrixT<T> _ones   ( int _rows, int _cols ) const;
-    inline MatrixT<T> _rands  ( int _rows, int _cols ) const;
-    inline MatrixT<T> _rands2 ( int _rows, int _cols ) const;
+    static inline MatrixT<T> _zeros  ( int _rows, int _cols );
+    static inline MatrixT<T> _ones   ( int _rows, int _cols );
+    static inline MatrixT<T> _rands  ( int _rows, int _cols );
+    static inline MatrixT<T> _rands2 ( int _rows, int _cols );
 
     /////////////////////////////////////////////////////////////////////////
     // get part of matrix

@@ -14,7 +14,6 @@ void ShowMessage( HWND hWnd, const TCHAR *szValName, int nValue, UINT nType )
 	else
 		_stprintf_s(szText, _countof(szText), _T("Var = %d."), nValue);
 	::MessageBox(hWnd, szText, _T("Value of Var..."), nType);
-
 }
 
 void ShowMessage( HWND hWnd, const TCHAR *szValName, UINT nType )
@@ -25,7 +24,6 @@ void ShowMessage( HWND hWnd, const TCHAR *szValName, UINT nType )
 	else
 		_stprintf_s(szText, _countof(szText), _T("%s"), szValName);
 	::MessageBox(hWnd, szText, _T("Information..."), nType);
-
 }
 
 int filter(unsigned int code, struct _EXCEPTION_POINTERS *ep) {

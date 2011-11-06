@@ -1435,6 +1435,30 @@ CAnnMatrix & CAnnMatrix::transpose( void )
 	return *this;
 }
 
+int CAnnMatrix::zeros( void )
+{
+	// 重置大小并初始化为全0矩阵
+	return resize(rows, cols, MAT_INIT_ZEROS);
+}
+
+int CAnnMatrix::ones( void )
+{
+	// 重置大小并初始化为全1矩阵
+	return resize(rows, cols, MAT_INIT_ONES);
+}
+
+int CAnnMatrix::rands( void )
+{
+	// 重置大小并初始化为[-1,1]随机数矩阵
+	return resize(rows, cols, MAT_INIT_RANDS);
+}
+
+int CAnnMatrix::rands2( void )
+{
+	// 重置大小并初始化为[0,1]随机数矩阵
+	return resize(rows, cols, MAT_INIT_RANDS_POSITIVE);
+}
+
 int CAnnMatrix::zeros( int _rows, int _cols )
 {
 	// 重置大小并初始化为全0矩阵

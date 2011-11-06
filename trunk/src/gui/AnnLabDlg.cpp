@@ -70,9 +70,125 @@ BEGIN_MESSAGE_MAP(CAnnLabDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	//}}AFX_MSG_MAP
+    ON_BN_CLICKED(IDC_BTN_TEST, &CAnnLabDlg::OnBnClickedBtnTest)
 END_MESSAGE_MAP()
 
 SHOWMESSAGE_IMP(CAnnLabDlg)
+
+
+int CAnnLabDlg::Matrix_Test()
+{
+    int size = 1000;
+    int N = 2;
+
+    SetProcessAffinityMask(GetCurrentProcess(), 2);
+    SetThreadAffinityMask(GetCurrentProcess(), 2);
+
+    //Armadillo
+    // size and N are specified by the user on the command line
+    annlab::MatrixT<double> A = annlab::MatrixT<double>::_rands(size, size);
+    annlab::MatrixT<double> B = annlab::MatrixT<double>::_rands(size, size);
+    annlab::MatrixT<double> C = annlab::MatrixT<double>::_rands(size, size);
+    annlab::MatrixT<double> Z = annlab::MatrixT<double>::_zeros(size, size);
+    int i;
+
+    annlab::itimer_t timer;
+    TCHAR szBuffer[256], szText[512];
+
+    timer.begin();
+    for(i=0; i<N; ++i)
+        Z = A + B;  //  or Z = A+B+C ... etc
+
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
+    _tcscpy_s(szText, _countof(szText), szBuffer);
+
+    timer.begin();
+    for(i=0; i<N; ++i)
+        Z = A * B;  //  or Z = A+B+C ... etc
+
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for multiplication = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
+    _tcscat_s(szText, _countof(szText), szBuffer);
+
+    //::ShowMessage( GetSafeHwnd(), szText );
+    //_tcscpy_s(szText, _countof(szText), _T(""));
+
+    timer.begin();
+    for(i=0; i<N; ++i)
+        Z = A + B + C;  //  or Z = A+B+C ... etc
+
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
+    _tcscat_s(szText, _countof(szText), szBuffer);
+
+    timer.begin();
+    for(i=0; i<N; ++i)
+        Z = A * B * C;  //  or Z = A+B+C ... etc
+
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for multiplication = %0.5f sec(s)."), timer.end().seconds() / double(N));
+    _tcscat_s(szText, _countof(szText), szBuffer);
+
+    ::ShowMessage( GetSafeHwnd(), szText );
+
+    return 0;
+}
+
+int CAnnLabDlg::Matrix_Test2()
+{
+    int size = 1000;
+    int N = 1;
+
+    SetProcessAffinityMask(GetCurrentProcess(), 2);
+    SetThreadAffinityMask(GetCurrentProcess(), 2);
+
+    //Armadillo
+    // size and N are specified by the user on the command line
+    annlab::CAnnMatrix A(size, size);
+    annlab::CAnnMatrix B(size, size);
+    annlab::CAnnMatrix C(size, size);
+    annlab::CAnnMatrix Z(size, size);
+    int i;
+    A.rands();
+    B.rands();
+    C.rands();
+    Z.zeros();
+
+    annlab::itimer_t timer;
+    TCHAR szBuffer[256], szText[512];
+
+    timer.begin();
+    for(i=0; i<N; ++i)
+        Z = A + B;  //  or Z = A+B+C ... etc
+
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
+    _tcscpy_s(szText, _countof(szText), szBuffer);
+
+    timer.begin();
+    for(i=0; i<N; ++i)
+        Z = A * B;  //  or Z = A+B+C ... etc
+
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for multiplication = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
+    _tcscat_s(szText, _countof(szText), szBuffer);
+
+    //::ShowMessage( GetSafeHwnd(), szText );
+    //_tcscpy_s(szText, _countof(szText), _T(""));
+
+    timer.begin();
+    for(i=0; i<N; ++i)
+        Z = A + B + C;  //  or Z = A+B+C ... etc
+
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
+    _tcscat_s(szText, _countof(szText), szBuffer);
+
+    timer.begin();
+    for(i=0; i<N; ++i)
+        Z = A * B * C;  //  or Z = A+B+C ... etc
+
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("armadillo: time taken for multiplication = %0.5f sec(s)."), timer.end().seconds() / double(N));
+    _tcscat_s(szText, _countof(szText), szBuffer);
+
+    ::ShowMessage( GetSafeHwnd(), szText );
+
+    return 0;
+}
 
 int CAnnLabDlg::BpNetwork_Test()
 {
@@ -170,6 +286,8 @@ void CAnnLabDlg::BpNetwork_ShowTest()
 {
 	int indexLayer;
 #if 1
+    indexLayer = Matrix_Test();
+    indexLayer = Matrix_Test2();
 	indexLayer = BpNetwork_Test();
 #else
 	///*
@@ -214,7 +332,7 @@ BOOL CAnnLabDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-	BpNetwork_ShowTest();
+	//BpNetwork_ShowTest();
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -266,4 +384,10 @@ void CAnnLabDlg::OnPaint()
 HCURSOR CAnnLabDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
+}
+
+void CAnnLabDlg::OnBnClickedBtnTest()
+{
+    // 测试矩阵
+    BpNetwork_ShowTest();
 }

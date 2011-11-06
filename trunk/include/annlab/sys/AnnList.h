@@ -16,6 +16,7 @@ using namespace std;
 
 _STD_BEGIN
 
+/*
 // TEMPLATE CLASS CxList
 template<class _Ty,
 class _Ax = allocator<_Ty> >
@@ -35,6 +36,7 @@ public:
 	CAnnListEx(void);
 	virtual ~CAnnListEx(void);
 };
+//*/
 
 _STD_END
 
