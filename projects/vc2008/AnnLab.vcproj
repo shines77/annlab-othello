@@ -124,12 +124,14 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/O3 /G7 /QxP /Qipo /Qprec-div-"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
 				MinimalRebuild="false"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
+				EnableEnhancedInstructionSet="0"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -150,6 +152,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(SolutionDir)..\..\bin\ia32\vc9\release\$(ProjectName).exe"
 				LinkIncremental="1"
+				UACExecutionLevel="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

@@ -6,6 +6,16 @@
 	ProjectGUID="{17350C15-E76A-4BB0-9F17-166DA27C82CE}"
 	VCNestedProjectGUID="{BA471E35-0620-4F45-855A-26426F512336}"
 	VCNestedProjectFileName="AnnLab.vcproj">
-	<Configurations/>
+	<Configurations>
+		<Configuration
+			Name="Release|Win32">
+			<Tool
+				Name="CppCmplrTool"
+				Optimization="1000"
+				GlobalOptimizations="true"
+				OptimizeForWindowsApplication="true"
+				UseIntelOptimizedHeaders="true"/>
+		</Configuration>
+	</Configurations>
 	<Files/>
 </VisualStudioProject>

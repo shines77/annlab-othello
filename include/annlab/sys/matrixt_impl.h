@@ -1019,15 +1019,78 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
     // [D][E][F] * [I][J]  =  [D*G + E*I + F*K][D*H + E*J + F*L]
     //             [K][L]
     //
-#if MATRIXT_FAST_MODE
+#if 1 & MATRIXT_FAST_MODE
   #if 1
+    #if 1
+      #if 1
+    register value_type temp;
+    register pointer left_ptr, out_ptr;
+    pointer right_ptr;
+    //left_ptr  = get_data();
+    right_ptr = _Right.get_data();
+    //out_ptr   = _Result.get_data();
+
+    for (int n_col=0; n_col<_newCols; ++n_col) {
+        out_ptr = _Result.get_data() + n_col * _newRows;
+        for (int n_row=0; n_row<_newRows; ++n_row) {
+            *out_ptr++ = value_type(0.0);
+        }
+        for (int r_row=0; r_row<_oldCols; ++r_row) {
+            temp = right_ptr[r_row + n_col * _oldCols];
+            if (temp != value_type(0.0)) {
+                out_ptr  = _Result.get_data() + n_col * _newRows;
+                left_ptr = get_data() + r_row * _newRows;
+                for (int s_row=0; s_row<_newRows; ++s_row) {
+                    (*out_ptr++) += temp * (*left_ptr++);
+                }
+                /*
+                for (int s_row=0; s_row<_newRows/2; ++s_row) {
+                    *out_ptr     += temp * (*left_ptr);
+                    *(out_ptr+1) += temp * (*(left_ptr+1));
+                    out_ptr  += 2;
+                    left_ptr += 2;
+                }
+                if (_newRows & 1)
+                    *out_ptr += temp * (*left_ptr);
+                //*/
+            }
+        }
+    }
+      #else
+    value_type temp;
+    pointer left_ptr, right_ptr, out_ptr;
+    left_ptr  = pvData;
+    right_ptr = _Right.get_data();
+    out_ptr   = _Result.get_data();
+
+    for (int n_col=0; n_col<_newCols; ++n_col) {
+        for (int n_row=0; n_row<_newRows; ++n_row) {
+            //_Result.set_at(n_row, n_col, value_type(0.0));
+            out_ptr[n_row + n_col * _newRows] = value_type(0.0);
+        }
+        for (int r_row=0; r_row<_oldCols; ++r_row) {
+            //temp = _Right.get_at(r_row, n_col);
+            temp = right_ptr[r_row + n_col * _oldCols];
+            if (temp != value_type(0.0)) {
+                for (int s_row=0; s_row<_newRows; ++s_row) {
+                    //_Result.set_at(s_row, n_col,
+                    //    _Result.get_at(s_row, n_col) + temp * get_at(s_row, r_row));
+                    out_ptr[s_row + n_col * _newRows] += temp * left_ptr[s_row + r_row * _newRows];
+                    //_value1 = value_type(0.0);
+                    //_value2 = value_type(0.0);
+                }
+            }
+        }
+    }
+      #endif
+    #else
     value_type _value1, _value2;
     MatrixT<T> tmp_row(1, _oldCols);
     pointer tmp_rowdata;
     pointer right_colptr;
 
     for (int _row=0; _row<_newRows; ++_row) {
-        tmp_row.copy_row(*this, _row);
+        tmp_row.copy_row(*this, n_row);
         for (int _col=0; _col<_newCols; ++_col) {
             _value1 = value_type(0.0);
             _value2 = value_type(0.0);
@@ -1041,9 +1104,10 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
             }
             if (i < _oldCols)
                 _value1 = tmp_rowdata[i] * right_colptr[i];
-            _Result.set_at(_row, _col, _value1 + _value2);
+            _Result.set_at(n_row, _col, _value1 + _value2);
         }
     }
+    #endif
   #else
     value_type _value1, _value2;
     pointer right_colptr;
@@ -1066,6 +1130,8 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
     }
   #endif
 #else
+#if 1
+    // 这个版本要稍快于下面的版本, 与我预料的有点差距, 不解..., 不过对Cache利用都不好
     value_type _value;
     for (int i=0; i<_newRows; ++i) {
         for (int j=0; j<_newCols; ++j) {
@@ -1075,6 +1141,19 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
             _Result.set_at(i, j, _value);
         }
     }
+#else
+    // 表面上看这个利用缓存要好一些, 但比上面的版本慢, 可能是get_at(i, k)地址过于的游离导致
+    // _Right.get_at(k, j)很容易在Cache中被挤到2级缓存(L2 Cache)或导致未命中率提高
+    value_type _value;
+    for (int j=0; j<_newCols; ++j) {
+        for (int i=0; i<_newRows; ++i) {
+            _value = value_type(0.0);
+            for (int k=0; k<_oldCols; ++k)
+                _value += get_at(i, k) * _Right.get_at(k, j);
+            _Result.set_at(i, j, _value);
+        }
+    }
+#endif
 #endif  // !MATRIXT_FAST_MODE
 
     return _Result;
@@ -1616,6 +1695,7 @@ void MatrixT<T>::display_ex( const TCHAR *szText )
         szTypeName = NULL;
     }
 #endif
+#ifndef _DEBUG
     if (szTypeNameA) {
         const int nHeaderSize = 0x48;
         bool bFound = false;
@@ -1626,6 +1706,7 @@ void MatrixT<T>::display_ex( const TCHAR *szText )
         if (bFound)
             ::free(szHeader);
     }
+#endif
 #endif
 }
 
