@@ -93,7 +93,7 @@ int CAnnLabDlg::Matrix_Test()
     SetProcessAffinityMask(GetCurrentProcess(), 2);
     SetThreadAffinityMask(GetCurrentProcess(), 2);
 
-    //Armadillo
+    // MatrixT
     // size and N are specified by the user on the command line
     annlab::MatrixT<double> A = annlab::MatrixT<double>::_rands(size, size);
     annlab::MatrixT<double> B = annlab::MatrixT<double>::_rands(size, size);
@@ -101,7 +101,7 @@ int CAnnLabDlg::Matrix_Test()
     annlab::MatrixT<double> Z = annlab::MatrixT<double>::_zeros(size, size);
     int i;
 
-    annlab::itimer_t timer;
+    annlab::tickcount_t timer;
     TCHAR szBuffer[256], szText[512];
 
     timer.begin();
@@ -165,7 +165,7 @@ int CAnnLabDlg::Matrix_Test2()
     C.fill(1);
     Z.fill(2);
 
-    annlab::itimer_t timer;
+    annlab::tickcount_t timer;
     TCHAR szBuffer[256], szText[512];
 
     timer.begin();
@@ -229,7 +229,7 @@ int CAnnLabDlg::Matrix_Test3()
     C.rands();
     Z.zeros();
 
-    annlab::itimer_t timer;
+    annlab::tickcount_t timer;
     TCHAR szBuffer[256], szText[512];
 
     timer.begin();
@@ -270,6 +270,11 @@ int CAnnLabDlg::Matrix_Test3()
 
 int CAnnLabDlg::BpNetwork_Test()
 {
+    annlab::itimer_t timer;
+    TCHAR szBuffer[256], szText[512];
+
+    timer.begin();
+
 	int nRetCode = 0;
 	CAnnNetwork net, *pNetwork;
 	net.setNumInputs( 0 );
@@ -357,6 +362,11 @@ int CAnnLabDlg::BpNetwork_Test()
     mt3.display_ex();
 
     mt1 = mt2;
+
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("BpNetwork_Test() used time = %0.5f sec(s)."), timer.end().seconds());
+    _tcscpy_s(szText, _countof(szText), szBuffer);
+
+    ::ShowMessage( GetSafeHwnd(), szText );
 	return indexLayer;
 }
 

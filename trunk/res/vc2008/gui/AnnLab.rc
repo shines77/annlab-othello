@@ -125,13 +125,14 @@ BEGIN
     BEGIN
         BLOCK "080403a8"
         BEGIN
-            VALUE "CompanyName", "TODO: <公司名>"
-            VALUE "FileDescription", "TODO: <文件说明>"
+            VALUE "CompanyName", "77Studio.Net"
+            VALUE "FileDescription", "AnnLab Library"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "AnnLab.exe"
-            VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
+            VALUE "LegalCopyright", "(C) 77Studio.Net，保留所有权利。"
+            VALUE "LegalTrademarks", "77Studio.Net"
             VALUE "OriginalFilename", "AnnLab.exe"
-            VALUE "ProductName", "TODO: <产品名>"
+            VALUE "ProductName", "AnnLab Library"
             VALUE "ProductVersion", "1.0.0.1"
         END
     END
