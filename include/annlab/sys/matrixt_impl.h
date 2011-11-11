@@ -12,6 +12,9 @@ namespace annlab {
 
 #include <math.h>
 
+#include <xmmintrin.h>
+#include <emmintrin.h>
+
 template<typename T>
 MatrixT<T>::MatrixT( void ) :
     pvData(NULL), ppvCol(NULL), pvAlloc(NULL), ppvColAlloc(NULL),
@@ -999,10 +1002,169 @@ inline MatrixT<T> MatrixT<T>::operator*( value_type _value )
     }
 }
 
+//#define MULTIPLY_SSE2_NAKED  1
+
+template<typename T>
+inline
+#ifdef MULTIPLY_SSE2_NAKED
+__declspec(naked)
+#endif
+void MatrixT<T>::CalcArrayProducts_double_SSE2( pointer dest,
+                                               pointer src,
+                                               pointer alpha,
+                                               unsigned int len )
+{
+    __asm {
+#ifdef MULTIPLY_SSE2_NAKED
+        push        ebp
+        mov         ebp, esp
+        push        edx
+        push        ecx
+        push        esi
+        push        edi
+
+        mov         edx, dword ptr [ebp + 10h]
+        mov         ecx, dword ptr [ebp + 14h]
+        mov         edi, dword ptr [ebp + 08h]
+        mov         esi, dword ptr [ebp + 0Ch]
+#else
+        mov         edx, alpha
+        mov         ecx, len
+        mov         edi, dest
+        mov         esi, src
+#endif
+
+        movlpd      xmm6, qword ptr [edx]           ; xmm6 = [0,     alpha]
+        shr         ecx, 3
+        shufpd      xmm6, xmm6, 00000000b           ; xmm6 = [alpha, alpha]
+
+//ALIGN 16                                            ; Align address of loop to a 16-byte boundary.
+
+sse2_multiple_loop:
+        movapd      xmm2, xmmword ptr [esi]         ; [src]
+        mulpd       xmm2, xmm6
+
+        movapd      xmm3, xmmword ptr [esi + 16]    ; [src  + 16]
+        addpd       xmm2, xmmword ptr [edi     ]
+        mulpd       xmm3, xmm6    
+
+        movapd      xmmword ptr [edi     ], xmm2
+
+        movapd      xmm4, xmmword ptr [esi + 32]    ; [src  + 32]
+        addpd       xmm3, xmmword ptr [edi + 16]
+        mulpd       xmm4, xmm6
+
+        movapd      xmmword ptr [edi + 16], xmm3
+
+        movapd      xmm5, xmmword ptr [esi + 48]    ; [src  + 48]
+        addpd       xmm4, xmmword ptr [edi + 32]
+        mulpd       xmm5, xmm6
+
+        movapd      xmmword ptr [edi + 32], xmm4
+
+        addpd       xmm5, xmmword ptr [edi + 48]
+        movapd      xmmword ptr [edi + 48], xmm5
+
+        add         edi, 64
+        add         esi, 64
+
+        dec         ecx
+        jne         sse2_multiple_loop
+
+#ifdef MULTIPLY_SSE2_NAKED
+        pop         edi
+        pop         esi
+        pop         ecx
+        pop         edx
+        mov         esp, ebp
+        pop         ebp
+
+        ret
+#endif
+    }
+}
+
+template<typename T>
+inline
+#ifdef MULTIPLY_SSE2_NAKED
+__declspec(naked)
+#endif
+void MatrixT<T>::CalcArrayProducts_double_SSE2_( pointer dest,
+                                                pointer src,
+                                                pointer alpha,
+                                                unsigned int len )
+{
+    __asm {
+#ifdef MULTIPLY_SSE2_NAKED
+        push        ebp
+        mov         ebp, esp
+        push        edx
+        push        ecx
+        push        esi
+        push        edi
+
+        mov         edx, dword ptr [ebp + 10h]
+        mov         ecx, dword ptr [ebp + 14h]
+        mov         edi, dword ptr [ebp + 08h]
+        mov         esi, dword ptr [ebp + 0Ch]
+#else
+        mov         edx, alpha
+        mov         ecx, len
+        mov         edi, dest
+        mov         esi, src
+#endif
+
+        movlpd      xmm6, dword ptr [edx]           ; xmm6 = [0,     alpha]
+        shr         ecx, 2
+        shufpd      xmm6, xmm6, 00000010b           ; xmm6 = [alpha, alpha]
+
+//ALIGN 16                                            ; Align address of loop to a 16-byte boundary.
+
+sse2_multiple_loop:
+        //movsd
+        //mulsd
+        //addsd
+        movapd      xmm4, xmmword ptr [esi]         ; [src]
+        movapd      xmm5, xmmword ptr [esi + 16]    ; [src  + 16]
+
+        mulpd       xmm4, xmm6
+        movapd      xmm0, xmmword ptr [edi]         ; [dest]
+        mulpd       xmm5, xmm6
+        movapd      xmm1, xmmword ptr [edi + 16]    ; [dest + 16]
+
+        addpd       xmm0, xmm4
+        addpd       xmm1, xmm5
+
+        movapd      xmmword ptr [edi], xmm0
+        movapd      xmmword ptr [edi + 16], xmm1
+
+        //movntpd     xmmword ptr [edi], xmm0         ; [dest]
+        //movntpd     xmmword ptr [edi + 16], xmm1    ; [dest + 16]
+
+        add         edi, 32
+        add         esi, 32
+
+        dec         ecx
+        jne         sse2_multiple_loop
+
+        //sfence                                      ; Finish all memory writes.
+#ifdef MULTIPLY_SSE2_NAKED
+        pop         edi
+        pop         esi
+        pop         ecx
+        pop         edx
+        mov         esp, ebp
+        pop         ebp
+
+        ret
+#endif
+    }
+}
+
 template<typename T>
 inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
 {
-    // 首先检查乘矩阵的行数和被乘矩阵的列数是否相同
+    // 首先检查乘矩阵的列数和被乘矩阵的行数是否相同
     __ANNLAB_ASSERT(cols == _Right.rows);
 
     int _newRows, _newCols, _oldCols;
@@ -1030,6 +1192,12 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
     right_ptr = _Right.get_data();
     //out_ptr   = _Result.get_data();
 
+#define DOUBLE_NUMS_PER_LOOP    16
+#define MM_PREFETCH_OFFSET      768
+#define MM_PREFETCH_OFFSET_V    (MM_PREFETCH_OFFSET/sizeof(value_type))
+
+if (typeid(value_type) == typeid(double)) {
+
     for (int n_col=0; n_col<_newCols; ++n_col) {
         out_ptr = _Result.get_data() + n_col * _newRows;
         for (int n_row=0; n_row<_newRows; ++n_row) {
@@ -1037,12 +1205,123 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
         }
         for (int r_row=0; r_row<_oldCols; ++r_row) {
             temp = right_ptr[r_row + n_col * _oldCols];
-            if (temp != value_type(0.0)) {
+            //if (temp != value_type(0.0)) {
+            if (temp > value_type(FLOAT_EPSINON) || temp < value_type(-FLOAT_EPSINON)) {
                 out_ptr  = _Result.get_data() + n_col * _newRows;
                 left_ptr = get_data() + r_row * _newRows;
+  #if 1
+                /*
+                __asm {
+                    nop
+                    nop
+                    nop
+                    emms
+                }
+                //*/
+    #if 0
+                CalcArrayProducts_double_SSE2(out_ptr, left_ptr, &temp, _newRows);
+                ///*
+    #else
+                __m128d tmp;
+                __m128d mm1, mm2, mm3, mm4;
+#if (DOUBLE_NUMS_PER_LOOP == 16)
+                __m128d mm5, mm6, mm7, mm8;
+#endif
+                tmp = _mm_setzero_pd();
+                tmp = _mm_loadl_pd(tmp, &temp);
+                tmp = _mm_shuffle_pd(tmp, tmp, 0);
+                pointer end_ptr = out_ptr + _newRows;
+
+                for (int s_row=_newRows/DOUBLE_NUMS_PER_LOOP;
+                    s_row >= 0;
+                    out_ptr += DOUBLE_NUMS_PER_LOOP, left_ptr += DOUBLE_NUMS_PER_LOOP, --s_row) {
+                /*
+                for (; (out_ptr != NULL) && (out_ptr < end_ptr);
+                    out_ptr+=DOUBLE_COUNT_PER_TIME, left_ptr+=DOUBLE_COUNT_PER_TIME) {
+                //*/
+
+                    // prefetchnta [addr]
+                    _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
+                    _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
+
+                    mm1 = _mm_load_pd(left_ptr    );
+                    mm2 = _mm_load_pd(left_ptr + 2);
+
+                    mm3 = _mm_load_pd(left_ptr + 4);
+                    mm4 = _mm_load_pd(left_ptr + 6);
+
+                    mm1 = _mm_mul_pd(mm1, tmp);
+                    mm2 = _mm_mul_pd(mm2, tmp);
+
+                    mm3 = _mm_mul_pd(mm3, tmp);
+                    mm4 = _mm_mul_pd(mm4, tmp);
+
+                    mm1 = _mm_add_pd(mm1, *((__m128d*)(out_ptr))    );
+                    mm2 = _mm_add_pd(mm2, *((__m128d*)(out_ptr + 2)));
+
+                    mm3 = _mm_add_pd(mm3, *((__m128d*)(out_ptr + 4)));
+                    mm4 = _mm_add_pd(mm4, *((__m128d*)(out_ptr + 6)));
+
+                    _mm_store_pd(out_ptr,     mm1);
+                    _mm_store_pd(out_ptr + 2, mm2);
+
+#if (DOUBLE_NUMS_PER_LOOP == 16)
+                    _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
+                    _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
+
+                    mm5 = _mm_load_pd(left_ptr + 8 );
+                    mm6 = _mm_load_pd(left_ptr + 10);
+#endif
+                    _mm_store_pd(out_ptr + 4, mm3);
+                    _mm_store_pd(out_ptr + 6, mm4);
+
+#if (DOUBLE_NUMS_PER_LOOP == 16)
+                    mm5 = _mm_mul_pd(mm5, tmp);
+                    mm6 = _mm_mul_pd(mm6, tmp);
+
+                    mm7 = _mm_load_pd(left_ptr + 12);
+                    mm8 = _mm_load_pd(left_ptr + 14);
+
+                    mm5 = _mm_add_pd(mm5, *((__m128d*)(out_ptr +  8)));
+                    mm6 = _mm_add_pd(mm6, *((__m128d*)(out_ptr + 10)));
+
+                    mm7 = _mm_mul_pd(mm7, tmp);
+                    mm8 = _mm_mul_pd(mm8, tmp);
+
+                    _mm_store_pd(out_ptr + 8,  mm5);
+                    _mm_store_pd(out_ptr + 10, mm6);
+
+                    mm7 = _mm_add_pd(mm7, *((__m128d*)(out_ptr + 12)));
+                    mm8 = _mm_add_pd(mm8, *((__m128d*)(out_ptr + 14)));
+
+                    _mm_store_pd(out_ptr + 12, mm7);
+                    _mm_store_pd(out_ptr + 14, mm8);
+#endif
+                    /*
+                    __asm {
+                        nop
+                        nop
+                        nop
+                        nop
+                        nop
+                        emms
+                    }
+                    //*/
+                }
+                //*/
+    #endif
+  #else
                 for (int s_row=0; s_row<_newRows; ++s_row) {
                     (*out_ptr++) += temp * (*left_ptr++);
                 }
+                /*
+                __asm {
+                    nop
+                    nop
+                    emms
+                }
+                //*/
+  #endif
                 /*
                 for (int s_row=0; s_row<_newRows/2; ++s_row) {
                     *out_ptr     += temp * (*left_ptr);
@@ -1071,7 +1350,7 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
         for (int r_row=0; r_row<_oldCols; ++r_row) {
             //temp = _Right.get_at(r_row, n_col);
             temp = right_ptr[r_row + n_col * _oldCols];
-            if (temp != value_type(0.0)) {
+            if (temp > value_type(FLOAT_EPSINON) || temp < value_type(-FLOAT_EPSINON)) {
                 for (int s_row=0; s_row<_newRows; ++s_row) {
                     //_Result.set_at(s_row, n_col,
                     //    _Result.get_at(s_row, n_col) + temp * get_at(s_row, r_row));
@@ -1155,6 +1434,34 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
     }
 #endif
 #endif  // !MATRIXT_FAST_MODE
+    }
+    else {
+        value_type temp;
+        pointer left_ptr, right_ptr, out_ptr;
+        left_ptr  = pvData;
+        right_ptr = _Right.get_data();
+        out_ptr   = _Result.get_data();
+
+        for (int n_col=0; n_col<_newCols; ++n_col) {
+            for (int n_row=0; n_row<_newRows; ++n_row) {
+                //_Result.set_at(n_row, n_col, value_type(0.0));
+                out_ptr[n_row + n_col * _newRows] = value_type(0.0);
+            }
+            for (int r_row=0; r_row<_oldCols; ++r_row) {
+                //temp = _Right.get_at(r_row, n_col);
+                temp = right_ptr[r_row + n_col * _oldCols];
+                if (temp > value_type(FLOAT_EPSINON) || temp < value_type(-FLOAT_EPSINON)) {
+                    for (int s_row=0; s_row<_newRows; ++s_row) {
+                        //_Result.set_at(s_row, n_col,
+                        //    _Result.get_at(s_row, n_col) + temp * get_at(s_row, r_row));
+                        out_ptr[s_row + n_col * _newRows] += temp * left_ptr[s_row + r_row * _newRows];
+                        //_value1 = value_type(0.0);
+                        //_value2 = value_type(0.0);
+                    }
+                }
+            }
+        }
+    }
 
     return _Result;
 }

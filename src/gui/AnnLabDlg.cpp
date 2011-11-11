@@ -86,7 +86,7 @@ int CAnnLabDlg::Matrix_Test()
     int size = 500;
     int N = 1;
 #else
-    int size = 1000;
+    int size = 1024;
     int N = 2;
 #endif
 

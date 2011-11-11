@@ -35,6 +35,9 @@
 #define __MY_ASSERT(expression, ...)
 #define __MY_TRACE(expression, ...)
 
+#define FLOAT_EPSINON     (0.00001)
+#define DOUBLE_EPSINON    (0.00000001)
+
 // We do not need defines below for resource processing on windows
 #if !defined RC_INVOKED
 
@@ -117,7 +120,7 @@
 // ann_config.h should be included the first since it contains macro definitions used in other headers
 #include "annlab_config.h"
 
-#if defined(_MSC_VER) && _MSC_VER >=1400
+#if defined(_MSC_VER) && (_MSC_VER >=1400)
     #define __ANNLAB_EXPORTED_FUNC   __cdecl
     #define __ANNLAB_EXPORTED_METHOD __thiscall
 #else

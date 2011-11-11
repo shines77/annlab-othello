@@ -235,6 +235,11 @@ public:
     inline int get_partof_matrix( int _rowStart, int _rowEnd,
                 int _colStart, int _colEnd, MatrixT<T>* pMatrix ) const;
 
+    inline void CalcArrayProducts_double_SSE2( pointer dest, pointer src,
+        pointer alpha, unsigned int len );
+    inline void CalcArrayProducts_double_SSE2_( pointer dest, pointer src,
+        pointer alpha, unsigned int len );
+
 protected:
     // methods
     inline void destroy( void );
