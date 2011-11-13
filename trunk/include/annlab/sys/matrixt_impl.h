@@ -10,11 +10,6 @@
 namespace annlab {
 #endif
 
-#include <math.h>
-
-#include <xmmintrin.h>
-#include <emmintrin.h>
-
 template<typename T>
 MatrixT<T>::MatrixT( void ) :
     pvData(NULL), ppvCol(NULL), pvAlloc(NULL), ppvColAlloc(NULL),
@@ -610,6 +605,18 @@ inline void MatrixT<T>::copy_row( const MatrixT<T>& src, int _row )
 
     switch (_cols) {
     default:
+#if 1
+        {
+            pointer src_ptr = src.get_data();
+            const int _rows = src.rows;
+            for (int i=0; i<_cols; ++i) {
+                //dest[i] = src.get_at(_row, i);
+                (*dest++) = *src_ptr;
+                src_ptr += _rows;
+            }
+        }
+        break;
+#else
         int i,j;
         for (i=0, j=1; j<_cols; i+=2, j+=2) {
             dest[i] = src.get_at(_row, i); 
@@ -620,6 +627,7 @@ inline void MatrixT<T>::copy_row( const MatrixT<T>& src, int _row )
             dest[i] = src.get_at(_row, i); 
         }
         break;
+#endif
     case 8:
       dest[7] = src.get_at(_row, 7);
     case 7:
@@ -1041,6 +1049,9 @@ void MatrixT<T>::CalcArrayProducts_double_SSE2( pointer dest,
 //ALIGN 16                                            ; Align address of loop to a 16-byte boundary.
 
 sse2_multiple_loop:
+        prefetchnta [esi + 768]
+        prefetchnta [edi + 768]
+
         movapd      xmm2, xmmword ptr [esi]         ; [src]
         mulpd       xmm2, xmm6
 
@@ -1161,6 +1172,351 @@ sse2_multiple_loop:
     }
 }
 
+#define _MM128_MEM(ptr)           (*((__m128* )(ptr))
+#define _MM128I_MEM(ptr)          (*((__m128i*)(ptr))
+#define _MM128D_MEM(ptr)          (*((__m128d*)(ptr))
+
+#define _MATRIXT_MULT_TEST_      1
+
+#if _MATRIXT_MULT_TEST_
+
+#define DOUBLE_NUMS_PER_LOOP     16
+#define MM_PREFETCH_OFFSET       768
+#define MM_PREFETCH_OFFSET_V     (MM_PREFETCH_OFFSET/sizeof(value_type))
+#define USE_SEE2_WRITE_PREFRTCH  1
+
+#define _DONT_USE_MAT_MULT_SSE2  0
+/* 0=纯C代码, 1=ASM嵌入SSE2代码, 2=编译器级别SSE2代码, 3=其他(默认) */
+#define _MULT_SSE2_MODE          2
+
+template<typename T>
+inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
+{
+    // 首先检查乘矩阵的列数和被乘矩阵的行数是否相同
+    __ANNLAB_ASSERT(cols == _Right.rows);
+
+    int _newRows, _newCols, _oldCols;
+    _newRows = rows;
+    _newCols = _Right.cols;
+    _oldCols = cols;
+
+    // 创建目标乘积矩阵
+    MatrixT<T> _Result(_newRows, _newCols);
+
+#if _DONT_USE_MAT_MULT_SSE2
+  #if 1
+    //__declspec(align(16)) value_type _value;
+    //__declspec(align(16)) double _value128[2] = { 0.0, 0.0 };
+    MatrixT<T> tmp_row(1, _oldCols);
+    register pointer temp_ptr;
+    register pointer right_ptr;
+    pointer out_ptr;
+    __m128d mm0, mm1, mm2, mm3;
+    __m128d mm4, mm5, mm6, mm7;
+    __m128d mmv1, mmv2;
+
+    for (int _row=0; _row<_newRows; ++_row) {
+        tmp_row.copy_row(*this, _row);
+        out_ptr = _Result.get_data() + _row;
+        for (int _col=0; _col<_newCols; ++_col) {
+            //_value = value_type(0.0);
+            temp_ptr  = tmp_row.get_data();
+            right_ptr = _Right.get_colptr(_col);
+    #if 1
+            mmv1 = _mm_setzero_pd();
+            mmv2 = _mm_setzero_pd();
+            for (int i=0; i<_oldCols/8; ++i) {
+                // prefetchnta [addr + offset]
+                _mm_prefetch((char *)(temp_ptr  + 1024/8), _MM_HINT_NTA);
+                _mm_prefetch((char *)(right_ptr + 1024/8), _MM_HINT_NTA);
+
+                mm0 = _mm_load_pd(temp_ptr );
+                mm1 = _mm_load_pd(right_ptr);
+
+                mm2 = _mm_load_pd(temp_ptr  + 2);
+                mm3 = _mm_load_pd(right_ptr + 2);
+
+                mm0 = _mm_mul_pd(mm0, mm1);
+                mm2 = _mm_mul_pd(mm2, mm3);
+
+                mm4 = _mm_load_pd(temp_ptr  + 4);
+                mm5 = _mm_load_pd(right_ptr + 4);
+
+                mm6 = _mm_load_pd(temp_ptr  + 6);
+                mm7 = _mm_load_pd(right_ptr + 6);
+
+                mm4 = _mm_mul_pd(mm4, mm5);
+                mm6 = _mm_mul_pd(mm6, mm7);
+
+                mm0 = _mm_add_pd(mm0, mm2);
+                mm4 = _mm_add_pd(mm4, mm6);
+
+                mmv1 = _mm_add_pd(mmv1, mm0);
+                mmv2 = _mm_add_pd(mmv2, mm4);
+
+                temp_ptr  += 8;
+                right_ptr += 8;
+            }
+            //_Result.set_at(_row, _col, _value);
+            mmv1 = _mm_hadd_pd(mmv1, mmv2);
+            mmv1 = _mm_hadd_pd(mmv1, mmv1);
+            _mm_store_sd(out_ptr, mmv1);
+            //_mm_stream_pd(out_ptr, mmv1);
+            out_ptr += _newRows;
+            /*
+            __asm {
+                nop
+                emms
+            }
+            //*/
+    #else
+            for (int i=0; i<_oldCols/8; ++i) {
+                // prefetchnta [addr + offset]
+                _mm_prefetch((char *)(temp_ptr  + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
+                _mm_prefetch((char *)(right_ptr + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
+
+                mm0 = _mm_load_pd(temp_ptr );
+                mm1 = _mm_load_pd(right_ptr);
+
+                mm2 = _mm_load_pd(temp_ptr  + 2);
+                mm3 = _mm_load_pd(right_ptr + 2);
+
+                mm4 = _mm_load_pd(temp_ptr  + 4);
+                mm5 = _mm_load_pd(right_ptr + 4);
+
+                mm6 = _mm_load_pd(temp_ptr  + 6);
+                mm7 = _mm_load_pd(right_ptr + 6);
+
+                mm0 = _mm_mul_pd(mm0, mm1);
+                mm2 = _mm_mul_pd(mm2, mm3);
+
+                mm4 = _mm_mul_pd(mm4, mm5);
+                mm6 = _mm_mul_pd(mm6, mm7);
+
+                mm0 = _mm_hadd_pd(mm0, mm2);
+                mm0 = _mm_hadd_pd(mm0, mm0);
+
+                mmv = _mm_load_pd(&_value );
+
+                mm4 = _mm_hadd_pd(mm4, mm6);
+                mm4 = _mm_hadd_pd(mm4, mm4);
+
+                mm0 = _mm_add_pd(mm0, mm4);
+
+                _mm_store_sd((float *)&_value, mm0);
+
+                temp_ptr += 8;
+                right_ptr += 8;
+                //_value += (*temp_ptr++) * (*right_ptr++);
+            }
+            //_Result.set_at(_row, _col, _value);
+            (*out_ptr) = _value;
+            out_ptr += _newRows;
+    #endif
+        }
+    }
+
+  #else
+    value_type _value;
+    MatrixT<T> tmp_row(1, _oldCols);
+    register pointer tmp_rowdata;
+    register pointer right_colptr;
+    pointer out_ptr;
+
+    for (int _row=0; _row<_newRows; ++_row) {
+        tmp_row.copy_row(*this, _row);
+        out_ptr = _Result.get_data() + _row;
+        for (int _col=0; _col<_newCols; ++_col) {
+            _value = value_type(0.0);
+            tmp_rowdata  = tmp_row.get_data();
+            right_colptr = _Right.get_colptr(_col);
+            for (int i=0; i<_oldCols; ++i) {
+                //_value += get_at(i, k) * _Right.get_at(k, j);
+                //_value += tmp_rowdata[i] * right_colptr[i];
+                _value += (*tmp_rowdata++) * (*right_colptr++);
+            }
+            //_Result.set_at(_row, _col, _value);
+            (*out_ptr) = _value;
+            out_ptr += _newRows;
+        }
+    }
+  #endif
+#else  /* !_DONT_USE_MAT_MULT_SSE2 */
+    value_type temp;
+    register pointer left_ptr, out_ptr;
+    pointer right_ptr;
+    right_ptr = _Right.get_data();
+
+    for (int n_col=0; n_col<_newCols; ++n_col) {
+        out_ptr = _Result.get_data() + n_col * _newRows;
+        for (int n_row=0; n_row<_newRows; ++n_row) {
+            *out_ptr++ = value_type(0.0);
+        }
+        for (int r_row=0; r_row<_oldCols; ++r_row) {
+            temp = right_ptr[r_row + n_col * _oldCols];
+            if (temp > value_type(FLOAT_EPSINON) || temp < value_type(-FLOAT_EPSINON)) {
+                out_ptr  = _Result.get_data() + n_col * _newRows;
+                left_ptr = get_data() + r_row * _newRows;
+
+            #if (_MULT_SSE2_MODE == 0)      // pure c code
+                for (int s_row=0; s_row<_newRows; ++s_row) {
+                    (*out_ptr++) += temp * (*left_ptr++);
+                }
+            #elif (_MULT_SSE2_MODE == 1)    // asm SSE2 code
+                // call SSE2 asm routine
+                CalcArrayProducts_double_SSE2(out_ptr, left_ptr, &temp, _newRows);
+
+            #elif (_MULT_SSE2_MODE == 2)    // intel/vc.net inline SSE2 code
+                __m128d tmp;
+                __m128d mm1, mm2, mm3, mm4;
+#if USE_SEE2_WRITE_PREFRTCH
+                __m128d mma, mmb;
+#endif
+#if (DOUBLE_NUMS_PER_LOOP == 16)
+                __m128d mm5, mm6, mm7, mm8;
+#endif
+                tmp = _mm_setzero_pd();
+                tmp = _mm_loadl_pd(tmp, &temp);
+                tmp = _mm_shuffle_pd(tmp, tmp, 0);
+
+                for (int s_row=_newRows/DOUBLE_NUMS_PER_LOOP;
+                    s_row >= 0;
+                    out_ptr += DOUBLE_NUMS_PER_LOOP, left_ptr += DOUBLE_NUMS_PER_LOOP, --s_row) {
+#if USE_SEE2_WRITE_PREFRTCH
+                    // prefetchnta [addr + offset]
+                    _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
+                    _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
+
+                    mm1 = _mm_load_pd(left_ptr    );
+                    mm2 = _mm_load_pd(left_ptr + 2);
+
+                    mma = _mm_load_pd(out_ptr);
+                    mmb = _mm_load_pd(out_ptr + 2);
+
+                    mm1 = _mm_mul_pd(mm1, tmp);
+                    mm2 = _mm_mul_pd(mm2, tmp);
+
+                    mm3 = _mm_load_pd(left_ptr + 4);
+                    mm4 = _mm_load_pd(left_ptr + 6);
+
+                    mm3 = _mm_mul_pd(mm3, tmp);
+                    mm4 = _mm_mul_pd(mm4, tmp);
+
+                    mm1 = _mm_add_pd(mm1, mma);
+                    mm2 = _mm_add_pd(mm2, mmb);
+
+                    mm3 = _mm_add_pd(mm3, *((__m128d*)(out_ptr + 4)));
+                    mm4 = _mm_add_pd(mm4, *((__m128d*)(out_ptr + 6)));
+
+                    _mm_store_pd(out_ptr,     mm1);
+                    _mm_store_pd(out_ptr + 2, mm2);
+
+#if (DOUBLE_NUMS_PER_LOOP == 16)
+                    _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
+                    _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
+
+                    mm5 = _mm_load_pd(left_ptr + 8 );
+                    mm6 = _mm_load_pd(left_ptr + 10);
+#endif
+                    _mm_store_pd(out_ptr + 4, mm3);
+                    _mm_store_pd(out_ptr + 6, mm4);
+
+#if (DOUBLE_NUMS_PER_LOOP == 16)
+                    mma = _mm_load_pd(out_ptr + 8);
+                    mmb = _mm_load_pd(out_ptr + 10);
+
+                    mm5 = _mm_mul_pd(mm5, tmp);
+                    mm6 = _mm_mul_pd(mm6, tmp);
+
+                    mm7 = _mm_load_pd(left_ptr + 12);
+                    mm8 = _mm_load_pd(left_ptr + 14);
+
+                    mm5 = _mm_add_pd(mm5, mma);
+                    mm6 = _mm_add_pd(mm6, mmb);
+
+                    mm7 = _mm_mul_pd(mm7, tmp);
+                    mm8 = _mm_mul_pd(mm8, tmp);
+
+                    _mm_store_pd(out_ptr + 8,  mm5);
+                    _mm_store_pd(out_ptr + 10, mm6);
+
+                    mm7 = _mm_add_pd(mm7, *((__m128d*)(out_ptr + 12)));
+                    mm8 = _mm_add_pd(mm8, *((__m128d*)(out_ptr + 14)));
+
+                    _mm_store_pd(out_ptr + 12, mm7);
+                    _mm_store_pd(out_ptr + 14, mm8);
+#endif
+#else /* !USE_SEE2_WRITE_PREFRTCH */
+                    // prefetchnta [addr + offset]
+                    _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
+                    _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
+
+                    mm1 = _mm_load_pd(left_ptr    );
+                    mm2 = _mm_load_pd(left_ptr + 2);
+
+                    mm3 = _mm_load_pd(left_ptr + 4);
+                    mm4 = _mm_load_pd(left_ptr + 6);
+
+                    mm1 = _mm_mul_pd(mm1, tmp);
+                    mm2 = _mm_mul_pd(mm2, tmp);
+
+                    mm3 = _mm_mul_pd(mm3, tmp);
+                    mm4 = _mm_mul_pd(mm4, tmp);
+
+                    mm1 = _mm_add_pd(mm1, *((__m128d*)(out_ptr))    );
+                    mm2 = _mm_add_pd(mm2, *((__m128d*)(out_ptr + 2)));
+
+                    mm3 = _mm_add_pd(mm3, *((__m128d*)(out_ptr + 4)));
+                    mm4 = _mm_add_pd(mm4, *((__m128d*)(out_ptr + 6)));
+
+                    _mm_store_pd(out_ptr,     mm1);
+                    _mm_store_pd(out_ptr + 2, mm2);
+
+#if (DOUBLE_NUMS_PER_LOOP == 16)
+                    _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
+                    _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
+
+                    mm5 = _mm_load_pd(left_ptr + 8 );
+                    mm6 = _mm_load_pd(left_ptr + 10);
+#endif
+                    _mm_store_pd(out_ptr + 4, mm3);
+                    _mm_store_pd(out_ptr + 6, mm4);
+
+#if (DOUBLE_NUMS_PER_LOOP == 16)
+                    mm5 = _mm_mul_pd(mm5, tmp);
+                    mm6 = _mm_mul_pd(mm6, tmp);
+
+                    mm7 = _mm_load_pd(left_ptr + 12);
+                    mm8 = _mm_load_pd(left_ptr + 14);
+
+                    mm5 = _mm_add_pd(mm5, *((__m128d*)(out_ptr +  8)));
+                    mm6 = _mm_add_pd(mm6, *((__m128d*)(out_ptr + 10)));
+
+                    mm7 = _mm_mul_pd(mm7, tmp);
+                    mm8 = _mm_mul_pd(mm8, tmp);
+
+                    _mm_store_pd(out_ptr + 8,  mm5);
+                    _mm_store_pd(out_ptr + 10, mm6);
+
+                    mm7 = _mm_add_pd(mm7, *((__m128d*)(out_ptr + 12)));
+                    mm8 = _mm_add_pd(mm8, *((__m128d*)(out_ptr + 14)));
+
+                    _mm_store_pd(out_ptr + 12, mm7);
+                    _mm_store_pd(out_ptr + 14, mm8);
+#endif
+        #endif  /* !USE_SEE2_WRITE_PREFRTCH */
+                }
+    #endif  /* _MULT_SSE2_MODE other value */
+            }
+        }
+    }
+#endif /* !_DONT_USE_MAT_MULT_SSE2 */
+
+    return _Result;
+}
+
+#else  /* !_MATRIXT_MULT_TEST_ */
+
 template<typename T>
 inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
 {
@@ -1181,6 +1537,8 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
     // [D][E][F] * [I][J]  =  [D*G + E*I + F*K][D*H + E*J + F*L]
     //             [K][L]
     //
+if (typeid(value_type) == typeid(double)) {
+
 #if 1 & MATRIXT_FAST_MODE
   #if 1
     #if 1
@@ -1195,8 +1553,7 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
 #define DOUBLE_NUMS_PER_LOOP    16
 #define MM_PREFETCH_OFFSET      768
 #define MM_PREFETCH_OFFSET_V    (MM_PREFETCH_OFFSET/sizeof(value_type))
-
-if (typeid(value_type) == typeid(double)) {
+#define USE_SEE2_WRITE_PREFRTCH 1
 
     for (int n_col=0; n_col<_newCols; ++n_col) {
         out_ptr = _Result.get_data() + n_col * _newRows;
@@ -1224,6 +1581,9 @@ if (typeid(value_type) == typeid(double)) {
     #else
                 __m128d tmp;
                 __m128d mm1, mm2, mm3, mm4;
+        #if USE_SEE2_WRITE_PREFRTCH
+                __m128d mma, mmb;
+        #endif
 #if (DOUBLE_NUMS_PER_LOOP == 16)
                 __m128d mm5, mm6, mm7, mm8;
 #endif
@@ -1239,7 +1599,71 @@ if (typeid(value_type) == typeid(double)) {
                 for (; (out_ptr != NULL) && (out_ptr < end_ptr);
                     out_ptr+=DOUBLE_COUNT_PER_TIME, left_ptr+=DOUBLE_COUNT_PER_TIME) {
                 //*/
+        #if USE_SEE2_WRITE_PREFRTCH
+                    // prefetchnta [addr]
+                    _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
+                    _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
 
+                    mm1 = _mm_load_pd(left_ptr    );
+                    mm2 = _mm_load_pd(left_ptr + 2);
+
+                    mma = _mm_load_pd(out_ptr);
+                    mmb = _mm_load_pd(out_ptr + 2);
+
+                    mm1 = _mm_mul_pd(mm1, tmp);
+                    mm2 = _mm_mul_pd(mm2, tmp);
+
+                    mm3 = _mm_load_pd(left_ptr + 4);
+                    mm4 = _mm_load_pd(left_ptr + 6);
+
+                    mm3 = _mm_mul_pd(mm3, tmp);
+                    mm4 = _mm_mul_pd(mm4, tmp);
+
+                    mm1 = _mm_add_pd(mm1, mma);
+                    mm2 = _mm_add_pd(mm2, mmb);
+
+                    mm3 = _mm_add_pd(mm3, *((__m128d*)(out_ptr + 4)));
+                    mm4 = _mm_add_pd(mm4, *((__m128d*)(out_ptr + 6)));
+
+                    _mm_store_pd(out_ptr,     mm1);
+                    _mm_store_pd(out_ptr + 2, mm2);
+
+#if (DOUBLE_NUMS_PER_LOOP == 16)
+                    _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
+                    _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
+
+                    mm5 = _mm_load_pd(left_ptr + 8 );
+                    mm6 = _mm_load_pd(left_ptr + 10);
+#endif
+                    _mm_store_pd(out_ptr + 4, mm3);
+                    _mm_store_pd(out_ptr + 6, mm4);
+
+#if (DOUBLE_NUMS_PER_LOOP == 16)
+                    mma = _mm_load_pd(out_ptr + 8);
+                    mmb = _mm_load_pd(out_ptr + 10);
+
+                    mm5 = _mm_mul_pd(mm5, tmp);
+                    mm6 = _mm_mul_pd(mm6, tmp);
+
+                    mm7 = _mm_load_pd(left_ptr + 12);
+                    mm8 = _mm_load_pd(left_ptr + 14);
+
+                    mm5 = _mm_add_pd(mm5, mma);
+                    mm6 = _mm_add_pd(mm6, mmb);
+
+                    mm7 = _mm_mul_pd(mm7, tmp);
+                    mm8 = _mm_mul_pd(mm8, tmp);
+
+                    _mm_store_pd(out_ptr + 8,  mm5);
+                    _mm_store_pd(out_ptr + 10, mm6);
+
+                    mm7 = _mm_add_pd(mm7, *((__m128d*)(out_ptr + 12)));
+                    mm8 = _mm_add_pd(mm8, *((__m128d*)(out_ptr + 14)));
+
+                    _mm_store_pd(out_ptr + 12, mm7);
+                    _mm_store_pd(out_ptr + 14, mm8);
+#endif
+        #else /* !USE_SEE2_WRITE_PREFRTCH */
                     // prefetchnta [addr]
                     _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
                     _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
@@ -1297,12 +1721,9 @@ if (typeid(value_type) == typeid(double)) {
                     _mm_store_pd(out_ptr + 12, mm7);
                     _mm_store_pd(out_ptr + 14, mm8);
 #endif
+        #endif  /* !USE_SEE2_WRITE_PREFRTCH */
                     /*
                     __asm {
-                        nop
-                        nop
-                        nop
-                        nop
                         nop
                         emms
                     }
@@ -1369,7 +1790,7 @@ if (typeid(value_type) == typeid(double)) {
     pointer right_colptr;
 
     for (int _row=0; _row<_newRows; ++_row) {
-        tmp_row.copy_row(*this, n_row);
+        tmp_row.copy_row(*this, _row);
         for (int _col=0; _col<_newCols; ++_col) {
             _value1 = value_type(0.0);
             _value2 = value_type(0.0);
@@ -1383,7 +1804,7 @@ if (typeid(value_type) == typeid(double)) {
             }
             if (i < _oldCols)
                 _value1 = tmp_rowdata[i] * right_colptr[i];
-            _Result.set_at(n_row, _col, _value1 + _value2);
+            _Result.set_at(_row, _col, _value1 + _value2);
         }
     }
     #endif
@@ -1465,6 +1886,8 @@ if (typeid(value_type) == typeid(double)) {
 
     return _Result;
 }
+
+#endif  // !_MATRIXT_MULT_TEST_
 
 template<typename T>
 inline MatrixT<T>& MatrixT<T>::operator*=( value_type _value )
@@ -1904,7 +2327,7 @@ void MatrixT<T>::display( const TCHAR *szText )
         TRACE(_T("\t"));
         for (int c=0; c<cols; c++) {
             value_type value = get_at(r, c);
-            if (abs(value) < static_cast<T>(10000000.0))
+            if (fabs(value) < static_cast<T>(10000000.0))
                 TRACE(_T("%12.4f "), value);
             else
                 TRACE(_T("%12.4E "), value);
@@ -1988,7 +2411,7 @@ void MatrixT<T>::display_ex( const TCHAR *szText )
         TRACE(_T("\t"));
         for (int c=0; c<cols; c++) {
             value_type value = get_at(r, c);
-            if (abs(value) < static_cast<T>(10000000.0))
+            if (fabs(value) < static_cast<T>(10000000.0))
                 TRACE(_T("%12.4f "), value);
             else
                 TRACE(_T("%12.4E "), value);

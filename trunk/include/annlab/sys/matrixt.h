@@ -7,6 +7,11 @@
 #include <vector>
 #include <typeinfo.h>
 
+#include <math.h>
+#include <intrin.h>
+#include <xmmintrin.h>
+#include <emmintrin.h>
+
 using namespace std;
 
 #define MATRIXT_FAST_MODE       1
