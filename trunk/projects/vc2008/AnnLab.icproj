@@ -13,7 +13,7 @@
 				Name="CppCmplrTool"
 				GlobalOptimizations="true"
 				OptimizeForWindowsApplication="false"
-				GenerateAlternateCodePaths="5"
+				GenerateAlternateCodePaths="0"
 				UseProcessorExtensions="6"
 				UseIntelOptimizedHeaders="false"/>
 		</Configuration>

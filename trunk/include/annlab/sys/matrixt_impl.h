@@ -1095,83 +1095,6 @@ sse2_multiple_loop:
     }
 }
 
-template<typename T>
-inline
-#ifdef MULTIPLY_SSE2_NAKED
-__declspec(naked)
-#endif
-void MatrixT<T>::CalcArrayProducts_double_SSE2_( pointer dest,
-                                                pointer src,
-                                                pointer alpha,
-                                                unsigned int len )
-{
-    __asm {
-#ifdef MULTIPLY_SSE2_NAKED
-        push        ebp
-        mov         ebp, esp
-        push        edx
-        push        ecx
-        push        esi
-        push        edi
-
-        mov         edx, dword ptr [ebp + 10h]
-        mov         ecx, dword ptr [ebp + 14h]
-        mov         edi, dword ptr [ebp + 08h]
-        mov         esi, dword ptr [ebp + 0Ch]
-#else
-        mov         edx, alpha
-        mov         ecx, len
-        mov         edi, dest
-        mov         esi, src
-#endif
-
-        movlpd      xmm6, dword ptr [edx]           ; xmm6 = [0,     alpha]
-        shr         ecx, 2
-        shufpd      xmm6, xmm6, 00000010b           ; xmm6 = [alpha, alpha]
-
-//ALIGN 16                                            ; Align address of loop to a 16-byte boundary.
-
-sse2_multiple_loop:
-        //movsd
-        //mulsd
-        //addsd
-        movapd      xmm4, xmmword ptr [esi]         ; [src]
-        movapd      xmm5, xmmword ptr [esi + 16]    ; [src  + 16]
-
-        mulpd       xmm4, xmm6
-        movapd      xmm0, xmmword ptr [edi]         ; [dest]
-        mulpd       xmm5, xmm6
-        movapd      xmm1, xmmword ptr [edi + 16]    ; [dest + 16]
-
-        addpd       xmm0, xmm4
-        addpd       xmm1, xmm5
-
-        movapd      xmmword ptr [edi], xmm0
-        movapd      xmmword ptr [edi + 16], xmm1
-
-        //movntpd     xmmword ptr [edi], xmm0         ; [dest]
-        //movntpd     xmmword ptr [edi + 16], xmm1    ; [dest + 16]
-
-        add         edi, 32
-        add         esi, 32
-
-        dec         ecx
-        jne         sse2_multiple_loop
-
-        //sfence                                      ; Finish all memory writes.
-#ifdef MULTIPLY_SSE2_NAKED
-        pop         edi
-        pop         esi
-        pop         ecx
-        pop         edx
-        mov         esp, ebp
-        pop         ebp
-
-        ret
-#endif
-    }
-}
-
 #define _MM128_MEM(ptr)           (*((__m128* )(ptr))
 #define _MM128I_MEM(ptr)          (*((__m128i*)(ptr))
 #define _MM128D_MEM(ptr)          (*((__m128d*)(ptr))
@@ -1180,7 +1103,7 @@ sse2_multiple_loop:
 
 #if _MATRIXT_MULT_TEST_
 
-#define DOUBLE_NUMS_PER_LOOP     16
+#define DOUBLE_NUMS_PER_LOOP     8
 #define MM_PREFETCH_OFFSET       768
 #define MM_PREFETCH_OFFSET_V     (MM_PREFETCH_OFFSET/sizeof(value_type))
 #define USE_SEE2_WRITE_PREFRTCH  1
@@ -1359,9 +1282,20 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
                 left_ptr = get_data() + r_row * _newRows;
 
             #if (_MULT_SSE2_MODE == 0)      // pure c code
+                /*
+                __asm {
+                    nop
+                    emms
+                }  //*/
                 for (int s_row=0; s_row<_newRows; ++s_row) {
                     (*out_ptr++) += temp * (*left_ptr++);
                 }
+                /*
+                __asm {
+                    nop
+                    nop
+                    emms
+                }  //*/
             #elif (_MULT_SSE2_MODE == 1)    // asm SSE2 code
                 // call SSE2 asm routine
                 CalcArrayProducts_double_SSE2(out_ptr, left_ptr, &temp, _newRows);

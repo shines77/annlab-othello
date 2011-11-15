@@ -242,8 +242,6 @@ public:
 
     inline void CalcArrayProducts_double_SSE2( pointer dest, pointer src,
         pointer alpha, unsigned int len );
-    inline void CalcArrayProducts_double_SSE2_( pointer dest, pointer src,
-        pointer alpha, unsigned int len );
 
 protected:
     // methods
