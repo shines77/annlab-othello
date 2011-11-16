@@ -1104,11 +1104,11 @@ sse2_multiple_loop:
 #if _MATRIXT_MULT_TEST_
 
 #define DOUBLE_NUMS_PER_LOOP     8
-#define MM_PREFETCH_OFFSET       768
+#define MM_PREFETCH_OFFSET       1024
 #define MM_PREFETCH_OFFSET_V     (MM_PREFETCH_OFFSET/sizeof(value_type))
 #define USE_SEE2_WRITE_PREFRTCH  1
 
-#define _DONT_USE_MAT_MULT_SSE2  0
+#define _DONT_USE_MAT_MULT_SSE2  1
 /* 0=纯C代码, 1=ASM嵌入SSE2代码, 2=编译器级别SSE2代码, 3=其他(默认) */
 #define _MULT_SSE2_MODE          2
 
