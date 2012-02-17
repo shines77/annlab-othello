@@ -648,6 +648,56 @@ inline void MatrixT<T>::copy_row( const MatrixT<T>& src, int _row )
 }
 
 template<typename T>
+inline void MatrixT<T>::copy_row( const MatrixT<T>& src, int _row, int r_step, int _start_col, int c_step )
+{
+    const int _cols = src.cols;
+    pointer dest = get_data();
+
+    switch (_cols) {
+    default:
+#if 1
+        {
+            pointer src_ptr = src.get_data();
+            const int _rows = src.rows;
+            for (int i=0; i<_cols; ++i) {
+                //dest[i] = src.get_at(_row, i);
+                (*dest++) = *src_ptr;
+                src_ptr += _rows;
+            }
+        }
+        break;
+#else
+        int i,j;
+        for (i=0, j=1; j<_cols; i+=2, j+=2) {
+            dest[i] = src.get_at(_row, i); 
+            dest[j] = src.get_at(_row, j);
+        }
+
+        if (i < _cols) {
+            dest[i] = src.get_at(_row, i); 
+        }
+        break;
+#endif
+    case 8:
+      dest[7] = src.get_at(_row, 7);
+    case 7:
+      dest[6] = src.get_at(_row, 6);
+    case 6:
+      dest[5] = src.get_at(_row, 5);
+    case 5:
+      dest[4] = src.get_at(_row, 4);
+    case 4:
+      dest[3] = src.get_at(_row, 3);
+    case 3:
+      dest[2] = src.get_at(_row, 2);
+    case 2:
+      dest[1] = src.get_at(_row, 1);
+    case 1:
+      dest[0] = src.get_at(_row, 0);
+    }
+}
+
+template<typename T>
 inline void MatrixT<T>::copy_from_array( const_pointer _array )
 {
     __MY_ASSERT((_array != NULL), _T(""));
@@ -1128,7 +1178,7 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
 
 #if _DONT_USE_MAT_MULT_SSE2
   #if 1
-    //__declspec(align(16)) value_type _value;
+    __declspec(align(16)) value_type _value;
     //__declspec(align(16)) double _value128[2] = { 0.0, 0.0 };
     MatrixT<T> tmp_row(1, _oldCols);
     register pointer temp_ptr;
@@ -1136,7 +1186,7 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
     pointer out_ptr;
     __m128d mm0, mm1, mm2, mm3;
     __m128d mm4, mm5, mm6, mm7;
-    __m128d mmv1, mmv2;
+    __m128d mmv0, mmv1;
 
     for (int _row=0; _row<_newRows; ++_row) {
         tmp_row.copy_row(*this, _row);
@@ -1146,8 +1196,15 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
             temp_ptr  = tmp_row.get_data();
             right_ptr = _Right.get_colptr(_col);
     #if 1
+            /*
+            __asm {
+                nop
+                nop
+                emms
+            }
+            //*/
+            mmv0 = _mm_setzero_pd();
             mmv1 = _mm_setzero_pd();
-            mmv2 = _mm_setzero_pd();
             for (int i=0; i<_oldCols/8; ++i) {
                 // prefetchnta [addr + offset]
                 _mm_prefetch((char *)(temp_ptr  + 1024/8), _MM_HINT_NTA);
@@ -1174,16 +1231,21 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
                 mm0 = _mm_add_pd(mm0, mm2);
                 mm4 = _mm_add_pd(mm4, mm6);
 
-                mmv1 = _mm_add_pd(mmv1, mm0);
-                mmv2 = _mm_add_pd(mmv2, mm4);
+                mmv0 = _mm_add_pd(mmv0, mm0);
+                mmv1 = _mm_add_pd(mmv1, mm4);
+
+                // _value += get_at(i, k) * _Right.get_at(k, j);
+                // _value += tmp_rowdata[i] * right_colptr[i];
+                // _value += (*tmp_rowdata++) * (*right_colptr++);
 
                 temp_ptr  += 8;
                 right_ptr += 8;
             }
-            //_Result.set_at(_row, _col, _value);
-            mmv1 = _mm_hadd_pd(mmv1, mmv2);
-            mmv1 = _mm_hadd_pd(mmv1, mmv1);
-            _mm_store_sd(out_ptr, mmv1);
+            mmv0 = _mm_hadd_pd(mmv0, mmv1);
+            mmv0 = _mm_hadd_pd(mmv0, mmv0);
+            // _Result.set_at(_row, _col, _value);
+            // (*out_ptr) = _value;
+            _mm_store_sd(out_ptr, mmv0);
             //_mm_stream_pd(out_ptr, mmv1);
             out_ptr += _newRows;
             /*
@@ -1219,14 +1281,14 @@ inline MatrixT<T> MatrixT<T>::operator*( MatrixT<T>& _Right )
                 mm0 = _mm_hadd_pd(mm0, mm2);
                 mm0 = _mm_hadd_pd(mm0, mm0);
 
-                mmv = _mm_load_pd(&_value );
+                //mmv0 = _mm_load_pd(&_value );
 
                 mm4 = _mm_hadd_pd(mm4, mm6);
                 mm4 = _mm_hadd_pd(mm4, mm4);
 
                 mm0 = _mm_add_pd(mm0, mm4);
 
-                _mm_store_sd((float *)&_value, mm0);
+                _mm_store_sd((double *)&_value, mm0);
 
                 temp_ptr += 8;
                 right_ptr += 8;

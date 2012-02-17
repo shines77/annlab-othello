@@ -220,6 +220,7 @@ public:
     // get part of matrix
 
     inline void copy_row( const MatrixT<T>& src, int _row );
+    inline void copy_row( const MatrixT<T>& src, int _row, int r_step, int _start_col, int c_step );
 
     // 获取矩阵的指定行矩阵
     inline int get_row_vector( int _row, double* pVector ) const;
