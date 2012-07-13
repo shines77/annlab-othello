@@ -9,7 +9,7 @@
 #include "../../include/annlab/itimer_t.h"
 #include "../../include/annlab/sys/AnnList.h"
 #include "../../include/annlab/sys/AnnMatrix.h"
-#include "../../include/annlab/sys/matrixt.h"
+#include "../../include/annlab/sys/fastmatrix.h"
 #include "../../include/annlab/sys/matrix.h"
 #include "../../include/annlab/toolbox/matlab/elmat.h"
 #include "../../include/annlab/toolbox/nnet/nninit.h"
@@ -95,10 +95,10 @@ int CAnnLabDlg::Matrix_Test()
 
     // MatrixT
     // size and N are specified by the user on the command line
-    annlab::MatrixT<double> A = annlab::MatrixT<double>::_rands(size, size);
-    annlab::MatrixT<double> B = annlab::MatrixT<double>::_rands(size, size);
-    annlab::MatrixT<double> C = annlab::MatrixT<double>::_rands(size, size);
-    annlab::MatrixT<double> Z = annlab::MatrixT<double>::_zeros(size, size);
+    annlab::FastMatrix<double> A = annlab::FastMatrix<double>::_rands(size, size);
+    annlab::FastMatrix<double> B = annlab::FastMatrix<double>::_rands(size, size);
+    annlab::FastMatrix<double> C = annlab::FastMatrix<double>::_rands(size, size);
+    annlab::FastMatrix<double> Z = annlab::FastMatrix<double>::_zeros(size, size);
     int i;
 
     annlab::tickcount_t timer;
@@ -108,14 +108,14 @@ int CAnnLabDlg::Matrix_Test()
     for(i=0; i<N*10; ++i)
         Z = A + B;  //  or Z = A+B+C ... etc
 
-    _stprintf_s(szBuffer, _countof(szBuffer), _T("MatrixT: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N*10));
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("FastMatrix: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N*10));
     _tcscpy_s(szText, _countof(szText), szBuffer);
 
     timer.begin();
     for(i=0; i<N; ++i)
         Z = A * B;  //  or Z = A+B+C ... etc
 
-    _stprintf_s(szBuffer, _countof(szBuffer), _T("MatrixT: time taken for multiplication = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("FastMatrix: time taken for multiplication = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N));
     _tcscat_s(szText, _countof(szText), szBuffer);
 
     //::ShowMessage( GetSafeHwnd(), szText );
@@ -125,14 +125,14 @@ int CAnnLabDlg::Matrix_Test()
     for(i=0; i<N*10; ++i)
         Z = A + B + C;  //  or Z = A+B+C ... etc
 
-    _stprintf_s(szBuffer, _countof(szBuffer), _T("MatrixT: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N*10));
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("FastMatrix: time taken for addition = %0.5f sec(s).\r\n\r\n"), timer.end().seconds() / double(N*10));
     _tcscat_s(szText, _countof(szText), szBuffer);
 
     timer.begin();
     for(i=0; i<N; ++i)
         Z = A * B * C;  //  or Z = A+B+C ... etc
 
-    _stprintf_s(szBuffer, _countof(szBuffer), _T("MatrixT: time taken for multiplication = %0.5f sec(s)."), timer.end().seconds() / double(N));
+    _stprintf_s(szBuffer, _countof(szBuffer), _T("FastMatrix: time taken for multiplication = %0.5f sec(s)."), timer.end().seconds() / double(N));
     _tcscat_s(szText, _countof(szText), szBuffer);
 
     ::ShowMessage( GetSafeHwnd(), szText );
@@ -343,17 +343,17 @@ int CAnnLabDlg::BpNetwork_Test()
 	n = annlab::diag(m);
 	//n.display(_T("n = diag(m);"));
 
-    MatrixT<double> mt1;
+    FastMatrix<double> mt1;
     mt1.size();
     mt1.resize(4, 5);
 
-    MatrixT<double> mt2(5, 5);
+    FastMatrix<double> mt2(5, 5);
     //mt2.resize(4, 5);
     mt2[1][1] = 0.2783;
     mt2[2][2] = 3.32178E+64;
     mt2.display_ex();
 
-    MatrixT<int> mt3;
+    FastMatrix<int> mt3;
     mt3.set_name(_T("mt3"));
     mt3.resize(6, 6);
     mt3.fill(INIT_FCN_SPECIFIED, 3);
