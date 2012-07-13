@@ -1,12 +1,12 @@
 
-#if !defined(_FASTMATRIX_IMPL_internal_H_)
+#if !defined(_MATRIXT_IMPL_internal_H_)
 #error Do not #include this internal file directly; use matrixt.h header file instead.
 #endif
 
-#ifndef _FASTMATRIX_IMPL_H_
-#define _FASTMATRIX_IMPL_H_
+#ifndef _MATRIXT_IMPL_H_
+#define _MATRIXT_IMPL_H_
 
-#ifndef _FASTMATRIX_IMPL_internal_H_
+#ifndef _MATRIXT_IMPL_internal_H_
 namespace annlab {
 #endif
 
@@ -2483,8 +2483,8 @@ MATRIXT_DISPLAY_EX_FUNC_UNSIGNED(bool)
 #endif
 
 
-#ifndef _FASTMATRIX_IMPL_internal_H_
+#ifndef _MATRIXT_IMPL_internal_H_
 }  // namespace annlab
 #endif
 
-#endif  // _FASTMATRIX_IMPL_H_
+#endif  // _MATRIXT_IMPL_H_

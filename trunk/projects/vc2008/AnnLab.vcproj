@@ -616,19 +616,19 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\include\annlab\sys\fastmatrix.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\annlab\sys\fastmatrix_impl.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\include\annlab\sys\matrix-impl.h"
 						>
 					</File>
 					<File
 						RelativePath="..\..\include\annlab\sys\matrix.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\include\annlab\sys\matrixt.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\include\annlab\sys\matrixt_impl.h"
 						>
 					</File>
 					<File

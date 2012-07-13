@@ -1,6 +1,6 @@
 
 #if !defined(_FASTMATRIX_IMPL_internal_H_)
-#error Do not #include this internal file directly; use matrixt.h header file instead.
+#error Do not #include this internal file directly; use fastmatrix.h header file instead.
 #endif
 
 #ifndef _FASTMATRIX_IMPL_H_
@@ -59,7 +59,7 @@ FastMatrix<T>::FastMatrix( const TCHAR *szName, int _rows, int _cols,
 }
 
 template<typename T>
-FastMatrix<T>::FastMatrix( const MatrixT<T>& src )
+FastMatrix<T>::FastMatrix( const FastMatrix<T>& src )
 {
     initialize_ex(NULL, src.rows, src.cols);
     copy_from_array(src.get_data());
@@ -69,7 +69,7 @@ FastMatrix<T>::FastMatrix( const MatrixT<T>& src )
 }
 
 template<typename T>
-FastMatrix<T>::FastMatrix( const MatrixT<T>& src, bool b_copy_data )
+FastMatrix<T>::FastMatrix( const FastMatrix<T>& src, bool b_copy_data )
 {
     initialize_ex(NULL, src.rows, src.cols);
 
@@ -409,7 +409,7 @@ inline typename FastMatrix<T>::size_type FastMatrix<T>::sizes( void ) const
 //////////////////////////////////////////////////////////////////////
 
 template<typename T>
-inline bool FastMatrix<T>::is_same_size( const MatrixT<T>* target, int n /*= 0 */ )
+inline bool FastMatrix<T>::is_same_size( const FastMatrix<T>* target, int n /*= 0 */ )
 {
     if (target != NULL) {
         if (n == 1)
@@ -429,7 +429,7 @@ inline bool FastMatrix<T>::is_same_size( const MatrixT<T>* target, int n /*= 0 *
 //////////////////////////////////////////////////////////////////////
 
 template<typename T>
-inline bool FastMatrix<T>::is_same_sizes( const MatrixT<T>& target )
+inline bool FastMatrix<T>::is_same_sizes( const FastMatrix<T>& target )
 {
     return (rows == target.rows && cols == target.cols);
 }
@@ -598,7 +598,7 @@ inline void FastMatrix<T>::copy_big_data( pointer dest, const_pointer src, int _
 }
 
 template<typename T>
-inline void FastMatrix<T>::copy_row( const MatrixT<T>& src, int _row )
+inline void FastMatrix<T>::copy_row( const FastMatrix<T>& src, int _row )
 {
     const int _cols = src.cols;
     pointer dest = get_data();
@@ -648,7 +648,7 @@ inline void FastMatrix<T>::copy_row( const MatrixT<T>& src, int _row )
 }
 
 template<typename T>
-inline void FastMatrix<T>::copy_row( const MatrixT<T>& src, int _row, int r_step, int _start_col, int c_step )
+inline void FastMatrix<T>::copy_row( const FastMatrix<T>& src, int _row, int r_step, int _start_col, int c_step )
 {
     const int _cols = src.cols;
     pointer dest = get_data();
@@ -732,13 +732,13 @@ FastMatrix<T>::copy_from_array_s( const_pointer _array, size_type _size )
 }
 
 template<typename T>
-inline FastMatrix<T>* FastMatrix<T>::clone( const MatrixT<T>* src )
+inline FastMatrix<T>* FastMatrix<T>::clone( const FastMatrix<T>* src )
 {
     return NULL;
 }
 
 template<typename T>
-inline FastMatrix<T>* FastMatrix<T>::copy( const MatrixT<T>* src )
+inline FastMatrix<T>* FastMatrix<T>::copy( const FastMatrix<T>* src )
 {
     resize(src->rows, src->cols);
     copy_from_array(src->get_data());
@@ -867,7 +867,7 @@ inline FastMatrix<T>& FastMatrix<T>::operator = ( value_type _value )
 }
 
 template<typename T>
-inline FastMatrix<T>& FastMatrix<T>::operator = ( MatrixT<T>& _Right )
+inline FastMatrix<T>& FastMatrix<T>::operator = ( FastMatrix<T>& _Right )
 {
     if ((&_Right) == this || (pvData == _Right.get_data() && pvData != NULL))
         return *this;
@@ -894,7 +894,7 @@ inline FastMatrix<T> FastMatrix<T>::operator+( value_type _value )
     // Matrix addition
 #if MATRIXT_FAST_MODE
     // Copy the current matrix
-    MatrixT<T> _Result((MatrixT<T> &)*this);
+    FastMatrix<T> _Result((FastMatrix<T> &)*this);
 
     int _length       = _Result.sizes();
     value_type *pData = _Result.get_data();
@@ -906,7 +906,7 @@ inline FastMatrix<T> FastMatrix<T>::operator+( value_type _value )
     }
 #else
     // Create the result matrix
-    MatrixT<T> _Result(rows, cols);
+    FastMatrix<T> _Result(rows, cols);
 
     for (int i=0; i<rows; ++i) {
         for (int j=0; j<cols; ++j)
@@ -918,10 +918,10 @@ inline FastMatrix<T> FastMatrix<T>::operator+( value_type _value )
 }
 
 template<typename T>
-inline FastMatrix<T> FastMatrix<T>::operator+( MatrixT<T>& _Right )
+inline FastMatrix<T> FastMatrix<T>::operator+( FastMatrix<T>& _Right )
 {
     // Copy the current matrix
-    MatrixT<T> _Result((MatrixT<T> &)*this);
+    FastMatrix<T> _Result((FastMatrix<T> &)*this);
 #if _DEBUG
     if (_Right.is_empty())
         return _Result;
@@ -1003,7 +1003,7 @@ inline FastMatrix<T>& FastMatrix<T>::operator+=( value_type _value )
 }
 
 template<typename T>
-inline FastMatrix<T>& FastMatrix<T>::operator+=( MatrixT<T>& _Right )
+inline FastMatrix<T>& FastMatrix<T>::operator+=( FastMatrix<T>& _Right )
 {
 #if _DEBUG
     if (_Right.is_empty())
@@ -1048,7 +1048,7 @@ template<typename T>
 inline FastMatrix<T> FastMatrix<T>::operator*( value_type _value )
 {
     // Copy the current matrix
-    MatrixT<T> _Result((MatrixT<T> &)_Right);
+    FastMatrix<T> _Result((FastMatrix<T> &)_Right);
 
     int _length       = _Result.sizes();
     value_type *pData = _Result.get_data();
@@ -1163,7 +1163,7 @@ sse2_multiple_loop:
 #define _MULT_SSE2_MODE          2
 
 template<typename T>
-inline FastMatrix<T> FastMatrix<T>::operator*( MatrixT<T>& _Right )
+inline FastMatrix<T> FastMatrix<T>::operator*( FastMatrix<T>& _Right )
 {
     // 首先检查乘矩阵的列数和被乘矩阵的行数是否相同
     __ANNLAB_ASSERT(cols == _Right.rows);
@@ -1174,13 +1174,13 @@ inline FastMatrix<T> FastMatrix<T>::operator*( MatrixT<T>& _Right )
     _oldCols = cols;
 
     // 创建目标乘积矩阵
-    MatrixT<T> _Result(_newRows, _newCols);
+    FastMatrix<T> _Result(_newRows, _newCols);
 
 #if _DONT_USE_MAT_MULT_SSE2
   #if 1
-    __declspec(align(16)) value_type _value;
+    //__declspec(align(16)) value_type _value;
     //__declspec(align(16)) double _value128[2] = { 0.0, 0.0 };
-    MatrixT<T> tmp_row(1, _oldCols);
+    FastMatrix<T> tmp_row(1, _oldCols);
     register pointer temp_ptr;
     register pointer right_ptr;
     pointer out_ptr;
@@ -1303,7 +1303,7 @@ inline FastMatrix<T> FastMatrix<T>::operator*( MatrixT<T>& _Right )
 
   #else
     value_type _value;
-    MatrixT<T> tmp_row(1, _oldCols);
+    FastMatrix<T> tmp_row(1, _oldCols);
     register pointer tmp_rowdata;
     register pointer right_colptr;
     pointer out_ptr;
@@ -1514,7 +1514,7 @@ inline FastMatrix<T> FastMatrix<T>::operator*( MatrixT<T>& _Right )
 #else  /* !_MATRIXT_MULT_TEST_ */
 
 template<typename T>
-inline FastMatrix<T> FastMatrix<T>::operator*( MatrixT<T>& _Right )
+inline FastMatrix<T> FastMatrix<T>::operator*( FastMatrix<T>& _Right )
 {
     // 首先检查乘矩阵的列数和被乘矩阵的行数是否相同
     __ANNLAB_ASSERT(cols == _Right.rows);
@@ -1525,7 +1525,7 @@ inline FastMatrix<T> FastMatrix<T>::operator*( MatrixT<T>& _Right )
     _oldCols = cols;
 
     // 创建目标乘积矩阵
-    MatrixT<T> _Result(_newRows, _newCols);
+    FastMatrix<T> _Result(_newRows, _newCols);
 
     // Matrix multiplication，即
     //
@@ -1781,7 +1781,7 @@ if (typeid(value_type) == typeid(double)) {
       #endif
     #else
     value_type _value1, _value2;
-    MatrixT<T> tmp_row(1, _oldCols);
+    FastMatrix<T> tmp_row(1, _oldCols);
     pointer tmp_rowdata;
     pointer right_colptr;
 
@@ -1899,13 +1899,13 @@ inline FastMatrix<T>& FastMatrix<T>::operator*=( value_type _value )
 }
 
 template<typename T>
-inline FastMatrix<T>& FastMatrix<T>::operator*=( MatrixT<T>& _Right )
+inline FastMatrix<T>& FastMatrix<T>::operator*=( FastMatrix<T>& _Right )
 {
     // 首先检查乘矩阵的行数和被乘矩阵的列数是否相同
     __ANNLAB_ASSERT(cols == _Right.rows);
 
     // Copy the current matrix
-    MatrixT<T> _Left((MatrixT<T> &)*this);
+    FastMatrix<T> _Left((FastMatrix<T> &)*this);
 
     int _newRows, _newCols, _oldCols;
     _newRows = rows;
@@ -1954,7 +1954,7 @@ inline FastMatrix<T>& FastMatrix<T>::transpose( void )
         }
     }
     else {
-        MatrixT<T> _trans((MatrixT<T> &)*this);
+        FastMatrix<T> _trans((FastMatrix<T> &)*this);
         // 转置各元素
         for (int i=0; i<rows; ++i) {
             for (int j=0; j<cols; ++j)
@@ -2000,7 +2000,7 @@ template<typename T>
 inline FastMatrix<T> FastMatrix<T>::_zeros( int _rows, int _cols )
 {
     // Copy the current matrix
-    MatrixT<T> _zeros(_rows, _cols);
+    FastMatrix<T> _zeros(_rows, _cols);
 
     // 所有元素置0
     for (int i=0; i<_rows; ++i) {
@@ -2015,7 +2015,7 @@ template<typename T>
 inline FastMatrix<T> FastMatrix<T>::_ones( int _rows, int _cols )
 {
     // Copy the current matrix
-    MatrixT<T> _ones(_rows, _cols);
+    FastMatrix<T> _ones(_rows, _cols);
 
     // 所有元素置1
     for (int i=0; i<_rows; ++i) {
@@ -2030,7 +2030,7 @@ template<typename T>
 inline FastMatrix<T> FastMatrix<T>::_rands( int _rows, int _cols )
 {
     // Copy the current matrix
-    MatrixT<T> _rands(_rows, _cols);
+    FastMatrix<T> _rands(_rows, _cols);
 
     // 所有元素置[-1,1]的随机数
     value_type _fRndNum;

@@ -1,6 +1,6 @@
 
-#ifndef _FASTMATRIX_H_
-#define _FASTMATRIX_H_
+#ifndef _MATRIXT_H_
+#define _MATRIXT_H_
 
 #include "../annlab_stddef.h"
 #include <list>
@@ -269,10 +269,10 @@ private:
     //
 };
 
-#define _FASTMATRIX_IMPL_internal_H_
-#include "fastmatrix_impl.h"
-#undef  _FASTMATRIX_IMPL_internal_H_
+#define _MATRIXT_IMPL_internal_H_
+#include "matrixt_impl.h"
+#undef  _MATRIXT_IMPL_internal_H_
 
 }  // namespace annlab
 
-#endif  // _FASTMATRIX_H_
+#endif  // _MATRIXT_H_
