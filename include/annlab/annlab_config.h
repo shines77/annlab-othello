@@ -42,7 +42,7 @@
 #ifdef _DEBUG
 #define ANNLAB_USE_ASSERT       1
 #define ANNLAB_USE_TRACE        1
-#define ANNLAB_USE_DISPLAY      0
+#define ANNLAB_USE_DISPLAY      1
 #define ANNLAB_USE_DISPLAY_EX   1
 #endif
 

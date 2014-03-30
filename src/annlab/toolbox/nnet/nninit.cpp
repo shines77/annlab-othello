@@ -175,7 +175,7 @@ int initnw( CAnnNetwork *net,
 	_weights.display(szText);
 
 	// b = w*my+b;
-	_biases  = _weights * my + _biases;
+	_biases = _weights * my + _biases;
 	_stprintf_s(szText, _countof(szText), _T("_biases[%d]"), _index);
 	_biases.display(szText);
 

@@ -11,83 +11,83 @@ namespace annlab {
 #endif
 
 template<typename T>
-FastMatrix<T>::FastMatrix( void ) :
+FastMatrix<T>::FastMatrix(void) :
     pvData(NULL), ppvCol(NULL), pvAlloc(NULL), ppvColAlloc(NULL),
     rows(0), cols(0), totals(0), totals_actual(0), alloc_size(0)
 {
 }
 
 template<typename T>
-FastMatrix<T>::FastMatrix( int _size )
+FastMatrix<T>::FastMatrix(int _size)
 {
-    initialize(_size, _size);
+    init(_size, _size);
 }
 
 template<typename T>
-FastMatrix<T>::FastMatrix( int _rows, int _cols)
+FastMatrix<T>::FastMatrix(int _rows, int _cols)
 {
-    initialize(_rows, _cols);
+    init(_rows, _cols);
 }
 
 template<typename T>
-FastMatrix<T>::FastMatrix( int _rows, int _cols, const value_type& _x )
+FastMatrix<T>::FastMatrix(int _rows, int _cols, const value_type& _x)
 {
-    initialize(_rows, _cols);
+    init(_rows, _cols);
     set_by_scalar(_x);
 }
 
 template<typename T>
-FastMatrix<T>::FastMatrix( int _rows, int _cols, const value_type* _array )
+FastMatrix<T>::FastMatrix(int _rows, int _cols, const value_type* _array)
 {
-    initialize(_rows, _cols);
+    init(_rows, _cols);
     copy_from_array(_array);
 }
 
 template<typename T>
-FastMatrix<T>::FastMatrix( int _rows, int _cols, int _initFcn,
+FastMatrix<T>::FastMatrix(int _rows, int _cols, int _initFcn,
                     value_type _fillVal /*= value_type(0.0)*/)
 {
-    initialize(_rows, _cols, _initFcn, value_type(0.0) );
+    init(_rows, _cols, _initFcn, value_type(0.0));
 }
 
 template<typename T>
-FastMatrix<T>::FastMatrix( const TCHAR *szName, int _rows, int _cols,
+FastMatrix<T>::FastMatrix(const TCHAR *szName, int _rows, int _cols,
                     int _initFcn /*= INIT_FCN_DEFAULT */,
-                    value_type _fillVal /*= value_type(0.0)*/ )
+                    value_type _fillVal /*= value_type(0.0)*/)
 {
-    initialize_ex(szName, _rows, _cols, _initFcn, _fillVal);
+    init_ex(szName, _rows, _cols, _initFcn, _fillVal);
 }
 
 template<typename T>
-FastMatrix<T>::FastMatrix( const FastMatrix<T>& src )
+FastMatrix<T>::FastMatrix(const FastMatrix<T>& src)
 {
-    initialize_ex(NULL, src.rows, src.cols);
+    init_ex(NULL, src.rows, src.cols);
     copy_from_array(src.get_data());
 
-    //MatrixT<T>* pMatrix = copy( &src );
+    //MatrixT<T>* pMatrix = copy(&src);
     //ASSERT(pMatrix != NULL);
 }
 
 template<typename T>
-FastMatrix<T>::FastMatrix( const FastMatrix<T>& src, bool b_copy_data )
+FastMatrix<T>::FastMatrix(const FastMatrix<T>& src, bool b_copy_data)
 {
-    initialize_ex(NULL, src.rows, src.cols);
+    init_ex(NULL, src.rows, src.cols);
 
     if (b_copy_data) {
         copy_from_array(src.get_data());
-        //MatrixT<T>* pMatrix = copy( &src );
+        //MatrixT<T>* pMatrix = copy(&src);
         //ASSERT(pMatrix != NULL);
     }
 }
 
 template<typename T>
-FastMatrix<T>::~FastMatrix( void )
+FastMatrix<T>::~FastMatrix(void)
 {
     destroy_data();
 }
 
 template<typename T>
-inline void FastMatrix<T>::destroy_data( void )
+inline void FastMatrix<T>::destroy_data(void)
 {
     if (pvAlloc != NULL) {
         delete[] pvAlloc;
@@ -97,7 +97,7 @@ inline void FastMatrix<T>::destroy_data( void )
 }
 
 template<typename T>
-inline void FastMatrix<T>::destroy( void )
+inline void FastMatrix<T>::destroy(void)
 {
     if (pvAlloc != NULL) {
         delete[] pvAlloc;
@@ -117,23 +117,23 @@ inline void FastMatrix<T>::destroy( void )
 
 /* Notice: use the function carefully! */
 template<typename T>
-inline void FastMatrix<T>::free( void )
+inline void FastMatrix<T>::free(void)
 {
     destroy();
 }
 
 template<typename T>
-inline void FastMatrix<T>::initialize( int _rows, int _cols,
-                                   int _initFcn /*= INIT_FCN_DEFAULT*/,
-                                   value_type _fillVal /*= 0.0*/ )
+inline void FastMatrix<T>::init(int _rows, int _cols,
+                                int _initFcn /*= INIT_FCN_DEFAULT*/,
+                                value_type _fillVal /*= 0.0*/)
 {
-    initialize_ex(NULL, _rows, _cols, _initFcn, _fillVal);
+    init_ex(NULL, _rows, _cols, _initFcn, _fillVal);
 }
 
 template<typename T>
-void FastMatrix<T>::initialize_ex( const TCHAR *szName, int _rows, int _cols,
-                               int _initFcn /*= INIT_FCN_DEFAULT*/,
-                               value_type _fillVal /*= 0.0*/ )
+void FastMatrix<T>::init_ex(const TCHAR *szName, int _rows, int _cols,
+                            int _initFcn /*= INIT_FCN_DEFAULT*/,
+                            value_type _fillVal /*= 0.0*/)
 {
     size_type _alloc_size;
     int _totals;
@@ -197,10 +197,10 @@ void FastMatrix<T>::initialize_ex( const TCHAR *szName, int _rows, int _cols,
 }
 
 template<typename T>
-void FastMatrix<T>::init_martix( int _rows, int _cols,
+void FastMatrix<T>::init_martix(int _rows, int _cols,
                              int _initMode /*= INIT_TYPE_NONE*/,
                              int _initFcn /*= MAT_INIT_DEFAULT */,
-                             value_type _fillVal /*= value_type(0.0)*/ )
+                             value_type _fillVal /*= value_type(0.0)*/)
 {
     size_type _alloc_size;
     int _totals;
@@ -277,9 +277,9 @@ void FastMatrix<T>::init_martix( int _rows, int _cols,
 }
 
 template<typename T>
-void FastMatrix<T>::reserve_and_fill_data( pointer pvNewData, int _rows, int _cols,
+void FastMatrix<T>::reserve_and_fill_data(pointer pvNewData, int _rows, int _cols,
                                        int _initFcn /*= MAT_INIT_DEFAULT */,
-                                       value_type _fillVal /*= 0.0*/ )
+                                       value_type _fillVal /*= 0.0*/)
 {
     ASSERT(pvData != NULL && pvNewData != NULL);
     if (pvData == NULL || pvNewData == NULL)
@@ -351,14 +351,22 @@ void FastMatrix<T>::reserve_and_fill_data( pointer pvNewData, int _rows, int _co
 }
 
 template<typename T>
-void FastMatrix<T>::fill( int _initFcn /*= INIT_FCN_DEFAULT */,
-                       value_type _fillVal /*= value_type(0.0)*/ )
+void FastMatrix<T>::fill(int _initFcn /*= INIT_FCN_DEFAULT */,
+                         value_type _fillVal /*= value_type(0.0)*/)
 {
     fill_data(cols, rows, _initFcn, _fillVal);
 }
 
 template<typename T>
-inline bool FastMatrix<T>::is_empty( void ) const
+inline int FastMatrix<T>::refill(int _initFcn, value_type _fillVal /*= 0.0*/)
+{
+    int _totals = rows * cols;
+    fill_data(rows, cols, _initFcn, _fillVal);
+    return _totals;
+}
+
+template<typename T>
+inline bool FastMatrix<T>::is_empty(void) const
 {
     return (sizes() == 0);
 }
@@ -374,7 +382,7 @@ inline bool FastMatrix<T>::is_empty( void ) const
 //////////////////////////////////////////////////////////////////////
 
 template <typename T>
-inline typename FastMatrix<T>::size_type FastMatrix<T>::size( int n /*= 0 */ ) const
+inline typename FastMatrix<T>::size_type FastMatrix<T>::size(int n /*= 0 */) const
 {
     size_type _size;
     if (n == 1)
@@ -393,7 +401,7 @@ inline typename FastMatrix<T>::size_type FastMatrix<T>::size( int n /*= 0 */ ) c
 //////////////////////////////////////////////////////////////////////
 
 template<typename T>
-inline typename FastMatrix<T>::size_type FastMatrix<T>::sizes( void ) const
+inline typename FastMatrix<T>::size_type FastMatrix<T>::sizes(void) const
 {
     return totals;
 }
@@ -409,7 +417,7 @@ inline typename FastMatrix<T>::size_type FastMatrix<T>::sizes( void ) const
 //////////////////////////////////////////////////////////////////////
 
 template<typename T>
-inline bool FastMatrix<T>::is_same_size( const FastMatrix<T>* target, int n /*= 0 */ )
+inline bool FastMatrix<T>::is_same_size(const FastMatrix<T>* target, int n /*= 0 */)
 {
     if (target != NULL) {
         if (n == 1)
@@ -429,13 +437,13 @@ inline bool FastMatrix<T>::is_same_size( const FastMatrix<T>* target, int n /*= 
 //////////////////////////////////////////////////////////////////////
 
 template<typename T>
-inline bool FastMatrix<T>::is_same_sizes( const FastMatrix<T>& target )
+inline bool FastMatrix<T>::is_same_sizes(const FastMatrix<T>& target)
 {
     return (rows == target.rows && cols == target.cols);
 }
 
 template<typename T>
-inline int FastMatrix<T>::resize( int _rows, int _cols )
+inline int FastMatrix<T>::resize(int _rows, int _cols)
 {
     if (rows == _rows && cols == _cols)
         return totals;
@@ -480,9 +488,9 @@ inline int FastMatrix<T>::resize( int _rows, int _cols )
 }
 
 template<typename T>
-inline int FastMatrix<T>::resize_ex( int _rows, int _cols,
-                                 int _initFcn /*= MAT_INIT_DEFAULT */,
-                                 value_type _fillVal /*= 0.0*/ )
+inline int FastMatrix<T>::resize_ex(int _rows, int _cols,
+                                    int _initFcn /*= MAT_INIT_DEFAULT */,
+                                    value_type _fillVal /*= 0.0*/)
 {
     if (rows == _rows && cols == _cols) {
         if (_initFcn != INIT_FCN_NONE)
@@ -491,12 +499,12 @@ inline int FastMatrix<T>::resize_ex( int _rows, int _cols,
     }
 
     destroy();
-    initialize(_rows, _cols, _fillVal, _initFcn);
+    init(_rows, _cols, _fillVal, _initFcn);
     return totals;
 }
 
 template<typename T>
-inline void FastMatrix<T>::copy_data( pointer dest, const_pointer src, int _totals )
+inline void FastMatrix<T>::copy_data(pointer dest, const_pointer src, int _totals)
 {
     switch (totals)
     {
@@ -523,7 +531,7 @@ inline void FastMatrix<T>::copy_data( pointer dest, const_pointer src, int _tota
 }
 
 template<typename T>
-inline void FastMatrix<T>::copy_big_data( pointer dest, const_pointer src, int _totals )
+inline void FastMatrix<T>::copy_big_data(pointer dest, const_pointer src, int _totals)
 {
     switch (totals)
     {
@@ -598,7 +606,7 @@ inline void FastMatrix<T>::copy_big_data( pointer dest, const_pointer src, int _
 }
 
 template<typename T>
-inline void FastMatrix<T>::copy_row( const FastMatrix<T>& src, int _row )
+inline void FastMatrix<T>::copy_row(const FastMatrix<T>& src, int _row)
 {
     const int _cols = src.cols;
     pointer dest = get_data();
@@ -648,7 +656,7 @@ inline void FastMatrix<T>::copy_row( const FastMatrix<T>& src, int _row )
 }
 
 template<typename T>
-inline void FastMatrix<T>::copy_row( const FastMatrix<T>& src, int _row, int r_step, int _start_col, int c_step )
+inline void FastMatrix<T>::copy_row(const FastMatrix<T>& src, int _row, int r_step, int _start_col, int c_step)
 {
     const int _cols = src.cols;
     pointer dest = get_data();
@@ -698,7 +706,7 @@ inline void FastMatrix<T>::copy_row( const FastMatrix<T>& src, int _row, int r_s
 }
 
 template<typename T>
-inline void FastMatrix<T>::copy_from_array( const_pointer _array )
+inline void FastMatrix<T>::copy_from_array(const_pointer _array)
 {
     __MY_ASSERT((_array != NULL), _T(""));
 
@@ -711,7 +719,7 @@ inline void FastMatrix<T>::copy_from_array( const_pointer _array )
 }
 
 template<typename T>
-inline void FastMatrix<T>::set_by_scalar( const_value_type _x )
+inline void FastMatrix<T>::set_by_scalar(const_value_type _x)
 {
     __MY_ASSERT((_array != NULL), _T(""));
 
@@ -721,7 +729,7 @@ inline void FastMatrix<T>::set_by_scalar( const_value_type _x )
 
 template<typename T>
 inline typename FastMatrix<T>::size_type
-FastMatrix<T>::copy_from_array_s( const_pointer _array, size_type _size )
+FastMatrix<T>::copy_from_array_s(const_pointer _array, size_type _size)
 {
     __MY_ASSERT((_array != NULL), _T(""));
 
@@ -732,13 +740,13 @@ FastMatrix<T>::copy_from_array_s( const_pointer _array, size_type _size )
 }
 
 template<typename T>
-inline FastMatrix<T>* FastMatrix<T>::clone( const FastMatrix<T>* src )
+inline FastMatrix<T>* FastMatrix<T>::clone(const FastMatrix<T>* src)
 {
     return NULL;
 }
 
 template<typename T>
-inline FastMatrix<T>* FastMatrix<T>::copy( const FastMatrix<T>* src )
+inline FastMatrix<T>* FastMatrix<T>::copy(const FastMatrix<T>* src)
 {
     resize(src->rows, src->cols);
     copy_from_array(src->get_data());
@@ -746,37 +754,37 @@ inline FastMatrix<T>* FastMatrix<T>::copy( const FastMatrix<T>* src )
 }
 
 template<typename T>
-inline typename FastMatrix<T>::value_type& FastMatrix<T>::get_at( int _index )
+inline typename FastMatrix<T>::value_type& FastMatrix<T>::get_at(int _index)
 {
     return pvData[_index];
 }
 
 template<typename T>
-inline typename FastMatrix<T>::value_type FastMatrix<T>::get_at( int _index ) const
+inline typename FastMatrix<T>::value_type FastMatrix<T>::get_at(int _index) const
 {
     return pvData[_index];
 }
 
 template<typename T>
-inline typename FastMatrix<T>::value_type& FastMatrix<T>::get_at( int _row, int _col )
+inline typename FastMatrix<T>::value_type& FastMatrix<T>::get_at(int _row, int _col)
 {
     return pvData[_col * rows + _row];
 }
 
 template<typename T>
-inline typename FastMatrix<T>::value_type FastMatrix<T>::get_at( int _row, int _col ) const
+inline typename FastMatrix<T>::value_type FastMatrix<T>::get_at(int _row, int _col) const
 {
     return pvData[_col * rows + _row];
 }
 
 template<typename T>
-inline void FastMatrix<T>::set_at( int _index, const value_type _value )
+inline void FastMatrix<T>::set_at(int _index, const value_type _value)
 {
     pvData[_index] = _value;
 }
 
 template<typename T>
-inline void FastMatrix<T>::set_at( int _row, int _col, const value_type _value )
+inline void FastMatrix<T>::set_at(int _row, int _col, const value_type _value)
 {
     pvData[_col * rows + _row] = _value;
 }
@@ -794,67 +802,67 @@ inline FastMatrix<T>::operator const T*() const
 }
 
 template<typename T>
-inline typename FastMatrix<T>::pointer FastMatrix<T>::operator[]( int _row )
+inline typename FastMatrix<T>::pointer FastMatrix<T>::operator[](int _row)
 {
     return ppvCol[_row];
 }
 
 template<typename T>
-inline typename FastMatrix<T>::const_pointer FastMatrix<T>::operator[]( int _row ) const
+inline typename FastMatrix<T>::const_pointer FastMatrix<T>::operator[](int _row) const
 {
     return ppvCol[_row];
 }
 
 template<typename T>
-inline typename FastMatrix<T>::reference FastMatrix<T>::operator()( int _index )
+inline typename FastMatrix<T>::reference FastMatrix<T>::operator()(int _index)
 {
     return pvData[_index];
 }
 
 template<typename T>
-inline typename FastMatrix<T>::value_type FastMatrix<T>::operator()( int _index ) const
+inline typename FastMatrix<T>::value_type FastMatrix<T>::operator()(int _index) const
 {
     return pvData[_index];
 }
 
 template<typename T>
-inline typename FastMatrix<T>::reference FastMatrix<T>::operator()( int _row, int _col )
+inline typename FastMatrix<T>::reference FastMatrix<T>::operator()(int _row, int _col)
 {
     return pvData[_col * rows + _row];
 }
 
 template<typename T>
-inline typename FastMatrix<T>::value_type FastMatrix<T>::operator()( int _row, int _col ) const
+inline typename FastMatrix<T>::value_type FastMatrix<T>::operator()(int _row, int _col) const
 {
     return pvData[_col * rows + _row];
 }
 
 template<typename T>
-inline typename FastMatrix<T>::pointer FastMatrix<T>::get_rowptr( int _row )
+inline typename FastMatrix<T>::pointer FastMatrix<T>::get_rowptr(int _row)
 {
     return &(pvData[_row * cols]);
 }
 
 template<typename T>
-inline typename FastMatrix<T>::const_pointer FastMatrix<T>::get_rowptr( int _row ) const
+inline typename FastMatrix<T>::const_pointer FastMatrix<T>::get_rowptr(int _row) const
 {
     return const_pointer(&(pvData[_row * cols]));
 }
 
 template<typename T>
-inline typename FastMatrix<T>::pointer FastMatrix<T>::get_colptr( int _col )
+inline typename FastMatrix<T>::pointer FastMatrix<T>::get_colptr(int _col)
 {
     return &(pvData[_col * rows]);
 }
 
 template<typename T>
-inline typename FastMatrix<T>::const_pointer FastMatrix<T>::get_colptr( int _col ) const
+inline typename FastMatrix<T>::const_pointer FastMatrix<T>::get_colptr(int _col) const
 {
     return const_pointer(&(pvData[_col * rows]));
 }
 
 template<typename T>
-inline FastMatrix<T>& FastMatrix<T>::operator = ( value_type _value )
+inline FastMatrix<T>& FastMatrix<T>::operator = (value_type _value)
 {
     // resize to one item matrix
     resize(1, 1);
@@ -867,7 +875,7 @@ inline FastMatrix<T>& FastMatrix<T>::operator = ( value_type _value )
 }
 
 template<typename T>
-inline FastMatrix<T>& FastMatrix<T>::operator = ( FastMatrix<T>& _Right )
+inline FastMatrix<T>& FastMatrix<T>::operator = (FastMatrix<T>& _Right)
 {
     if ((&_Right) == this || (pvData == _Right.get_data() && pvData != NULL))
         return *this;
@@ -877,7 +885,7 @@ inline FastMatrix<T>& FastMatrix<T>::operator = ( FastMatrix<T>& _Right )
     }
     else {
         destroy();
-        initialize(_Right.rows, _Right.cols);
+        init(_Right.rows, _Right.cols);
         copy_from_array(_Right.get_data());
 
         //MatrixT<T>* dest = copy(&_Right);
@@ -889,7 +897,7 @@ inline FastMatrix<T>& FastMatrix<T>::operator = ( FastMatrix<T>& _Right )
 }
 
 template<typename T>
-inline FastMatrix<T> FastMatrix<T>::operator+( value_type _value )
+inline FastMatrix<T> FastMatrix<T>::operator+(value_type _value)
 {
     // Matrix addition
 #if MATRIXT_FAST_MODE
@@ -918,7 +926,7 @@ inline FastMatrix<T> FastMatrix<T>::operator+( value_type _value )
 }
 
 template<typename T>
-inline FastMatrix<T> FastMatrix<T>::operator+( FastMatrix<T>& _Right )
+inline FastMatrix<T> FastMatrix<T>::operator+(FastMatrix<T>& _Right)
 {
     // Copy the current matrix
     FastMatrix<T> _Result((FastMatrix<T> &)*this);
@@ -932,7 +940,7 @@ inline FastMatrix<T> FastMatrix<T>::operator+( FastMatrix<T>& _Right )
 
 #if _DEBUG
     if (rows != _Right.rows || cols != _Right.cols) {
-        throw _T("Incompatible dimensions in operator + ( MatrixT<T> & _Right ).");
+        throw _T("Incompatible dimensions in operator + (MatrixT<T> & _Right).");
         //exit(1);
         //_Result.copy(this);
         return _Result;
@@ -978,7 +986,7 @@ inline FastMatrix<T> FastMatrix<T>::operator+( FastMatrix<T>& _Right )
 }
 
 template<typename T>
-inline FastMatrix<T>& FastMatrix<T>::operator+=( value_type _value )
+inline FastMatrix<T>& FastMatrix<T>::operator+=(value_type _value)
 {
     // Matrix addition
 #if MATRIXT_FAST_MODE
@@ -1003,7 +1011,7 @@ inline FastMatrix<T>& FastMatrix<T>::operator+=( value_type _value )
 }
 
 template<typename T>
-inline FastMatrix<T>& FastMatrix<T>::operator+=( FastMatrix<T>& _Right )
+inline FastMatrix<T>& FastMatrix<T>::operator+=(FastMatrix<T>& _Right)
 {
 #if _DEBUG
     if (_Right.is_empty())
@@ -1015,7 +1023,7 @@ inline FastMatrix<T>& FastMatrix<T>::operator+=( FastMatrix<T>& _Right )
 
 #if _DEBUG
     if (rows != _Right.rows || cols != _Right.cols) {
-        throw _T("Incompatible dimensions in operator += ( MatrixT<T> & _Right ). ");
+        throw _T("Incompatible dimensions in operator += (MatrixT<T> & _Right). ");
         //exit(1);
         return *this;
     }
@@ -1045,7 +1053,7 @@ inline FastMatrix<T>& FastMatrix<T>::operator+=( FastMatrix<T>& _Right )
 }
 
 template<typename T>
-inline FastMatrix<T> FastMatrix<T>::operator*( value_type _value )
+inline FastMatrix<T> FastMatrix<T>::operator*(value_type _value)
 {
     // Copy the current matrix
     FastMatrix<T> _Result((FastMatrix<T> &)_Right);
@@ -1067,10 +1075,10 @@ inline
 #ifdef MULTIPLY_SSE2_NAKED
 __declspec(naked)
 #endif
-void FastMatrix<T>::CalcArrayProducts_double_SSE2( pointer dest,
+void FastMatrix<T>::CalcArrayProducts_double_SSE2(pointer dest,
                                                pointer src,
                                                pointer alpha,
-                                               unsigned int len )
+                                               unsigned int len)
 {
     __asm {
 #ifdef MULTIPLY_SSE2_NAKED
@@ -1145,7 +1153,7 @@ sse2_multiple_loop:
     }
 }
 
-#define _MM128_MEM(ptr)           (*((__m128* )(ptr))
+#define _MM128_MEM(ptr)           (*((__m128*)(ptr))
 #define _MM128I_MEM(ptr)          (*((__m128i*)(ptr))
 #define _MM128D_MEM(ptr)          (*((__m128d*)(ptr))
 
@@ -1163,7 +1171,7 @@ sse2_multiple_loop:
 #define _MULT_SSE2_MODE          2
 
 template<typename T>
-inline FastMatrix<T> FastMatrix<T>::operator*( FastMatrix<T>& _Right )
+inline FastMatrix<T> FastMatrix<T>::operator*(FastMatrix<T>& _Right)
 {
     // 首先检查乘矩阵的列数和被乘矩阵的行数是否相同
     __ANNLAB_ASSERT(cols == _Right.rows);
@@ -1210,7 +1218,7 @@ inline FastMatrix<T> FastMatrix<T>::operator*( FastMatrix<T>& _Right )
                 _mm_prefetch((char *)(temp_ptr  + 1024/8), _MM_HINT_NTA);
                 _mm_prefetch((char *)(right_ptr + 1024/8), _MM_HINT_NTA);
 
-                mm0 = _mm_load_pd(temp_ptr );
+                mm0 = _mm_load_pd(temp_ptr);
                 mm1 = _mm_load_pd(right_ptr);
 
                 mm2 = _mm_load_pd(temp_ptr  + 2);
@@ -1260,7 +1268,7 @@ inline FastMatrix<T> FastMatrix<T>::operator*( FastMatrix<T>& _Right )
                 _mm_prefetch((char *)(temp_ptr  + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
                 _mm_prefetch((char *)(right_ptr + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
 
-                mm0 = _mm_load_pd(temp_ptr );
+                mm0 = _mm_load_pd(temp_ptr);
                 mm1 = _mm_load_pd(right_ptr);
 
                 mm2 = _mm_load_pd(temp_ptr  + 2);
@@ -1281,7 +1289,7 @@ inline FastMatrix<T> FastMatrix<T>::operator*( FastMatrix<T>& _Right )
                 mm0 = _mm_hadd_pd(mm0, mm2);
                 mm0 = _mm_hadd_pd(mm0, mm0);
 
-                //mmv0 = _mm_load_pd(&_value );
+                //mmv0 = _mm_load_pd(&_value);
 
                 mm4 = _mm_hadd_pd(mm4, mm6);
                 mm4 = _mm_hadd_pd(mm4, mm4);
@@ -1383,7 +1391,7 @@ inline FastMatrix<T> FastMatrix<T>::operator*( FastMatrix<T>& _Right )
                     _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
                     _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
 
-                    mm1 = _mm_load_pd(left_ptr    );
+                    mm1 = _mm_load_pd(left_ptr   );
                     mm2 = _mm_load_pd(left_ptr + 2);
 
                     mma = _mm_load_pd(out_ptr);
@@ -1411,7 +1419,7 @@ inline FastMatrix<T> FastMatrix<T>::operator*( FastMatrix<T>& _Right )
                     _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
                     _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
 
-                    mm5 = _mm_load_pd(left_ptr + 8 );
+                    mm5 = _mm_load_pd(left_ptr + 8);
                     mm6 = _mm_load_pd(left_ptr + 10);
 #endif
                     _mm_store_pd(out_ptr + 4, mm3);
@@ -1447,7 +1455,7 @@ inline FastMatrix<T> FastMatrix<T>::operator*( FastMatrix<T>& _Right )
                     _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
                     _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
 
-                    mm1 = _mm_load_pd(left_ptr    );
+                    mm1 = _mm_load_pd(left_ptr   );
                     mm2 = _mm_load_pd(left_ptr + 2);
 
                     mm3 = _mm_load_pd(left_ptr + 4);
@@ -1459,7 +1467,7 @@ inline FastMatrix<T> FastMatrix<T>::operator*( FastMatrix<T>& _Right )
                     mm3 = _mm_mul_pd(mm3, tmp);
                     mm4 = _mm_mul_pd(mm4, tmp);
 
-                    mm1 = _mm_add_pd(mm1, *((__m128d*)(out_ptr))    );
+                    mm1 = _mm_add_pd(mm1, *((__m128d*)(out_ptr))   );
                     mm2 = _mm_add_pd(mm2, *((__m128d*)(out_ptr + 2)));
 
                     mm3 = _mm_add_pd(mm3, *((__m128d*)(out_ptr + 4)));
@@ -1472,7 +1480,7 @@ inline FastMatrix<T> FastMatrix<T>::operator*( FastMatrix<T>& _Right )
                     _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
                     _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
 
-                    mm5 = _mm_load_pd(left_ptr + 8 );
+                    mm5 = _mm_load_pd(left_ptr + 8);
                     mm6 = _mm_load_pd(left_ptr + 10);
 #endif
                     _mm_store_pd(out_ptr + 4, mm3);
@@ -1514,7 +1522,7 @@ inline FastMatrix<T> FastMatrix<T>::operator*( FastMatrix<T>& _Right )
 #else  /* !_MATRIXT_MULT_TEST_ */
 
 template<typename T>
-inline FastMatrix<T> FastMatrix<T>::operator*( FastMatrix<T>& _Right )
+inline FastMatrix<T> FastMatrix<T>::operator*(FastMatrix<T>& _Right)
 {
     // 首先检查乘矩阵的列数和被乘矩阵的行数是否相同
     __ANNLAB_ASSERT(cols == _Right.rows);
@@ -1600,7 +1608,7 @@ if (typeid(value_type) == typeid(double)) {
                     _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
                     _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
 
-                    mm1 = _mm_load_pd(left_ptr    );
+                    mm1 = _mm_load_pd(left_ptr   );
                     mm2 = _mm_load_pd(left_ptr + 2);
 
                     mma = _mm_load_pd(out_ptr);
@@ -1628,7 +1636,7 @@ if (typeid(value_type) == typeid(double)) {
                     _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
                     _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
 
-                    mm5 = _mm_load_pd(left_ptr + 8 );
+                    mm5 = _mm_load_pd(left_ptr + 8);
                     mm6 = _mm_load_pd(left_ptr + 10);
 #endif
                     _mm_store_pd(out_ptr + 4, mm3);
@@ -1664,7 +1672,7 @@ if (typeid(value_type) == typeid(double)) {
                     _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
                     _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V), _MM_HINT_NTA);
 
-                    mm1 = _mm_load_pd(left_ptr    );
+                    mm1 = _mm_load_pd(left_ptr   );
                     mm2 = _mm_load_pd(left_ptr + 2);
 
                     mm3 = _mm_load_pd(left_ptr + 4);
@@ -1676,7 +1684,7 @@ if (typeid(value_type) == typeid(double)) {
                     mm3 = _mm_mul_pd(mm3, tmp);
                     mm4 = _mm_mul_pd(mm4, tmp);
 
-                    mm1 = _mm_add_pd(mm1, *((__m128d*)(out_ptr))    );
+                    mm1 = _mm_add_pd(mm1, *((__m128d*)(out_ptr))   );
                     mm2 = _mm_add_pd(mm2, *((__m128d*)(out_ptr + 2)));
 
                     mm3 = _mm_add_pd(mm3, *((__m128d*)(out_ptr + 4)));
@@ -1689,7 +1697,7 @@ if (typeid(value_type) == typeid(double)) {
                     _mm_prefetch((char *)(left_ptr + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
                     _mm_prefetch((char *)(out_ptr  + MM_PREFETCH_OFFSET_V + 8), _MM_HINT_NTA);
 
-                    mm5 = _mm_load_pd(left_ptr + 8 );
+                    mm5 = _mm_load_pd(left_ptr + 8);
                     mm6 = _mm_load_pd(left_ptr + 10);
 #endif
                     _mm_store_pd(out_ptr + 4, mm3);
@@ -1886,7 +1894,7 @@ if (typeid(value_type) == typeid(double)) {
 #endif  // !_MATRIXT_MULT_TEST_
 
 template<typename T>
-inline FastMatrix<T>& FastMatrix<T>::operator*=( value_type _value )
+inline FastMatrix<T>& FastMatrix<T>::operator*=(value_type _value)
 {
     return *this;
     // Matrix multiplication
@@ -1899,7 +1907,7 @@ inline FastMatrix<T>& FastMatrix<T>::operator*=( value_type _value )
 }
 
 template<typename T>
-inline FastMatrix<T>& FastMatrix<T>::operator*=( FastMatrix<T>& _Right )
+inline FastMatrix<T>& FastMatrix<T>::operator*=(FastMatrix<T>& _Right)
 {
     // 首先检查乘矩阵的行数和被乘矩阵的列数是否相同
     __ANNLAB_ASSERT(cols == _Right.rows);
@@ -1935,7 +1943,7 @@ inline FastMatrix<T>& FastMatrix<T>::operator*=( FastMatrix<T>& _Right )
 }
 
 template<typename T>
-inline FastMatrix<T>& FastMatrix<T>::transpose( void )
+inline FastMatrix<T>& FastMatrix<T>::transpose(void)
 {
     // 单行或单列的矩阵, 即Vector
     if (cols == 1 || rows == 1) {
@@ -1947,57 +1955,108 @@ inline FastMatrix<T>& FastMatrix<T>::transpose( void )
 
     // 对称矩阵(方块矩阵)
     if (cols == rows) {
-        // 转置各元素
+        value_type temp;
         for (int i=0; i<rows; ++i) {
-            for (int j=i+1; j<cols; ++j)
+            for (int j=i+1; j<cols; ++j) {
+                // 仅交换需要转置的元素
+                temp = get_at(j, i);
                 set_at(j, i, get_at(i, j));
+                set_at(i, j, temp);
+            }
         }
     }
     else {
+        // 先复制一个原矩阵的副本
         FastMatrix<T> _trans((FastMatrix<T> &)*this);
-        // 转置各元素
-        for (int i=0; i<rows; ++i) {
-            for (int j=0; j<cols; ++j)
-                set_at(j, i, _trans.get_at(i, j));
-        }
+
+        // 转置行和列数
         int temp = rows;
         rows = cols;
         cols = temp;
+
+        // 转置各元素
+        for (int i=0; i<cols; ++i) {
+            for (int j=0; j<rows; ++j) {
+                set_at(j, i, _trans.get_at(i, j));
+            }
+        }
     }
 
     return *this;
 }
 
 template<typename T>
-inline int FastMatrix<T>::zeros( int _rows, int _cols )
+inline int FastMatrix<T>::zeros(void)
+{
+    // 重置大小并初始化为全0矩阵
+    return refill(INIT_FCN_ZEROS);
+}
+
+template<typename T>
+inline int FastMatrix<T>::ones(void)
+{
+    // 重置大小并初始化为全1矩阵
+    return refill(INIT_FCN_ONES);
+}
+
+template<typename T>
+inline int FastMatrix<T>::rands(void)
+{
+    // 重置大小并初始化为[-1,1]随机数矩阵
+    return refill(INIT_FCN_RANDS);
+}
+
+template<typename T>
+inline int FastMatrix<T>::rands2(void)
+{
+    // 重置大小并初始化为[0,1]随机数矩阵
+    return refill(INIT_FCN_RANDS_POSITIVE);
+}
+
+template<typename T>
+inline int FastMatrix<T>::order(void)
+{
+    // 重置大小并初始化为指定的特殊顺序排列矩阵
+    return refill(INIT_FCN_ORDER);
+}
+
+template<typename T>
+inline int FastMatrix<T>::zeros(int _rows, int _cols)
 {
     // 重置大小并初始化为全0矩阵
     return resize(_rows, _cols, INIT_FCN_ZEROS);
 }
 
 template<typename T>
-inline int FastMatrix<T>::ones( int _rows, int _cols )
+inline int FastMatrix<T>::ones(int _rows, int _cols)
 {
     // 重置大小并初始化为全1矩阵
     return resize(_rows, _cols, INIT_FCN_ONES);
 }
 
 template<typename T>
-inline int FastMatrix<T>::rands( int _rows, int _cols )
+inline int FastMatrix<T>::rands(int _rows, int _cols)
 {
     // 重置大小并初始化为[-1,1]随机数矩阵
     return resize(_rows, _cols, INIT_FCN_RANDS);
 }
 
 template<typename T>
-inline int FastMatrix<T>::rands2( int _rows, int _cols )
+inline int FastMatrix<T>::rands2(int _rows, int _cols)
 {
     // 重置大小并初始化为[0,1]随机数矩阵
     return resize(_rows, _cols, INIT_FCN_RANDS_POSITIVE);
 }
 
 template<typename T>
-inline FastMatrix<T> FastMatrix<T>::_zeros( int _rows, int _cols )
+inline int FastMatrix<T>::order(int _rows, int _cols)
+{
+    // 重置大小并初始化为指定的特殊顺序排列矩阵
+    return resize(_rows, _cols, INIT_FCN_ORDER);
+}
+
+template<typename T>
+inline FastMatrix<T> FastMatrix<T>::_zeros(int _rows, int _cols)
 {
     // Copy the current matrix
     FastMatrix<T> _zeros(_rows, _cols);
@@ -2012,7 +2071,7 @@ inline FastMatrix<T> FastMatrix<T>::_zeros( int _rows, int _cols )
 }
 
 template<typename T>
-inline FastMatrix<T> FastMatrix<T>::_ones( int _rows, int _cols )
+inline FastMatrix<T> FastMatrix<T>::_ones(int _rows, int _cols)
 {
     // Copy the current matrix
     FastMatrix<T> _ones(_rows, _cols);
@@ -2027,7 +2086,7 @@ inline FastMatrix<T> FastMatrix<T>::_ones( int _rows, int _cols )
 }
 
 template<typename T>
-inline FastMatrix<T> FastMatrix<T>::_rands( int _rows, int _cols )
+inline FastMatrix<T> FastMatrix<T>::_rands(int _rows, int _cols)
 {
     // Copy the current matrix
     FastMatrix<T> _rands(_rows, _cols);
@@ -2046,7 +2105,7 @@ inline FastMatrix<T> FastMatrix<T>::_rands( int _rows, int _cols )
 }
 
 template<typename T>
-inline FastMatrix<T> FastMatrix<T>::_rands2( int _rows, int _cols )
+inline FastMatrix<T> FastMatrix<T>::_rands2(int _rows, int _cols)
 {
     // Copy the current matrix
     CAnnMatrix _rands(_rows, _cols);
@@ -2064,9 +2123,30 @@ inline FastMatrix<T> FastMatrix<T>::_rands2( int _rows, int _cols )
 }
 
 template<typename T>
-inline void FastMatrix<T>::fill_data( int _rows, int _cols,
+inline FastMatrix<T> FastMatrix<T>::_order(int _rows, int _cols)
+{
+    // Copy the current matrix
+    CAnnMatrix _order(_rows, _cols);
+
+    // 按指定的顺序编号
+    int _nIndex;
+    for (int i=0; i<_rows; ++i) {
+        for (int j=0; j<_cols; ++j) {
+            if (order == 0)
+			    _nIndex = j * _rows + i;
+            else
+                _nIndex = i * _cols + j;
+            _order.set_at(i, j, static_cast<value_type>(_nIndex));
+        }
+    }
+
+    return _order;
+}
+
+template<typename T>
+inline void FastMatrix<T>::fill_data(int _rows, int _cols,
                            int _initFcn /*= MAT_INIT_DEFAULT */,
-                           value_type _fillVal /*= 0.0*/ )
+                           value_type _fillVal /*= 0.0*/)
 {
     ASSERT(pvData != NULL);
     ASSERT(_rows <= rows && _rows >= 0 && _cols <= cols && _cols >= 0);
@@ -2089,13 +2169,18 @@ inline void FastMatrix<T>::fill_data( int _rows, int _cols,
     case INIT_FCN_EYES:
         // 暂未提供
         break;
-    case INIT_FCN_RANDS:           // all [-1,1] randomize
+    case INIT_FCN_RANDS:           // all [-1, 1] randomize
         for (int i=0; i<_totals; ++i)
             pvData[i] = value_type(value_type(2.0) * value_type(rand()) / value_type(RAND_MAX) - value_type(1.0));
         break;
-    case INIT_FCN_RANDS_POSITIVE:  // all [0,1] positive randomize
+    case INIT_FCN_RANDS_POSITIVE:  // all [0, 1] positive randomize
         for (int i=0; i<_totals; ++i)
             pvData[i] = value_type(rand()) / value_type(RAND_MAX);
+        break;
+    case INIT_FCN_ORDER:
+		for (int i=0; i<_totals; i++) {
+			pvData[i] = value_type(i);
+		}
         break;
     case INIT_FCN_SPECIFIED:
         for (int i=0; i<_totals; ++i)
@@ -2109,9 +2194,9 @@ inline void FastMatrix<T>::fill_data( int _rows, int _cols,
 
 #define MATRIXT_INIT_FCN_FUNC_SIGNED(Ty) \
 template<> \
-inline void FastMatrix<Ty>::fill_data( int _rows, int _cols, \
+inline void FastMatrix<Ty>::fill_data(int _rows, int _cols, \
                             int _initFcn /*= MAT_INIT_DEFAULT */, \
-                            value_type _fillVal /*= 0.0*/ ) \
+                            value_type _fillVal /*= 0.0*/) \
 { \
     ASSERT(pvData != NULL); \
     ASSERT(_rows <= rows && _rows >= 0 && _cols <= cols && _cols >= 0); \
@@ -2151,6 +2236,11 @@ inline void FastMatrix<Ty>::fill_data( int _rows, int _cols, \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = (value_type)(rand() & 1); \
         break; \
+    case INIT_FCN_ORDER: \
+		for (int i=0; i<_totals; i++) { \
+			pvData[i] = value_type(i); \
+		} \
+        break; \
     case INIT_FCN_SPECIFIED: \
         for (int i=0; i<_totals; ++i) \
             pvData[i] = _fillVal; \
@@ -2163,9 +2253,9 @@ inline void FastMatrix<Ty>::fill_data( int _rows, int _cols, \
 
 #define MATRIXT_INIT_FCN_FUNC_UNSIGNED(Ty) \
 template<> \
-inline void FastMatrix<Ty>::fill_data( int _rows, int _cols, \
+inline void FastMatrix<Ty>::fill_data(int _rows, int _cols, \
                             int _initFcn /*= MAT_INIT_DEFAULT */, \
-                            value_type _fillVal /*= 0.0*/ ) \
+                            value_type _fillVal /*= 0.0*/) \
 { \
     ASSERT(pvData != NULL); \
     ASSERT(_rows <= rows && _rows >= 0 && _cols <= cols && _cols >= 0); \
@@ -2225,34 +2315,32 @@ MATRIXT_INIT_FCN_FUNC_UNSIGNED(bool)
  * the converted string is allocated by AnsiToUnicode.
  */
 
- HRESULT __fastcall AnsiToUnicode(LPCSTR pszA, LPOLESTR* ppszW)
+ HRESULT __fastcall AnsiToUnicode(LPCSTR pszA, LPOLESTR *ppszW)
 {
 
     ULONG cCharacters;
     DWORD dwError;
 
     // If input is null then just return the same.
-    if (NULL == pszA)
-    {
+    if (NULL == pszA) {
         *ppszW = NULL;
         return NOERROR;
     }
 
     // Determine number of wide characters to be allocated for the
     // Unicode string.
-    cCharacters =  strlen(pszA)+1;
+    cCharacters = strlen(pszA) + 1;
 
     // Use of the OLE allocator is required if the resultant Unicode
     // string will be passed to another COM component and if that
     // component will free it. Otherwise you can use your own allocator.
-    *ppszW = (LPOLESTR) CoTaskMemAlloc(cCharacters*2);
+    *ppszW = (LPOLESTR)CoTaskMemAlloc(cCharacters * 2);
     if (NULL == *ppszW)
         return E_OUTOFMEMORY;
 
     // Covert to Unicode.
     if (0 == MultiByteToWideChar(CP_ACP, 0, pszA, cCharacters,
-        *ppszW, cCharacters))
-    {
+            *ppszW, cCharacters)) {
         dwError = GetLastError();
         CoTaskMemFree(*ppszW);
         *ppszW = NULL;
@@ -2306,39 +2394,40 @@ HRESULT __fastcall UnicodeToAnsi(LPCOLESTR pszW, LPSTR* ppszA)
 }
 
 template<typename T>
-void FastMatrix<T>::display( void )
+void FastMatrix<T>::display(void)
 {
     display(name());
 }
 
 template<typename T>
-void FastMatrix<T>::display( const TCHAR *szText )
+void FastMatrix<T>::display(const TCHAR *szText)
 {
 #if defined(ANNLAB_USE_DISPLAY) && (ANNLAB_USE_DISPLAY)
-    TCHAR* szTypeName = NULL;
-    AnsiToUnicode(typeid(T).name(), &szTypeName);
-    TRACE(("MatrixT<%s>: Name = [ %s ], [rows = %d, cols = %d]\n"), szTypeName, szText, rows, cols);
+    TCHAR *szTypeName = NULL;
+    //AnsiToUnicode(typeid(T).name(), &szTypeName);
+    TRACE(("FastMatrix<%s>: Name = [ %s ], [rows = %d, cols = %d]\n"), typeid(T).name(), szText, rows, cols);
+    //TRACE(_T("FastMatrix<double>: Name = [ %s ], [rows = %d, cols = %d]\n"), szText, rows, cols);
     TRACE(_T("============================================================================================================\n\n"));
     for (int r=0; r<rows; r++) {
         TRACE(_T("\t"));
         for (int c=0; c<cols; c++) {
-            value_type value = get_at(r, c);
-            if (fabs(value) < static_cast<T>(10000000.0))
-                TRACE(_T("%12.4f "), value);
+            value_type _value = get_at(r, c);
+            if (fabs(_value) < static_cast<T>(10000000.0))
+                TRACE(_T("%12.4f "), _value);
             else
-                TRACE(_T("%12.4E "), value);
+                TRACE(_T("%12.4E "), _value);
         }
         TRACE(_T("\n\n"));
     }
     TRACE(_T("============================================================================================================\n\n"));
-    if (szTypeName != NULL)
-        CoTaskMemFree(szTypeName);
+    //if (szTypeName != NULL)
+    //    CoTaskMemFree(szTypeName);
 #endif
 }
 
 #define MATRIXT_DISPLAY_FUNC_SIGNED(Ty) \
 template<> \
-void FastMatrix<Ty>::display( const TCHAR *szText ) \
+void FastMatrix<Ty>::display(const TCHAR *szText) \
 { \
     TRACE(_T("MatrixT<")_T(#Ty)_T(">: Name = [ %s ], [rows = %d, cols = %d]\n"), szText, rows, cols); \
     TRACE(_T("============================================================================================================\n\n")); \
@@ -2354,7 +2443,7 @@ void FastMatrix<Ty>::display( const TCHAR *szText ) \
 
 #define MATRIXT_DISPLAY_FUNC_UNSIGNED(Ty) \
 template<> \
-void FastMatrix<Ty>::display( const TCHAR *szText ) \
+void FastMatrix<Ty>::display(const TCHAR *szText) \
 { \
     TRACE(_T("MatrixT<")_T(#Ty)_T(">: Name = [ %s ], [rows = %d, cols = %d]\n"), szText, rows, cols); \
     TRACE(_T("============================================================================================================\n\n")); \
@@ -2383,22 +2472,22 @@ MATRIXT_DISPLAY_FUNC_UNSIGNED(bool)
 #endif
 
 template<typename T>
-void FastMatrix<T>::display_ex( void )
+void FastMatrix<T>::display_ex(void)
 {
     display_ex(name());
 }
 
 template<typename T>
-void FastMatrix<T>::display_ex( const TCHAR *szText )
+void FastMatrix<T>::display_ex(const TCHAR *szText)
 {
 #if defined(ANNLAB_USE_DISPLAY_EX) && (ANNLAB_USE_DISPLAY_EX)
     char*  szTypeNameA = NULL;
     TCHAR* szTypeName = NULL;
 #ifdef _UNICODE
-    szTypeNameA = (char* )typeid(T).name();
+    szTypeNameA = (char*)typeid(T).name();
     AnsiToUnicode(szTypeNameA, &szTypeName);
 #else
-    szTypeNameA = (char* )typeid(T).name();
+    szTypeNameA = (char*)typeid(T).name();
     szTypeName = szTypeNameA;
 #endif
     TRACE(_T("MatrixT<%s>: Name = [ %s ], [rows = %d, cols = %d]\n"), szTypeName, szText, rows, cols);
@@ -2438,7 +2527,7 @@ void FastMatrix<T>::display_ex( const TCHAR *szText )
 
 #define MATRIXT_DISPLAY_EX_FUNC_SIGNED(Ty) \
 template<> \
-void FastMatrix<Ty>::display_ex( const TCHAR *szText ) \
+void FastMatrix<Ty>::display_ex(const TCHAR *szText) \
 { \
     TRACE(_T("MatrixT<")_T(#Ty)_T(">: Name = [ %s ], [rows = %d, cols = %d]\n"), szText, rows, cols); \
     TRACE(_T("============================================================================================================\n\n")); \
@@ -2454,7 +2543,7 @@ void FastMatrix<Ty>::display_ex( const TCHAR *szText ) \
 
 #define MATRIXT_DISPLAY_EX_FUNC_UNSIGNED(Ty) \
 template<> \
-void FastMatrix<Ty>::display_ex( const TCHAR *szText ) \
+void FastMatrix<Ty>::display_ex(const TCHAR *szText) \
 { \
     TRACE(_T("MatrixT<")_T(#Ty)_T(">: Name = [ %s ], [rows = %d, cols = %d]\n"), szText, rows, cols); \
     TRACE(_T("============================================================================================================\n\n")); \
