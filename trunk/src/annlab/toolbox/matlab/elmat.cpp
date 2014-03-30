@@ -5,41 +5,41 @@
 namespace annlab {
 
 // 重置大小并初始化为全0矩阵
-CAnnMatrix zeros( int _rows, int _cols )
+CAnnMatrix zeros(int _rows, int _cols)
 {
 	CAnnMatrix _result(_rows, _cols, MAT_INIT_ZEROS);
 	return _result;
 }
 
 // 重置大小并初始化为全1矩阵
-CAnnMatrix ones( int _rows, int _cols )
+CAnnMatrix ones(int _rows, int _cols)
 {
 	CAnnMatrix _result(_rows, _cols, MAT_INIT_ONES);
 	return _result;
 }
 
-CAnnMatrix eyes( int _rows, int _cols )
+CAnnMatrix eyes(int _rows, int _cols)
 {
 	CAnnMatrix _result(_rows, _cols, MAT_INIT_EYES);
 	return _result;
 }
 
 // 重置大小并初始化为[-1,1]随机数矩阵
-CAnnMatrix rands( int _rows, int _cols )
+CAnnMatrix rands(int _rows, int _cols)
 {
 	CAnnMatrix _result(_rows, _cols, MAT_INIT_RANDS);
 	return _result;
 }
 
 // 重置大小并初始化为[0,1]随机数矩阵
-CAnnMatrix rands2( int _rows, int _cols )
+CAnnMatrix rands2(int _rows, int _cols)
 {
 	CAnnMatrix _result(_rows, _cols, MAT_INIT_RANDS_POSITIVE);
 	return _result;
 }
 
 ///*
-CAnnMatrix transpose( const CAnnMatrix &mat )
+CAnnMatrix transpose(const CAnnMatrix &mat)
 {
     if (mat.cols == 1 || mat.rows == 1) {
         CAnnMatrix _Result(mat);		// copy ourselves
@@ -49,10 +49,15 @@ CAnnMatrix transpose( const CAnnMatrix &mat )
     }
     else if (mat.cols == mat.rows) {
         CAnnMatrix _Result(mat);		// copy ourselves
-	    // 转置各元素
+
+        double temp;
 	    for (int i=0; i<mat.rows; ++i) {
-		    for (int j=i+1; j<mat.cols; ++j)
-			    _Result.set_element(j, i, mat.get_element(i, j));
+            for (int j=i+1; j<mat.cols; ++j) {
+                // 仅交换需要转置的元素
+                temp = _Result.get_element(i, j);
+			    _Result.set_element(j, i, _Result.get_element(i, j));
+                _Result.set_element(i, j, temp);
+            }
 	    }
         return _Result;
     }
@@ -69,7 +74,7 @@ CAnnMatrix transpose( const CAnnMatrix &mat )
 //*/
 
 /*
-CAnnMatrix& transpose( const CAnnMatrix &mat )
+CAnnMatrix& transpose(const CAnnMatrix &mat)
 {
     if (mat.cols == 1 || mat.rows == 1) {
         CAnnMatrix& _Result = *(CAnnMatrix *)new CAnnMatrix(mat);
@@ -79,10 +84,14 @@ CAnnMatrix& transpose( const CAnnMatrix &mat )
     }
     else if (mat.cols == mat.rows) {
         CAnnMatrix& _Result = *(CAnnMatrix *)new CAnnMatrix(mat);
-	    // 转置各元素
+
 	    for (int i=0; i<mat.rows; ++i) {
-		    for (int j=i+1; j<mat.cols; ++j)
-			    _Result.set_element(j, i, mat.get_element(i, j));
+		    for (int j=i+1; j<mat.cols; ++j) {
+                // 仅交换需要转置的元素
+                temp = _Result.get_element(i, j);
+			    _Result.set_element(j, i, _Result.get_element(i, j));
+                _Result.set_element(i, j, temp);
+            }
 	    }
         return _Result;
     }
@@ -98,7 +107,7 @@ CAnnMatrix& transpose( const CAnnMatrix &mat )
 }
 //*/
 
-CAnnMatrix expand_row( CAnnMatrix &mat, int _rows )
+CAnnMatrix expand_row(CAnnMatrix &mat, int _rows)
 {
 	CAnnMatrix _Result(_rows, mat.cols);
 	for (int i=0; i<_Result.rows; i++) {
@@ -109,7 +118,7 @@ CAnnMatrix expand_row( CAnnMatrix &mat, int _rows )
 	return _Result;
 }
 
-CAnnMatrix expand_col( CAnnMatrix &mat, int _cols )
+CAnnMatrix expand_col(CAnnMatrix &mat, int _cols)
 {
 	CAnnMatrix _Result(mat.rows, _cols);
 	for (int i=0; i<_Result.cols; i++) {
@@ -120,7 +129,7 @@ CAnnMatrix expand_col( CAnnMatrix &mat, int _cols )
 	return _Result;
 }
 
-CAnnMatrix diag( CAnnMatrix &mat )
+CAnnMatrix diag(CAnnMatrix &mat)
 {
 	CAnnMatrix _Result;
 	int _size = MIN(mat.rows, mat.cols);
@@ -136,7 +145,7 @@ CAnnMatrix diag( CAnnMatrix &mat )
 	return _Result;
 }
 
-CAnnMatrix abs( CAnnMatrix &mat )
+CAnnMatrix abs(CAnnMatrix &mat)
 {
 	CAnnMatrix _Result(mat);
 	int _index = 0;
@@ -149,7 +158,7 @@ CAnnMatrix abs( CAnnMatrix &mat )
 	return _Result;
 }
 
-CAnnMatrix sqrt( CAnnMatrix &mat )
+CAnnMatrix sqrt(CAnnMatrix &mat)
 {
 	CAnnMatrix _Result(mat);
 	int _index = 0;
@@ -172,7 +181,7 @@ CAnnMatrix sqrt( CAnnMatrix &mat )
  **            12    15    18 
  ****************************************************************************/
 
-CAnnMatrix sum( CAnnMatrix &m )
+CAnnMatrix sum(CAnnMatrix &m)
 {
 	int _cols = m.cols;
 	CAnnMatrix _Result(1, _cols);
@@ -185,7 +194,7 @@ CAnnMatrix sum( CAnnMatrix &m )
 	return _Result;
 }
 
-CAnnMatrix sumsqrt( CAnnMatrix &m )
+CAnnMatrix sumsqrt(CAnnMatrix &m)
 {
 	int _cols = m.cols;
 	CAnnMatrix _Result(1, _cols);
@@ -198,7 +207,7 @@ CAnnMatrix sumsqrt( CAnnMatrix &m )
 	return _Result;
 }
 
-CAnnMatrix sign( CAnnMatrix &m )
+CAnnMatrix sign(CAnnMatrix &m)
 {
 	double _sign;
 	CAnnMatrix _Result(m);
@@ -247,7 +256,7 @@ CAnnMatrix sign( CAnnMatrix &m )
 	end
 **********************************************************************/
 
-CAnnMatrix norm( CAnnMatrix &m )
+CAnnMatrix norm(CAnnMatrix &m)
 {
 	int mr, mc;
 	CAnnMatrix n;
@@ -290,7 +299,7 @@ CAnnMatrix norm( CAnnMatrix &m )
 	end
 **********************************************************************/
 
-CAnnMatrix normr( CAnnMatrix &m )
+CAnnMatrix normr(CAnnMatrix &m)
 {
 	int mr, mc;
 	CAnnMatrix n;
@@ -340,7 +349,7 @@ CAnnMatrix linspace(double d1, double d2, int n)
 	if (n > 1) {
 		_Result.resize(1, n);
 		for (int i=0; i<n; i++) {
-			_Result.set_element(0, i, d1 + i * (d2 - d1)/( n - 1));
+			_Result.set_element(0, i, d1 + i * (d2 - d1)/(n - 1));
 		}
 	}
 	else if (n == 1) {
@@ -350,14 +359,14 @@ CAnnMatrix linspace(double d1, double d2, int n)
 	return _Result;
 }
 
-CAnnMatrix randnr( int _rows, int _cols )
+CAnnMatrix randnr(int _rows, int _cols)
 {
 	CAnnMatrix _Result;
 	_Result = normr(rands(_rows, _cols));
 	return _Result;
 }
 
-double dotprod( const CAnnVector &x, const CAnnVector &y )
+double dotprod(const CAnnVector &x, const CAnnVector &y)
 {
 	//  Check for compatible dimensions:
 	if (x.size() != y.size()) {
@@ -372,7 +381,7 @@ double dotprod( const CAnnVector &x, const CAnnVector &y )
 	return prods;
 }
 
-CAnnMatrix dotprod( const CAnnMatrix &x, const CAnnMatrix &y )
+CAnnMatrix dotprod(const CAnnMatrix &x, const CAnnMatrix &y)
 {
 	CAnnMatrix _Result;
 
@@ -413,7 +422,7 @@ CAnnMatrix dotprod( const CAnnMatrix &x, const CAnnMatrix &y )
 	return _Result;
 }
 
-CAnnMatrix dotdiv( const CAnnMatrix &x, const CAnnMatrix &y )
+CAnnMatrix dotdiv(const CAnnMatrix &x, const CAnnMatrix &y)
 {
 	CAnnMatrix _Result;
 
