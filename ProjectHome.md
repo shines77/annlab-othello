@@ -1,0 +1,1 @@
+a annlab about othello
